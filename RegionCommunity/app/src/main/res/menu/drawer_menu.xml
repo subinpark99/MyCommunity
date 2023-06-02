@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/ulsan"
+        android:title="@string/ulsan"
+        android:icon="@drawable/icon_surfing"/>
+
+    <item
+        android:id="@+id/busan"
+        android:title="@string/busan"
+        android:icon="@drawable/icon_sea"/>
+
+</menu>
