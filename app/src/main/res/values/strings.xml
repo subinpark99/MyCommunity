@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Community</string>
+    <string name="home">Home</string>
+    <string name="mypage">MyPage</string>
+    <string name="back">back</string>
+    <string name="forward">forward</string>
+    <string name="userEmail">psb0000@naver.com</string>
+    <string name="userAddress">울산광역시 남구</string>
+    <string name="ulsan">울산광역시</string>
+    <string name="busan">부산광역시</string>
+    <string name="splashtext">My City, My Community</string>
+    <string name="nickname">닉네임 </string>
+    <string name="putnickname">닉네임을 입력하세요. </string>
+    <string name="putemail">이메일을 입력하세요. </string>
+    <string name="email">이메일 </string>
+    <string name="password">비밀번호 </string>
+    <string name="againpassword">비밀번호 재입력</string>
+    <string name="city">지역 선택</string>
+</resources>
