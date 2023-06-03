@@ -5,9 +5,10 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.view.GravityCompat
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.community.R
 import com.example.community.databinding.ActivityMainBinding
-import com.example.community.ui.adpater.ExpandableListAdapter
 import com.google.android.material.navigation.NavigationView
 
 class MainActivity :
@@ -27,6 +28,13 @@ class MainActivity :
 
     private fun initNavi(){
 
+        val navHostFragment =   // FragmentContainerView
+            supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        binding.navBar.setupWithNavController(navController)
+        binding.navBar.background = null   // 바텀네비게이션 배경 없애기
+
         val navView=binding.drawerNav
         val toolbar=binding.toolbar
 
@@ -35,7 +43,6 @@ class MainActivity :
         supportActionBar?.setHomeAsUpIndicator(R.drawable.icon_menu) // 홈버튼 이미지 변경
         supportActionBar?.setDisplayShowTitleEnabled(false) // 툴바에 타이틀 안보이게
         navView.setNavigationItemSelectedListener(this)
-
 
     }
 
@@ -88,6 +95,5 @@ class MainActivity :
         }
         return false
     }
-
-
+    
 }

@@ -2,8 +2,8 @@
     <string name="app_name">Community</string>
     <string name="home">Home</string>
     <string name="mypage">MyPage</string>
-    <string name="back">back</string>
-    <string name="forward">forward</string>
+    <string name="notice">Notice</string>
+    <string name="writing">Writing</string>
     <string name="userEmail">psb0000@naver.com</string>
     <string name="userAddress">울산광역시 남구</string>
     <string name="ulsan">울산광역시</string>
@@ -13,7 +13,16 @@
     <string name="putnickname">닉네임을 입력하세요. </string>
     <string name="putemail">이메일을 입력하세요. </string>
     <string name="email">이메일 </string>
+    <string name="noticetxt">알림 </string>
     <string name="password">비밀번호 </string>
     <string name="againpassword">비밀번호 재입력</string>
     <string name="city">지역 선택</string>
+    <string name="timecnt">10분 전</string>
+    <string name="views">328</string>
+    <string name="title">오늘 다들 뭐하셨나요?</string>
+    <string name="content">저는 오늘 하루종일 잤어요.</string>
+    <string name="writenotice">글 쓰기</string>
+    <string name="writetitle">제목</string>
+    <string name="writecontent">내용을 입력해주세요</string>
+    <string name="currentlocation">현재 위치 - </string>
 </resources>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/noticeiv"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/icon_small_notice"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toTopOf="@id/noticetv"
+        app:layout_constraintBottom_toBottomOf="@id/ver_line3"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/noticetv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="새로운 댓글이 달렸어요"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/noticeiv" />
+
+    <TextView
+        android:id="@+id/notice_content_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:text="@string/content"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="15dp"
+        android:textSize="15sp"
+        app:layout_constraintStart_toEndOf="@id/noticeiv"
+        app:layout_constraintTop_toBottomOf="@id/noticetv"/>
+
+    <TextView
+        android:id="@+id/notice_date_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="6월 4일"
+        android:layout_marginTop="6dp"
+        android:textSize="13sp"
+        android:textColor="@color/gray"
+        app:layout_constraintTop_toBottomOf="@id/notice_content_tv"
+        app:layout_constraintStart_toStartOf="@id/notice_content_tv"/>
+
+    <TextView
+        android:id="@+id/notice_time_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="11:40"
+        android:textSize="13sp"
+        android:textColor="@color/gray"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintTop_toTopOf="@id/notice_date_tv"
+        app:layout_constraintStart_toEndOf="@id/notice_date_tv"/>
+
+
+    <View
+        android:id="@+id/ver_line3"
+        android:layout_width="match_parent"
+        android:layout_height="0.2dp"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:background="#D3D6D3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/notice_date_tv"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

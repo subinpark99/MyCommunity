@@ -1,4 +1,4 @@
-package com.example.community.ui.adpater
+package com.example.community.ui
 
 import android.content.Context
 import android.view.LayoutInflater

@@ -8,12 +8,40 @@
     <fragment
         android:id="@+id/homeFragment"
         tools:layout="@layout/fragment_home"
-        android:name="com.example.community.ui.HomeFragment"
+        android:name="com.example.community.ui.home.HomeFragment"
         android:label="HomeFragment" />
     <fragment
         android:id="@+id/myPageFragment"
         tools:layout="@layout/fragment_mypage"
-        android:name="com.example.community.ui.MyPageFragment"
-        android:label="MyPageFragment" />
+        android:name="com.example.community.ui.mypage.MyPageFragment"
+        android:label="MyPageFragment" >
+        <action
+            android:id="@+id/action_myPageFragment_to_myReplyFragment"
+            app:destination="@id/myReplyFragment" />
+        <action
+            android:id="@+id/action_myPageFragment_to_myContentsFragment"
+            app:destination="@id/myContentsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/writingFragment"
+        tools:layout="@layout/fragment_writing"
+        android:name="com.example.community.ui.writing.WritingFragment"
+        android:label="WritingFragment" />
+
+    <fragment
+        android:id="@+id/noticeFragment"
+        tools:layout="@layout/fragment_notice"
+        android:name="com.example.community.ui.notice.NoticeFragment"
+        android:label="NoticeFragment" />
+    <fragment
+        android:id="@+id/myReplyFragment"
+        tools:layout="@layout/fragment_myreply"
+        android:name="com.example.community.ui.mypage.MyReplyFragment"
+        android:label="MyReplyFragment" />
+    <fragment
+        android:id="@+id/myContentsFragment"
+        tools:layout="@layout/fragment_mycontents"
+        android:name="com.example.community.ui.mypage.MyContentsFragment"
+        android:label="MyContentsFragment" />
 
 </navigation>
