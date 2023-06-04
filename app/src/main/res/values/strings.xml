@@ -15,7 +15,6 @@
     <string name="email">이메일 </string>
     <string name="noticetxt">알림 </string>
     <string name="password">비밀번호 </string>
-    <string name="againpassword">비밀번호 재입력</string>
     <string name="city">지역 선택</string>
     <string name="timecnt">10분 전</string>
     <string name="views">328</string>
@@ -25,4 +24,5 @@
     <string name="writetitle">제목</string>
     <string name="writecontent">내용을 입력해주세요</string>
     <string name="currentlocation">현재 위치 - </string>
+    <string name="setlocation">지역을 설정해주세요</string>
 </resources>
