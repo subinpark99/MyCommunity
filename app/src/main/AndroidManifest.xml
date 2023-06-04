@@ -35,8 +35,9 @@
         </activity>
 
         <activity android:name=".ui.MainActivity"/>
-        <activity android:name=".ui.SignUpActivity"/>
-        <activity android:name=".ui.OcrActivity"/>
+        <activity android:name=".ui.signup_login.SignUpActivity"/>
+        <activity android:name=".ui.signup_login.OcrActivity"/>
+        <activity android:name=".ui.signup_login.LoginActivity"/>
     </application>
 
 </manifest>

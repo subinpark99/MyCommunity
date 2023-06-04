@@ -33,15 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/signup_iv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_signup"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:padding="30dp"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

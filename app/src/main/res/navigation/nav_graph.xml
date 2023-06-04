@@ -21,6 +21,9 @@
         <action
             android:id="@+id/action_myPageFragment_to_myContentsFragment"
             app:destination="@id/myContentsFragment" />
+        <action
+            android:id="@+id/action_myPageFragment_to_loginActivity"
+            app:destination="@id/loginActivity" />
     </fragment>
     <fragment
         android:id="@+id/writingFragment"
@@ -43,5 +46,11 @@
         tools:layout="@layout/fragment_mycontents"
         android:name="com.example.community.ui.mypage.MyContentsFragment"
         android:label="MyContentsFragment" />
+
+    <activity
+        android:id="@+id/loginActivity"
+        tools:layout="@layout/activity_login"
+        android:name="com.example.community.ui.signup_login.LoginActivity"
+        android:label="LoginActivity" />
 
 </navigation>
