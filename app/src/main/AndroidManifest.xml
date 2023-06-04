@@ -9,6 +9,11 @@
     <!-- Android 10 (API level 29) and higher. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
+    <uses-permission android:name="android.permission.CAMERA"/> <!--카메라 권한-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>    <!--저장소 읽기 권한-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />    <!--저장소 쓰기 권한-->
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -31,6 +36,7 @@
 
         <activity android:name=".ui.MainActivity"/>
         <activity android:name=".ui.SignUpActivity"/>
+        <activity android:name=".ui.OcrActivity"/>
     </application>
 
 </manifest>

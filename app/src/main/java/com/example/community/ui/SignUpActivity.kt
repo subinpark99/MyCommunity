@@ -30,8 +30,8 @@ class SignUpActivity:AppCompatActivity() {
         setContentView(binding.root)
         init()
 
-        //등록
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this) // 등록
 
         binding.submitBtn.setOnClickListener {  // 제출하기
             val intent = Intent(this, MainActivity::class.java)
@@ -42,6 +42,16 @@ class SignUpActivity:AppCompatActivity() {
             binding.setLocationTv.text=""
             checkLocationPermission()
         }
+
+        binding.identicLocationIv.setOnClickListener {
+            val intent = Intent(this,OcrActivity::class.java)
+            startActivity(intent)
+        }
+
+        if (intent.hasExtra("location")){
+            binding.setLocationTv.text=intent.getStringExtra("location")
+        }
+
     }
 
     //퍼미션 체크 및 권한 요청 함수
