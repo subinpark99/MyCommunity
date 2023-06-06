@@ -4,6 +4,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <!-- Navigation DrawerLayout-->
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -56,25 +60,27 @@
         android:id="@+id/drawer_nav"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:headerLayout="@layout/item_drawer_header"
         android:layout_gravity="start">
 
         <LinearLayout
+            android:id="@+id/header_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
             android:orientation="vertical">
-
-        <include
-            android:id="@+id/nav_header_menu"
-            layout="@layout/item_drawer_header" />
 
         <ExpandableListView
             android:id="@+id/expanded_menu"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:groupIndicator="@null" />
+
         </LinearLayout>
+
 
     </com.google.android.material.navigation.NavigationView>
     </androidx.drawerlayout.widget.DrawerLayout>
 
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

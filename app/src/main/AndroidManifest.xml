@@ -15,6 +15,7 @@
         tools:ignore="ScopedStorage" />    <!--저장소 쓰기 권한-->
 
     <application
+        android:name=".data.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -34,7 +35,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.MainActivity"/>
+        <activity android:name=".ui.MainActivity"
+            android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".ui.signup_login.SignUpActivity"/>
         <activity android:name=".ui.signup_login.OcrActivity"/>
         <activity android:name=".ui.signup_login.LoginActivity"/>

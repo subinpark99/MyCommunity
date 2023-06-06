@@ -52,5 +52,10 @@
         tools:layout="@layout/activity_login"
         android:name="com.example.community.ui.signup_login.LoginActivity"
         android:label="LoginActivity" />
+    <activity
+        android:id="@+id/signUpActivity"
+        tools:layout="@layout/activity_signup"
+        android:name="com.example.community.ui.signup_login.SignUpActivity"
+        android:label="SignUpActivity" />
 
 </navigation>

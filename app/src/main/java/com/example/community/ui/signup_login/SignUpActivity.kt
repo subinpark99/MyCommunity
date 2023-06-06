@@ -14,19 +14,24 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.example.community.data.entity.User
 import com.example.community.databinding.ActivitySignupBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import java.util.*
+
 
 class SignUpActivity:AppCompatActivity() {
     private lateinit var binding:ActivitySignupBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var auth : FirebaseAuth
+    private lateinit var db : DatabaseReference
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +39,6 @@ class SignUpActivity:AppCompatActivity() {
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
         init()
-
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this) // 등록
 
@@ -53,6 +57,8 @@ class SignUpActivity:AppCompatActivity() {
         }
 
         auth = Firebase.auth
+        db=FirebaseDatabase.getInstance().reference
+
         initSignupButton() // 회원가입 버튼 클릭
     }
 
@@ -140,10 +146,16 @@ class SignUpActivity:AppCompatActivity() {
         binding.submitBtn.setOnClickListener {
             val email = binding.putEmailTv.text.toString()
             val password = binding.putPasswordTv.text.toString()
+            val nickname=binding.putNicknameEv.text.toString()
+            val location=binding.setLocationTv.text.toString()
 
             auth.createUserWithEmailAndPassword(email,password)
                 .addOnCompleteListener { task ->
                     if(task.isSuccessful){
+
+                        val user= User(email,password,nickname,location)
+
+                        db.child("user").child(auth.uid.toString()).setValue(user)
 
                         val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
                         startActivity(intent)
@@ -155,6 +167,7 @@ class SignUpActivity:AppCompatActivity() {
                 }
         }
     }
+
 
     private fun init() {
 

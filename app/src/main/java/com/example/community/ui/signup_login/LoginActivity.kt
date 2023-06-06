@@ -7,16 +7,21 @@ import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.community.data.MyApplication
+import com.example.community.data.entity.User
 import com.example.community.databinding.ActivityLoginBinding
 import com.example.community.ui.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 
 class LoginActivity:AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-
     private lateinit var auth: FirebaseAuth
+    private val userRef = Firebase.database.getReference("user")
+    private var gson : Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,23 +38,40 @@ class LoginActivity:AppCompatActivity() {
             val email = binding.putEmailTv.text.toString()
             val password = binding.putPasswordTv.text.toString()
 
-            if (email.isNotEmpty() and password.isNotEmpty()) {
+            if (email.isEmpty() or password.isEmpty()) {
+                return@setOnClickListener
+            }
 
-                auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Toast.makeText(this, "로그인에 성공했습니다!", Toast.LENGTH_SHORT).show()
-                            val intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        var users: User
 
-                        } else {
-                            Toast.makeText(this, "아이디와 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
+                        auth.currentUser?.let { it1 ->
+                            userRef.child(it1.uid).get().addOnSuccessListener {
+                                if (it != null) {
+
+                                    users= it.getValue(User::class.java)!!
+
+                                    saveData(auth.currentUser!!.uid,users)
+                                    val intent = Intent(this, MainActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                } }
                         }
-                    }
+                        } else {
+                            Toast.makeText(this, "아이디와 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show() }
             }
         }
     }
 
+    private fun saveData(uid:String,user:User){
+
+        val userJson=gson.toJson(user)
+        MyApplication.prefs.setUser("user",userJson)  // current user 정보 저장
+
+        MyApplication.prefs.setUid("uid",uid) // current user uid 저장
+    }
 
     private fun init() {
 

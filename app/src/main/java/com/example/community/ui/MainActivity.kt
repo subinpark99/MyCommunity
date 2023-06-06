@@ -3,24 +3,33 @@ package com.example.community.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.GravityCompat
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.community.R
+import com.example.community.data.MyApplication
+import com.example.community.data.entity.User
 import com.example.community.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
+import com.google.gson.Gson
 
 class MainActivity :
     AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener
 {
     private lateinit var binding: ActivityMainBinding
+    private lateinit var user: User
+    private val gson : Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val userJson= MyApplication.prefs.getUser("user","")
+        user=gson.fromJson(userJson,User::class.java)
 
         initNavi()
         setExpandableList()
@@ -37,12 +46,19 @@ class MainActivity :
 
         val navView=binding.drawerNav
         val toolbar=binding.toolbar
+        val headerView= navView.getHeaderView(0)
 
         setSupportActionBar(toolbar)  // toolbar setting
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // 드로어를 꺼낼 홈 버튼 활성화
         supportActionBar?.setHomeAsUpIndicator(R.drawable.icon_menu) // 홈버튼 이미지 변경
         supportActionBar?.setDisplayShowTitleEnabled(false) // 툴바에 타이틀 안보이게
         navView.setNavigationItemSelectedListener(this)
+
+        val userEmailView = headerView.findViewById<TextView>(R.id.user_email_tv)
+        val userAddressView = headerView.findViewById<TextView>(R.id.user_address_tv)
+
+        userEmailView.text=user.email
+        userAddressView.text=user.location
 
     }
 
@@ -85,6 +101,7 @@ class MainActivity :
 
     // drawer menu item click
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
         when(item.itemId){
             R.id.ulsan ->{
                 Toast.makeText(this,"ulsan",Toast.LENGTH_SHORT).show()
