@@ -306,7 +306,7 @@
                                 <PersistentState>
                                   <option name="values">
                                     <map>
-                                      <entry key="url" value="file:$USER_HOME$/Library/Android/sdk/icons/material/materialicons/arrow_back/baseline_arrow_back_24.xml" />
+                                      <entry key="url" value="file:$USER_HOME$/Library/Android/sdk/icons/material/materialicons/add_comment/baseline_add_comment_24.xml" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -316,8 +316,8 @@
                         </option>
                         <option name="values">
                           <map>
-                            <entry key="color" value="1d1d1d" />
-                            <entry key="outputName" value="icon_back" />
+                            <entry key="color" value="727171" />
+                            <entry key="outputName" value="icon_add_reply_24" />
                           </map>
                         </option>
                       </PersistentState>

@@ -9,7 +9,11 @@
         android:id="@+id/homeFragment"
         tools:layout="@layout/fragment_home"
         android:name="com.example.community.ui.home.HomeFragment"
-        android:label="HomeFragment" />
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/action_homeFragment_to_inContentFragment"
+            app:destination="@id/inContentFragment" />
+    </fragment>
     <fragment
         android:id="@+id/myPageFragment"
         tools:layout="@layout/fragment_mypage"
@@ -57,5 +61,17 @@
         tools:layout="@layout/activity_signup"
         android:name="com.example.community.ui.signup_login.SignUpActivity"
         android:label="SignUpActivity" />
+    <fragment
+        android:id="@+id/inContentFragment"
+        tools:layout="@layout/fragment_in_content"
+        android:name="com.example.community.ui.home.InContentFragment"
+        android:label="InContentFragment" >
+        <action
+            android:id="@+id/action_inContentFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="post"
+            app:argType="com.example.community.data.entity.Post" />
+    </fragment>
 
 </navigation>

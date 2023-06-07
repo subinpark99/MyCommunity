@@ -1,31 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/layout_click"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/home_title_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:text="@string/title"
         android:textColor="@color/black"
         android:textStyle="bold"
         android:textSize="18sp"
+        android:maxLines="1"
+        android:ellipsize="end"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"/>
 
     <TextView
         android:id="@+id/home_content_tv"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textColor="@color/black"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="20dp"
         android:text="@string/content"
-        android:layout_marginTop="7dp"
+        android:textColor="@color/black"
         android:textSize="16sp"
+        android:maxLines="3"
+        android:ellipsize="end"
+        app:layout_constraintEnd_toStartOf="@id/image_ex_iv"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/home_title_tv"/>
+        app:layout_constraintTop_toBottomOf="@id/home_title_tv" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image_ex_iv"
@@ -33,6 +44,7 @@
         android:layout_height="80dp"
         android:src="@drawable/icon_photo"
         android:layout_margin="5dp"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -97,11 +109,13 @@
         android:layout_width="match_parent"
         android:layout_height="0.2dp"
         android:layout_marginTop="5dp"
-        android:layout_marginBottom="7dp"
+        android:layout_marginBottom="3dp"
         android:background="#D3D6D3"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/content_time_tv"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

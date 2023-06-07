@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
+
+   <androidx.appcompat.widget.AppCompatImageView
+       android:id="@+id/back_iv"
+       android:layout_width="35dp"
+       android:layout_height="33dp"
+       android:layout_marginStart="10dp"
+       android:src="@drawable/icon_back"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/title_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/title"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@drawable/writing_border"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/content_tv"
+            android:text="@string/content"
+            android:layout_margin="10dp"
+            android:textColor="@color/black"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/img_rv"
+            android:text="@string/title"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="horizontal"
+            android:layout_marginStart="10dp"
+            tools:listitem="@layout/item_photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/user_nickname_tv"
+                android:text="@string/nickname"
+                android:textSize="13sp"
+                android:textColor="@color/deep_green"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/content_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/timecnt"
+                android:layout_marginStart="5dp"
+                android:textSize="13sp"
+                android:textColor="@color/gray"
+                app:layout_constraintTop_toBottomOf="@id/home_content_tv"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="15dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/icon_view_24"/>
+
+
+            <TextView
+            android:id="@+id/view_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/views"
+                android:layout_marginEnd="5dp"
+            android:textSize="13sp"
+            android:textColor="@color/gray"
+            app:layout_constraintTop_toBottomOf="@id/home_content_tv"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_margin="10dp"
+            android:orientation="vertical">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reply_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/writing_border"
+                tools:listitem="@layout/item_comment"
+                android:scrollbars="vertical" />
+
+
+            <LinearLayout
+                android:id="@+id/reply_reply_lv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <EditText
+                    android:id="@+id/reply_reply_et"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="대댓글 작성" />
+
+                <Button
+                    android:id="@+id/reply_reply_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="작성" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/reply_et"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:padding="9dp"
+            android:textSize="15sp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/reply_border"
+            android:hint="@string/writereply" />
+
+        <Button
+            android:id="@+id/reply_submit_bnt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/deep_green"
+            android:text="@string/writedone" />
+
+    </LinearLayout>
+
+    </LinearLayout>
+
+</layout>
