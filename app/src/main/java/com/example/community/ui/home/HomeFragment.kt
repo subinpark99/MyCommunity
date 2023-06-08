@@ -48,7 +48,6 @@ class HomeFragment: Fragment() {
         super.onStart()
 
         getPost()
-
     }
 
     private fun getPost(){
@@ -59,11 +58,11 @@ class HomeFragment: Fragment() {
             layoutManager= LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         }
 
-        postDB.addValueEventListener(object :ValueEventListener{
+        postDB.orderByChild("date").addValueEventListener(object :ValueEventListener{  // 날짜 기준 내림차순 정렬(reversed)
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists())
                 {
-                   for( contentSnapshot in snapshot.children){
+                   for( contentSnapshot in snapshot.children.reversed()){
                        val post=contentSnapshot.getValue(Post::class.java)
                        if (post != null) {
                            rvAdpater.submitList(post)

@@ -65,6 +65,9 @@ class WritingFragment: Fragment() {
 
         binding.writeDoneIv.setOnClickListener {  // 작성 완료
             addPost()
+            binding.writingContentEt.text=null
+            binding.writingTitleEt.text=null
+            binding.writeGalleryRv.layoutManager=null
         }
 
         return binding.root
