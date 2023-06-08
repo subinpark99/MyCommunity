@@ -91,7 +91,7 @@ class WritingFragment: Fragment() {
 
             user = gson.fromJson(userJson, User::class.java)
 
-            val addpost = Post(0, userUid, user.nickname, currentTime, 0, title, content, imgList)
+            val addpost = Post(0, user.location,user.age,userUid, user.nickname, currentTime, 0, title, content, imgList)
             setPost(addpost)
             Toast.makeText(requireContext(),"완료",Toast.LENGTH_SHORT).show()
         }

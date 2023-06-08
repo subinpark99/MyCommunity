@@ -58,11 +58,14 @@ class HomeFragment: Fragment() {
             layoutManager= LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         }
 
-        postDB.orderByChild("date").addValueEventListener(object :ValueEventListener{  // 날짜 기준 내림차순 정렬(reversed)
+        val postdb=postDB.orderByChild("location").equalTo(user.location)
+        postdb.addValueEventListener(object :ValueEventListener{  // 내 지역에 있는 게시물만 가져오기
             override fun onDataChange(snapshot: DataSnapshot) {
+
                 if (snapshot.exists())
                 {
-                   for( contentSnapshot in snapshot.children.reversed()){
+                  for( contentSnapshot in snapshot.children.reversed()){ // reversed로 최근 게시물이 위로 오게
+
                        val post=contentSnapshot.getValue(Post::class.java)
                        if (post != null) {
                            rvAdpater.submitList(post)

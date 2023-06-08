@@ -30,4 +30,9 @@
     <string name="writereply">댓글 작성</string>
     <string name="writedone">완료</string>
     <string name="delete">삭제</string>
+    <string name="age">age</string>
+    <string name="ㅁㅎㄷ">나이</string>
+    <string name="bini">bini</string>
+    <string name="_25">25</string>
+    <string name="_20">20대</string>
 </resources>

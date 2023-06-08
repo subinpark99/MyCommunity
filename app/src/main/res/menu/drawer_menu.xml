@@ -6,9 +6,4 @@
         android:title="@string/ulsan"
         android:icon="@drawable/icon_surfing"/>
 
-    <item
-        android:id="@+id/busan"
-        android:title="@string/busan"
-        android:icon="@drawable/icon_sea"/>
-
 </menu>

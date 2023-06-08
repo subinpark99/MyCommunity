@@ -5,6 +5,8 @@ import android.os.Parcelable
 
 data class Post(  // 게시글
     var postIdx: Int=0,
+    var location:String="",
+    val age:Int=0,
     val uid: String = "",
     val nickname: String = "",
     val date: String ="",
@@ -14,6 +16,8 @@ data class Post(  // 게시글
     val imgs: List<String>?=null
 ):Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
+        parcel.readString().toString(),
         parcel.readInt(),
         parcel.readString().toString(),
         parcel.readString().toString(),

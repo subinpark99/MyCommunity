@@ -73,5 +73,18 @@
             android:name="post"
             app:argType="com.example.community.data.entity.Post" />
     </fragment>
+    <fragment
+        android:id="@+id/ageFragment"
+        tools:layout="@layout/fragment_age"
+        android:name="com.example.community.ui.other.AgeFragment"
+        android:label="AgeFragment" >
+        <action
+            android:id="@+id/action_ageFragment_to_inContentFragment"
+            app:destination="@id/inContentFragment" />
+    </fragment>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.community.ui.other.MainActivity"
+        android:label="MainActivity" />
 
 </navigation>

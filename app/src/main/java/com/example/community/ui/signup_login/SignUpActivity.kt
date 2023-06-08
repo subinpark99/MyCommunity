@@ -95,7 +95,7 @@ class SignUpActivity:AppCompatActivity() {
                                     }
                                 //울산광역시 남구 달동
                                 binding.setLocationTv
-                                    .append("${address[1]} ${address[2]} ${address[3]}")
+                                    .append("${address[1]} ${address[2]}")
                             }
                     }
                 }
@@ -148,26 +148,31 @@ class SignUpActivity:AppCompatActivity() {
             val password = binding.putPasswordTv.text.toString()
             val nickname=binding.putNicknameEv.text.toString()
             val location=binding.setLocationTv.text.toString()
+            val age=binding.putAgeEv.text.toString()
 
-            auth.createUserWithEmailAndPassword(email,password)
-                .addOnCompleteListener { task ->
-                    if(task.isSuccessful){
+            if(email.isEmpty() or password.isEmpty() or nickname.isEmpty() or location.isEmpty() or age.isEmpty()) {
+                Toast.makeText(this,"정보를 입력해주세요",Toast.LENGTH_SHORT).show()
+                return@setOnClickListener }
 
-                        val user= User(email,password,nickname,location)
+                auth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
 
-                        db.child("user").child(auth.uid.toString()).setValue(user)
+                            val user = User(email, password, nickname, location,age.toInt())
 
-                        val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
-                        startActivity(intent)
+                            db.child("user").child(auth.uid.toString()).setValue(user)
 
-                        Toast.makeText(this,"회원가입에 성공했습니다!",Toast.LENGTH_SHORT).show()
-                    }else{
-                        Toast.makeText(this,"이미 존재하는 계정이거나, 회원가입에 실패했습니다.",Toast.LENGTH_SHORT).show()
-                    }
-                }
+                            val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
+                            startActivity(intent)
+
+                            Toast.makeText(this, "회원가입에 성공했습니다!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this, "이미 존재하는 계정이거나, 회원가입에 실패했습니다.", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+            }
         }
     }
-
 
     private fun init() {
 

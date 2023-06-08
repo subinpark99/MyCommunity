@@ -4,5 +4,6 @@ data class User(
     val email:String="",
     val pw:String="",
     val nickname:String="",
-    val location:String=""
+    val location:String="",
+    val age:Int=0
 )

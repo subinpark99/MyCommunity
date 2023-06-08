@@ -10,14 +10,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.community.data.MyApplication
 import com.example.community.data.entity.User
 import com.example.community.databinding.ActivityLoginBinding
-import com.example.community.ui.MainActivity
+import com.example.community.ui.other.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 
-class LoginActivity:AppCompatActivity() {
+class  LoginActivity:AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private val userRef = Firebase.database.getReference("user")
