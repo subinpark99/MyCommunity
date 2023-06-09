@@ -28,7 +28,13 @@ class MyPageFragment: Fragment() {
 
         auth = Firebase.auth
 
+       nav()
 
+        return binding.root
+    }
+
+
+    private fun nav(){
         binding.mycontentsTv.setOnClickListener {
             view?.findNavController()?.navigate(R.id.action_myPageFragment_to_myContentsFragment)
         }
@@ -42,9 +48,8 @@ class MyPageFragment: Fragment() {
             view?.findNavController()?.navigate(R.id.action_myPageFragment_to_loginActivity)
             activity?.finish()
         }
-
-        return binding.root
     }
+
 
     override fun onStart() {
         super.onStart()

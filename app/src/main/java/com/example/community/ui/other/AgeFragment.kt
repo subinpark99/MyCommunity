@@ -6,31 +6,34 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.community.data.MyApplication
 import com.example.community.data.entity.Post
 import com.example.community.data.entity.User
 import com.example.community.databinding.FragmentAgeBinding
 import com.example.community.ui.home.ContentRVAdpater
-import com.example.community.ui.home.HomeFragmentDirections
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 
 
-class AgeFragment(
-    private val ageRange:String,private val user:User): Fragment() {
+class AgeFragment: Fragment() {
 
     private var _binding: FragmentAgeBinding? = null
     private val binding get() = _binding!!
     private val postDB= Firebase.database.getReference("post")
     private lateinit var range: IntRange
+    private lateinit var ageRange: String
+    private lateinit var user:User
+    private val gson : Gson = Gson()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,19 +45,24 @@ class AgeFragment(
 
         binding.backIv.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
-            startActivity(intent)
-            }
+            startActivity(intent) }
+
+        ageRange=arguments?.getString("age","").toString()
+        val userJson= MyApplication.prefs.getUser("user","")
+        user=gson.fromJson(userJson,User::class.java)
 
        binding.ageTv.text=ageRange
-        val age=mutableListOf("10대", "20대","30대","40대","50대","60대")
-        if (ageRange==age[0]) range=10..19
-        if (ageRange==age[1]) range=20..29
-        if (ageRange==age[2]) range=30..39
-        if (ageRange==age[3]) range=40..49
-        if (ageRange==age[4]) range=50..59
-        if (ageRange==age[5]) range=60..69
 
-        getAgePost()
+        val ageRanges = listOf(
+            "10대" to 10..19,
+            "20대" to 20..29,
+            "30대" to 30..39,
+            "40대" to 40..49,
+            "50대" to 50..59,
+            "60대" to 60..69
+        )
+
+        range = ageRanges.firstOrNull { it.first == ageRange }?.second!!
 
         return binding.root
     }
@@ -95,9 +103,8 @@ class AgeFragment(
             override fun onContentClicked(post: Post) {
                 onPostClicked(post.postIdx)
 
-              //  val arguments=AgeFragmentDirections.
-                //val arguments= HomeFragmentDirections.actionHomeFragmentToInContentFragment(post)
-                //findNavController().navigate(arguments)
+                val arguments=AgeFragmentDirections.actionAgeFragmentToInContentFragment(post)
+                findNavController().navigate(arguments)
             }
         })
     }
@@ -124,6 +131,7 @@ class AgeFragment(
     override fun onStart() {
         super.onStart()
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+        getAgePost()
     }
 
     override fun onStop() {

@@ -14,15 +14,15 @@
             android:layout_height="35dp"
             android:layout_marginStart="15dp"
             android:src="@drawable/icon_back"
-            app:layout_constraintTop_toTopOf="@id/myreplytv"
-            app:layout_constraintBottom_toBottomOf="@id/myreplytv"
+            app:layout_constraintTop_toTopOf="@id/mycontenttv"
+            app:layout_constraintBottom_toBottomOf="@id/mycontenttv"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <TextView
-            android:id="@+id/myreplytv"
+            android:id="@+id/mycontenttv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="내가 쓴 댓글"
+            android:text="@string/mycontent"
             android:textSize="23sp"
             android:textColor="@color/black"
             android:textStyle="bold"
@@ -32,12 +32,12 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/myreply_rv"
+            android:id="@+id/mycontent_rv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="20dp"
             tools:listitem="@layout/item_home_contents"
-            app:layout_constraintTop_toBottomOf="@id/myreplytv"
+            app:layout_constraintTop_toBottomOf="@id/mycontenttv"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

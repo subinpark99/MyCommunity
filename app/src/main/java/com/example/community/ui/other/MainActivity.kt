@@ -6,9 +6,10 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.community.R
@@ -26,6 +27,7 @@ class MainActivity :
     private lateinit var user: User
     private val gson : Gson = Gson()
     private lateinit var drawerLayout:DrawerLayout
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,16 +37,16 @@ class MainActivity :
         val userJson= MyApplication.prefs.getUser("user","")
         user=gson.fromJson(userJson,User::class.java)
 
+        val navHostFragment =   // FragmentContainerView
+            supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
+        navController = navHostFragment.navController
+
         drawerLayout=binding.drawerLayout
         initNavi()
         setAge()
     }
 
     private fun initNavi(){
-
-        val navHostFragment =   // FragmentContainerView
-            supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
-        val navController = navHostFragment.navController
 
         binding.navBar.setupWithNavController(navController)
         binding.navBar.background = null   // 바텀네비게이션 배경 없애기
@@ -108,25 +110,23 @@ class MainActivity :
                     when (childPosition) {
                         0, 1, 2, 3, 4, 5 -> {
 
-                            val replace: Fragment? = when (childPosition) {
+                            val replace = when (childPosition) {
                                 0, 1, 2, 3, 4, 5 -> {
                                     if (childPosition < ageRange.size) {
                                         val ageValue = ageRange[childPosition]
-                                        AgeFragment(ageValue,user)  // menuitem의 ageRange 전달
+                                        val bundle=
+                                            bundleOf("age" to ageValue)
 
+                                        navController.navigate(R.id.ageFragment,bundle)
                                     } else {
-                                        null
-                                    }
+                                        null  }
                                 }
                                 else -> null
                             }
                             if (replace != null) {
-                                replaceFragment(replace)
-                                drawerLayout.closeDrawer(GravityCompat.START)
-                            }
+                                drawerLayout.closeDrawer(GravityCompat.START) }
                         }
                     }
-
                     true
                 }
                 else -> {
@@ -134,13 +134,6 @@ class MainActivity :
                 false}
             }
         }
-    }
-
-
-    private fun replaceFragment(fragment: Fragment) {  // activity -> fragment
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.nav_host, fragment)
-            .commit()
     }
 
     // drawer menu item click

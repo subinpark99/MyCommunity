@@ -8,4 +8,5 @@ data class Comment( // 댓글
     var commentIdx:Int=0,
     val nickname: String="",
     val date: String="",
+    val time:String=""
 )

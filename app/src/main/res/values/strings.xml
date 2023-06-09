@@ -35,4 +35,6 @@
     <string name="bini">bini</string>
     <string name="_25">25</string>
     <string name="_20">20대</string>
+    <string name="mycontent">내가 쓴 글</string>
+    <string name="myreply">내가 쓴 댓글</string>
 </resources>

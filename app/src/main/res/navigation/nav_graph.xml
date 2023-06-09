@@ -44,12 +44,20 @@
         android:id="@+id/myReplyFragment"
         tools:layout="@layout/fragment_myreply"
         android:name="com.example.community.ui.mypage.MyReplyFragment"
-        android:label="MyReplyFragment" />
+        android:label="MyReplyFragment" >
+        <action
+            android:id="@+id/action_myReplyFragment_to_inContentFragment"
+            app:destination="@id/inContentFragment" />
+    </fragment>
     <fragment
         android:id="@+id/myContentsFragment"
         tools:layout="@layout/fragment_mycontents"
         android:name="com.example.community.ui.mypage.MyContentsFragment"
-        android:label="MyContentsFragment" />
+        android:label="MyContentsFragment" >
+        <action
+            android:id="@+id/action_myContentsFragment_to_inContentFragment"
+            app:destination="@id/inContentFragment" />
+    </fragment>
 
     <activity
         android:id="@+id/loginActivity"
@@ -72,6 +80,12 @@
         <argument
             android:name="post"
             app:argType="com.example.community.data.entity.Post" />
+        <action
+            android:id="@+id/action_inContentFragment_to_myContentsFragment"
+            app:destination="@id/myContentsFragment" />
+        <action
+            android:id="@+id/action_inContentFragment_to_myReplyFragment"
+            app:destination="@id/myReplyFragment" />
     </fragment>
     <fragment
         android:id="@+id/ageFragment"
@@ -81,6 +95,12 @@
         <action
             android:id="@+id/action_ageFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
+        <argument
+            android:name="ageRange"
+            app:argType="string" />
+        <argument
+            android:name="location"
+            app:argType="string" />
     </fragment>
     <activity
         android:id="@+id/mainActivity"

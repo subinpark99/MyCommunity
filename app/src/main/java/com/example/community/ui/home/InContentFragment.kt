@@ -82,9 +82,12 @@ class InContentFragment : Fragment() {
                 return@setOnClickListener
             }
             val formatter = DateTimeFormatter.ofPattern("MM/dd")
-            val currentTime = LocalDateTime.now().format(formatter)
+            val timeFormatter=DateTimeFormatter.ofPattern("HH:mm")
+
+            val currentDate = LocalDateTime.now().format(formatter)
+            val currentTime=LocalDateTime.now().format(timeFormatter)
             val comment =
-                Comment(userUid, postData.postIdx, content, 0, user.nickname, currentTime)
+                Comment(userUid, postData.postIdx, content, 0, user.nickname, currentDate,currentTime)
             setPost(comment)
             binding.replyEt.text=null
         }
