@@ -27,12 +27,12 @@ import com.googlecode.tesseract.android.TessBaseAPI
 import java.io.*
 
 
-class OcrActivity: AppCompatActivity() {
+class OcrActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOcrBinding
 
     private var image: Bitmap? = null  // 사용되는 이미지
-    private lateinit var loadImg:Uri
+    private lateinit var loadImg: Uri
     private var mTess: TessBaseAPI? = null // Tess API reference
     private var datapath = ""  // 언어 데이터가 있는 경로
     private lateinit var ocrTv: TextView // OCR 결과뷰
@@ -53,11 +53,11 @@ class OcrActivity: AppCompatActivity() {
 
         binding.doneIv.setOnClickListener {  // 제출하기
 
-            if (image==null){
-                Toast.makeText(this, "이미지를 선택해주세요",Toast.LENGTH_SHORT).show()
-            }else {
+            if (image == null) {
+                Toast.makeText(this, "이미지를 선택해주세요", Toast.LENGTH_SHORT).show()
+            } else {
                 val intent = Intent(this, SignUpActivity::class.java)
-                intent.putExtra("location",ocrTv.text.toString())
+                intent.putExtra("location", ocrTv.text.toString())
                 startActivity(intent)
             }
         }
@@ -66,7 +66,7 @@ class OcrActivity: AppCompatActivity() {
             if (it.resultCode == Activity.RESULT_OK) {
                 val intent = checkNotNull(it.data)
 
-                loadImg= intent.data!!
+                loadImg = intent.data!!
 
                 Glide.with(this) // 화면에 이미지 불러오기
                     .load(loadImg)
@@ -112,27 +112,27 @@ class OcrActivity: AppCompatActivity() {
         return img.copy(Bitmap.Config.ARGB_8888, true)
     }
 
-    private fun loadBitmapFromMediaStoreBy(photoUri: Uri) : Bitmap?{ // uri to bitmap
+    private fun loadBitmapFromMediaStoreBy(photoUri: Uri): Bitmap? { // uri to bitmap
         var image: Bitmap? = null
-        try{
-            image = if(Build.VERSION.SDK_INT > 27){
+        try {
+            image = if (Build.VERSION.SDK_INT > 27) {
                 val source: ImageDecoder.Source =
                     ImageDecoder.createSource(this.contentResolver, photoUri)
                 ImageDecoder.decodeBitmap(source)
 
-            }else{
+            } else {
                 MediaStore.Images.Media.getBitmap(this.contentResolver, photoUri)
             }
-        }catch(e:IOException){
+        } catch (e: IOException) {
             e.printStackTrace()
         }
         return image
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
-    private fun getLocationText(){
+    private fun getLocationText() {
 
-        image= loadBitmapFromMediaStoreBy(loadImg)?.let { aRGBBitmap(it) }
+        image = loadBitmapFromMediaStoreBy(loadImg)?.let { aRGBBitmap(it) }
 
         //언어파일 경로
         datapath = "$filesDir/tesseract/"
@@ -147,7 +147,7 @@ class OcrActivity: AppCompatActivity() {
         mTess = TessBaseAPI()
         mTess!!.init(datapath, lang)
 
-        ocrTv=binding.getLocationTv
+        ocrTv = binding.getLocationTv
         processImage()
 
     }
@@ -159,7 +159,7 @@ class OcrActivity: AppCompatActivity() {
         mTess!!.setImage(image)
         ocrRst = mTess!!.utF8Text
 
-        val test=ocrRst.split("\n")  // 한 문장씩 출력
+        val test = ocrRst.split("\n")  // 한 문장씩 출력
         ocrTv.text = test[3]
     }
 

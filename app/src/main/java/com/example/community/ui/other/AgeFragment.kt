@@ -24,15 +24,15 @@ import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 
 
-class AgeFragment: Fragment() {
+class AgeFragment : Fragment() {
 
     private var _binding: FragmentAgeBinding? = null
     private val binding get() = _binding!!
-    private val postDB= Firebase.database.getReference("post")
+    private val postDB = Firebase.database.getReference("post")
     private lateinit var range: IntRange
     private lateinit var ageRange: String
-    private lateinit var user:User
-    private val gson : Gson = Gson()
+    private lateinit var user: User
+    private val gson: Gson = Gson()
 
 
     override fun onCreateView(
@@ -45,13 +45,14 @@ class AgeFragment: Fragment() {
 
         binding.backIv.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
-            startActivity(intent) }
+            startActivity(intent)
+        }
 
-        ageRange=arguments?.getString("age","").toString()
-        val userJson= MyApplication.prefs.getUser("user","")
-        user=gson.fromJson(userJson,User::class.java)
+        ageRange = arguments?.getString("age", "").toString()
+        val userJson = MyApplication.prefs.getUser("user", "")
+        user = gson.fromJson(userJson, User::class.java)
 
-       binding.ageTv.text=ageRange
+        binding.ageTv.text = ageRange
 
         val ageRanges = listOf(
             "10대" to 10..19,
@@ -68,24 +69,23 @@ class AgeFragment: Fragment() {
     }
 
 
-    private fun getAgePost(){
+    private fun getAgePost() {
 
-        val rvAdpater= ContentRVAdpater(requireContext())
+        val rvAdpater = ContentRVAdpater(requireContext())
         binding.ageContentsRv.apply {
-            adapter=rvAdpater
-            layoutManager= LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            adapter = rvAdpater
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         }
 
         postDB.orderByChild("location").equalTo(user.location)
-        val postdb=postDB.orderByChild("location").equalTo(user.location)
+        val postdb = postDB.orderByChild("location").equalTo(user.location)
         postdb.addValueEventListener(object : ValueEventListener {  // 내 지역에 있는 게시물만 가져오기
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                if (snapshot.exists())
-                {
-                    for( contentSnapshot in snapshot.children.reversed()){ // reversed로 최근 게시물이 위로 오게
+                if (snapshot.exists()) {
+                    for (contentSnapshot in snapshot.children.reversed()) { // reversed로 최근 게시물이 위로 오게
 
-                        val post=contentSnapshot.getValue(Post::class.java)
+                        val post = contentSnapshot.getValue(Post::class.java)
                         if (post != null) {
                             if (post.age in range) {
                                 rvAdpater.submitList(post)
@@ -94,23 +94,25 @@ class AgeFragment: Fragment() {
                     }
                 }
             }
+
             override fun onCancelled(error: DatabaseError) {
-                Log.d("getPost",error.toString())
+                Log.d("getPost", error.toString())
             }
         })
 
-        rvAdpater.setItemClickListener(object : ContentRVAdpater.InContentInterface{
+        rvAdpater.setItemClickListener(object : ContentRVAdpater.InContentInterface {
             override fun onContentClicked(post: Post) {
                 onPostClicked(post.postIdx)
 
-                val arguments=AgeFragmentDirections.actionAgeFragmentToInContentFragment(post)
+                val arguments = AgeFragmentDirections.actionAgeFragmentToInContentFragment(post)
                 findNavController().navigate(arguments)
             }
         })
     }
 
     fun onPostClicked(postIdx: Int) {
-        val updatedPost = FirebaseDatabase.getInstance().getReference("post").child(postIdx.toString()) // 글 조회수 가져와서 증가
+        val updatedPost = FirebaseDatabase.getInstance().getReference("post")
+            .child(postIdx.toString()) // 글 조회수 가져와서 증가
         updatedPost.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val post = snapshot.getValue(Post::class.java)
@@ -121,8 +123,9 @@ class AgeFragment: Fragment() {
                     updatedPost.setValue(post)
                 }
             }
+
             override fun onCancelled(error: DatabaseError) {
-                Log.d("onPostClicked",error.toString())
+                Log.d("onPostClicked", error.toString())
             }
         })
     }

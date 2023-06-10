@@ -17,6 +17,7 @@ import com.example.community.data.entity.Comment
 import com.example.community.data.entity.Post
 import com.example.community.data.entity.User
 import com.example.community.databinding.FragmentInContentBinding
+import com.example.community.ui.writing.GalleryAdapter
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -71,7 +72,7 @@ class InContentFragment : Fragment() {
         binding.contentTv.text = postData.content
         binding.userNicknameTv.text = postData.nickname
         binding.titleTv.text = postData.title
-        binding.titleTv.isSelected=true
+        binding.titleTv.isSelected = true
         binding.viewTv.text = postData.view.toString()
 
 
@@ -82,14 +83,22 @@ class InContentFragment : Fragment() {
                 return@setOnClickListener
             }
             val formatter = DateTimeFormatter.ofPattern("MM/dd")
-            val timeFormatter=DateTimeFormatter.ofPattern("HH:mm")
+            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
             val currentDate = LocalDateTime.now().format(formatter)
-            val currentTime=LocalDateTime.now().format(timeFormatter)
+            val currentTime = LocalDateTime.now().format(timeFormatter)
             val comment =
-                Comment(userUid, postData.postIdx, content, 0, user.nickname, currentDate,currentTime)
+                Comment(
+                    userUid,
+                    postData.postIdx,
+                    content,
+                    0,
+                    user.nickname,
+                    currentDate,
+                    currentTime
+                )
             setPost(comment)
-            binding.replyEt.text=null
+            binding.replyEt.text = null
         }
 
         val adapter = CommentAdapter(userUid)
@@ -101,31 +110,39 @@ class InContentFragment : Fragment() {
 
             binding.deleteTv.setOnClickListener {
                 deletePost() // 게시글 삭제
-                }
             }
         }
 
-    private fun getComment(adapter: CommentAdapter){  // 댓글 데이터 불러와서 화면에 표시
+        val imgAdapter = GalleryAdapter(requireContext())
+        postData.imgs?.let { imgAdapter.submitList(it) }
+        binding.imgRv.adapter = imgAdapter
+        binding.imgRv.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+    }
 
-        binding.replyRv.adapter=adapter
-        binding.replyRv.layoutManager=LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
+    private fun getComment(adapter: CommentAdapter) {  // 댓글 데이터 불러와서 화면에 표시
 
-        commentDB.addValueEventListener(object :ValueEventListener{
+        binding.replyRv.adapter = adapter
+        binding.replyRv.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+
+        commentDB.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val comments= ArrayList<Comment>() // 새로운 댓글
+                val comments = ArrayList<Comment>() // 새로운 댓글
                 if (snapshot.exists()) {
-                    for(cmSnapShot in snapshot.children) {
+                    for (cmSnapShot in snapshot.children) {
                         val data = cmSnapShot.getValue(Comment::class.java)
 
-                        if (data != null && data.postIdx==postData.postIdx) {
+                        if (data != null && data.postIdx == postData.postIdx) {
                             comments.add(data)
                         }
                     }
                 }
                 adapter.submitList(comments)  // 댓글 전체 update
             }
+
             override fun onCancelled(error: DatabaseError) {
-                Log.d("getCommentFail",error.toString())
+                Log.d("getCommentFail", error.toString())
             }
         })
     }
@@ -143,17 +160,18 @@ class InContentFragment : Fragment() {
 
     private fun deletePost() {
 
-        val postIdx= postData.postIdx // 게시글 삭제
+        val postIdx = postData.postIdx // 게시글 삭제
 
-        commentDB.orderByChild("postIdx").equalTo(postIdx.toDouble()) // commentDB 에서 postIdx가 postDB의 postIdx와 같을 때
+        commentDB.orderByChild("postIdx")
+            .equalTo(postIdx.toDouble()) // commentDB 에서 postIdx가 postDB의 postIdx와 같을 때
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
 
                     for (commentSnapshot in dataSnapshot.children) { // 각 댓글에 대한 데이터
-                         commentSnapshot.ref.removeValue()
+                        commentSnapshot.ref.removeValue()
                     }
 
-                     postDB.child(postIdx.toString()).removeValue()
+                    postDB.child(postIdx.toString()).removeValue()
 
                     val arguments =
                         InContentFragmentDirections.actionInContentFragmentToHomeFragment()
@@ -169,31 +187,31 @@ class InContentFragment : Fragment() {
 
 
     private fun setPost(comment: Comment) { // commentIdx 1씩 증가
-            getLastCommentIdx { lastCommentIdx ->
-                val newCommentIdx = lastCommentIdx + 1
-                comment.commentIdx = newCommentIdx
-                commentDB.child(newCommentIdx.toString()).setValue(comment)
-            }
+        getLastCommentIdx { lastCommentIdx ->
+            val newCommentIdx = lastCommentIdx + 1
+            comment.commentIdx = newCommentIdx
+            commentDB.child(newCommentIdx.toString()).setValue(comment)
         }
+    }
 
-        private fun getLastCommentIdx(completion: (Int) -> Unit) { // 마지막 commentIdx 값 불러옴
-            commentDB.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    var lastCommentIdx = 0
-                    for (commentSnapshot in snapshot.children) {
-                        val comment = commentSnapshot.getValue(Comment::class.java)
-                        if (comment != null && comment.commentIdx > lastCommentIdx) {
-                            lastCommentIdx = comment.commentIdx
-                        }
+    private fun getLastCommentIdx(completion: (Int) -> Unit) { // 마지막 commentIdx 값 불러옴
+        commentDB.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var lastCommentIdx = 0
+                for (commentSnapshot in snapshot.children) {
+                    val comment = commentSnapshot.getValue(Comment::class.java)
+                    if (comment != null && comment.commentIdx > lastCommentIdx) {
+                        lastCommentIdx = comment.commentIdx
                     }
-                    completion(lastCommentIdx)
                 }
+                completion(lastCommentIdx)
+            }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d("getLastCommentIdx", error.toString())
-                }
-            })
-        }
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("getLastCommentIdx", error.toString())
+            }
+        })
+    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onStart() {

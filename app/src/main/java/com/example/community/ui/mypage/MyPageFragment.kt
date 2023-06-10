@@ -13,10 +13,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
-class MyPageFragment: Fragment() {
+class MyPageFragment : Fragment() {
     private var _binding: FragmentMypageBinding? = null
     private val binding get() = _binding!!
-    private lateinit var auth : FirebaseAuth
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,13 +28,13 @@ class MyPageFragment: Fragment() {
 
         auth = Firebase.auth
 
-       nav()
+        nav()
 
         return binding.root
     }
 
 
-    private fun nav(){
+    private fun nav() {
         binding.mycontentsTv.setOnClickListener {
             view?.findNavController()?.navigate(R.id.action_myPageFragment_to_myContentsFragment)
         }

@@ -17,13 +17,14 @@ import com.example.community.databinding.ItemHomeContentsBinding
 
 
 class ContentRVAdpater(
-    private val context:Context):
-    RecyclerView.Adapter<ContentRVAdpater.ViewHolder>(){
+    private val context: Context
+) :
+    RecyclerView.Adapter<ContentRVAdpater.ViewHolder>() {
 
     private val items = ArrayList<Post>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitList(post:Post) {
+    fun submitList(post: Post) {
         this.items.add(post)
         notifyDataSetChanged()
     }
@@ -31,13 +32,18 @@ class ContentRVAdpater(
     interface InContentInterface {
         fun onContentClicked(post: Post)
     }
+
     private lateinit var itemClickListener: InContentInterface
     fun setItemClickListener(myItemClickListener: InContentInterface) {
         itemClickListener = myItemClickListener
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-        val binding: ItemHomeContentsBinding = ItemHomeContentsBinding.inflate(LayoutInflater.from(viewGroup.context),viewGroup,false)
+        val binding: ItemHomeContentsBinding = ItemHomeContentsBinding.inflate(
+            LayoutInflater.from(viewGroup.context),
+            viewGroup,
+            false
+        )
         return ViewHolder(binding)
     }
 
@@ -47,30 +53,31 @@ class ContentRVAdpater(
             bind(items[position])
 
             binding.layoutClick.setOnClickListener {  // 게시물 클릭시 조회수 증가
-                val views=items[position].view+1
-                val update=items[position].copy(view=views)
+                val views = items[position].view + 1
+                val update = items[position].copy(view = views)
                 itemClickListener.onContentClicked(update)
             }
 
-            if (items[position].imgs!=null){
-                img.visibility=View.VISIBLE
+            if (items[position].imgs != null) {
+                img.visibility = View.VISIBLE
 
-                items[position].imgs?.get(0)?.let { displayImage(it,binding.imageExIv) }
+                items[position].imgs?.get(0)?.let { displayImage(it, binding.imageExIv) }
             }
         }
     }
 
     override fun getItemCount(): Int = items.size
 
-    inner class ViewHolder(val binding: ItemHomeContentsBinding): RecyclerView.ViewHolder(binding.root){
-        val img=binding.imageExIv
-        fun bind(post: Post){
+    inner class ViewHolder(val binding: ItemHomeContentsBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        val img = binding.imageExIv
+        fun bind(post: Post) {
 
-            binding.contentTimeTv.text=post.date
-            binding.homeContentTv.text=post.content
-            binding.homeTitleTv.text=post.title
-            binding.userNicknameTv.text=post.nickname
-            binding.contentViewsTv.text=post.view.toString()
+            binding.contentTimeTv.text = post.date
+            binding.homeContentTv.text = post.content
+            binding.homeTitleTv.text = post.title
+            binding.userNicknameTv.text = post.nickname
+            binding.contentViewsTv.text = post.view.toString()
 
         }
     }

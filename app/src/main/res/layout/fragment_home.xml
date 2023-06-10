@@ -12,25 +12,25 @@
             android:id="@+id/ly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
             android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/location"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            android:src="@drawable/icon_cur_location"/>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/location"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:src="@drawable/icon_cur_location" />
 
-        <TextView
-            android:id="@+id/current_location_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/userAddress"
-            android:textColor="@color/black"
-            android:layout_marginStart="7dp"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/current_location_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:text="@string/userAddress"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -39,9 +39,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="20dp"
-            tools:listitem="@layout/item_home_contents"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ly"/>
+            app:layout_constraintTop_toBottomOf="@id/ly"
+            tools:listitem="@layout/item_home_contents" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

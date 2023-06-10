@@ -10,8 +10,8 @@ import com.example.community.data.entity.Comment
 import com.example.community.databinding.ItemCommentBinding
 
 
-class CommentAdapter(private val userUid:String):
-    RecyclerView.Adapter<CommentAdapter.ViewHolder>(){
+class CommentAdapter(private val userUid: String) :
+    RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
 
     private val items = arrayListOf<Comment>()
 
@@ -23,15 +23,17 @@ class CommentAdapter(private val userUid:String):
     }
 
     interface DeleteInterface {
-        fun onDeleteClicked(commentIdx:Int)
+        fun onDeleteClicked(commentIdx: Int)
     }
+
     private lateinit var itemClickListener: DeleteInterface
     fun setItemClickListener(myItemClickListener: DeleteInterface) {
         itemClickListener = myItemClickListener
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-        val binding: ItemCommentBinding = ItemCommentBinding.inflate(LayoutInflater.from(viewGroup.context),viewGroup,false)
+        val binding: ItemCommentBinding =
+            ItemCommentBinding.inflate(LayoutInflater.from(viewGroup.context), viewGroup, false)
         return ViewHolder(binding)
     }
 
@@ -40,8 +42,8 @@ class CommentAdapter(private val userUid:String):
         holder.apply {
             bind(items[position])
         }
-        if (userUid==items[position].uid){
-            holder.binding.deleteCommentTv.visibility=View.VISIBLE
+        if (userUid == items[position].uid) {
+            holder.binding.deleteCommentTv.visibility = View.VISIBLE
             holder.binding.deleteCommentTv.setOnClickListener {
                 itemClickListener.onDeleteClicked(items[position].commentIdx)
             }
@@ -51,13 +53,14 @@ class CommentAdapter(private val userUid:String):
 
     override fun getItemCount(): Int = items.size
 
-    inner class ViewHolder(val binding: ItemCommentBinding): RecyclerView.ViewHolder(binding.root){
-        fun bind(comment: Comment){
-            binding.contentTimeTv.text=comment.date
-            binding.contentTv.text=comment.content
-            binding.userNicknameTv.text=comment.nickname
-            }
+    inner class ViewHolder(val binding: ItemCommentBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(comment: Comment) {
+            binding.contentTimeTv.text = comment.date
+            binding.contentTv.text = comment.content
+            binding.userNicknameTv.text = comment.nickname
         }
     }
+}
 
 

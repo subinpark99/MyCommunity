@@ -35,15 +35,15 @@ import java.io.FileInputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class WritingFragment: Fragment() {
+class WritingFragment : Fragment() {
     private var _binding: FragmentWritingBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var user: User
-    private val gson : Gson = Gson()
-    private val postDB=Firebase.database.getReference("post")
+    private val gson: Gson = Gson()
+    private val postDB = Firebase.database.getReference("post")
 
-    private var imgList= arrayListOf<String>()  // 이미지 리스트 가져오기
+    private var imgList = arrayListOf<String>()  // 이미지 리스트 가져오기
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -54,10 +54,10 @@ class WritingFragment: Fragment() {
 
         _binding = FragmentWritingBinding.inflate(inflater, container, false)
 
-        val userJson=MyApplication.prefs.getUser("user","")
-        user=gson.fromJson(userJson,User::class.java)
+        val userJson = MyApplication.prefs.getUser("user", "")
+        user = gson.fromJson(userJson, User::class.java)
 
-        binding.currentLocationTv.text=user.location
+        binding.currentLocationTv.text = user.location
 
         binding.addPhotoIv.setOnClickListener {
             getPermission()
@@ -65,9 +65,9 @@ class WritingFragment: Fragment() {
 
         binding.writeDoneIv.setOnClickListener {  // 작성 완료
             addPost()
-            binding.writingContentEt.text=null
-            binding.writingTitleEt.text=null
-            binding.writeGalleryRv.layoutManager=null
+            binding.writingContentEt.text = null
+            binding.writingTitleEt.text = null
+            binding.writeGalleryRv.layoutManager = null
         }
 
         return binding.root
@@ -81,7 +81,7 @@ class WritingFragment: Fragment() {
         val content = binding.writingContentEt.text.toString()
 
         if (title.isEmpty() or content.isEmpty()) {
-            Toast.makeText(requireContext(), "내용을 입력해주세요", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "제목과 내용을 입력해주세요", Toast.LENGTH_SHORT).show()
         } else {
             val userUid = MyApplication.prefs.getUid("uid", "")
             val userJson = MyApplication.prefs.getUser("user", "")
@@ -91,9 +91,20 @@ class WritingFragment: Fragment() {
 
             user = gson.fromJson(userJson, User::class.java)
 
-            val addpost = Post(0, user.location,user.age,userUid, user.nickname, currentTime, 0, title, content, imgList)
+            val addpost = Post(
+                0,
+                user.location,
+                user.age,
+                userUid,
+                user.nickname,
+                currentTime,
+                0,
+                title,
+                content,
+                imgList
+            )
             setPost(addpost)
-            Toast.makeText(requireContext(),"완료",Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "완료", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -109,8 +120,9 @@ class WritingFragment: Fragment() {
                 }
                 completion(lastPostIdx)
             }
+
             override fun onCancelled(error: DatabaseError) {
-                Log.d("getLastPostIdx",error.toString())
+                Log.d("getLastPostIdx", error.toString())
             }
         })
     }
@@ -124,13 +136,26 @@ class WritingFragment: Fragment() {
     }
 
     @SuppressLint("IntentReset")
-    private fun getPermission(){
-        val writePermission = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        val readPermission = ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.READ_EXTERNAL_STORAGE)
+    private fun getPermission() {
+        val writePermission = ContextCompat.checkSelfPermission(
+            requireContext(),
+            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        val readPermission = ContextCompat.checkSelfPermission(
+            requireContext(),
+            android.Manifest.permission.READ_EXTERNAL_STORAGE
+        )
 
         if (writePermission == PackageManager.PERMISSION_DENIED || readPermission == PackageManager.PERMISSION_DENIED) {
             // 권한 없어서 요청
-            ActivityCompat.requestPermissions(requireActivity(), arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE),200)
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE
+                ),
+                200
+            )
         } else {
             // 권한 있음
             val intent = Intent()
@@ -143,23 +168,24 @@ class WritingFragment: Fragment() {
         }
     }
 
-    private val getImage=registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()){ result->
+    private val getImage = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
 
-        if ( result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == Activity.RESULT_OK) {
 
             if (result.data?.clipData != null) { // 사진 여러개 선택한 경우
                 val count = result.data?.clipData!!.itemCount
-                    for (i in 0 until count) {
-                        val imageUri = result.data?.clipData!!.getItemAt(i).uri
-                        val imagePath=getImagePathFromUri(imageUri)
-                        val encoded=encodeImage(imagePath)
-                        imgList.add(encoded)
-                    }
+                for (i in 0 until count) {
+                    val imageUri = result.data?.clipData!!.getItemAt(i).uri
+                    val imagePath = getImagePathFromUri(imageUri)
+                    val encoded = encodeImage(imagePath)
+                    imgList.add(encoded)
+                }
             }
         } else { // 단일 선택
             result.data?.data?.let {
-                val imageUri : Uri? = result.data!!.data
+                val imageUri: Uri? = result.data!!.data
                 if (imageUri != null) {
                     imgList.add(encodeImage(imageUri.toString()))
                 }
@@ -170,7 +196,7 @@ class WritingFragment: Fragment() {
 
     private fun onRecyclerView() {
 
-        val galleryRVAdapter=GalleryAdapter(requireContext())
+        val galleryRVAdapter = GalleryAdapter(requireContext())
         galleryRVAdapter.submitList(imgList)
         binding.writeGalleryRv.adapter = galleryRVAdapter
         binding.writeGalleryRv.layoutManager =
@@ -204,7 +230,8 @@ class WritingFragment: Fragment() {
     private fun getImagePathFromUri(uri: Uri): String {    // 이미지 URI로부터 실제 경로 가져오기
         val cursor = requireActivity().contentResolver.query(uri, null, null, null, null)
         cursor?.moveToFirst()
-        val imagePath = cursor?.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA))
+        val imagePath =
+            cursor?.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA))
         cursor?.close()
         return imagePath ?: ""
     }

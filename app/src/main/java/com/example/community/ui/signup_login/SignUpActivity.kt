@@ -27,11 +27,11 @@ import com.google.firebase.ktx.Firebase
 import java.util.*
 
 
-class SignUpActivity:AppCompatActivity() {
-    private lateinit var binding:ActivitySignupBinding
+class SignUpActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySignupBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var auth : FirebaseAuth
-    private lateinit var db : DatabaseReference
+    private lateinit var auth: FirebaseAuth
+    private lateinit var db: DatabaseReference
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,7 @@ class SignUpActivity:AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this) // 등록
 
         binding.currentLocationIv.setOnClickListener { // 현재 위치 가져오기
-            binding.setLocationTv.text=""
+            binding.setLocationTv.text = ""
             checkLocationPermission()
         }
 
@@ -52,12 +52,12 @@ class SignUpActivity:AppCompatActivity() {
             startActivity(intent)
         }
 
-        if (intent.hasExtra("location")){
-            binding.setLocationTv.text=intent.getStringExtra("location")
+        if (intent.hasExtra("location")) {
+            binding.setLocationTv.text = intent.getStringExtra("location")
         }
 
         auth = Firebase.auth
-        db=FirebaseDatabase.getInstance().reference
+        db = FirebaseDatabase.getInstance().reference
 
         initSignupButton() // 회원가입 버튼 클릭
     }
@@ -83,7 +83,7 @@ class SignUpActivity:AppCompatActivity() {
 
                     // 최근에 알려진 위치
                     if (location != null) {
-                        Log.d("location","${location.latitude}${location.longitude}")
+                        Log.d("location", "${location.latitude}${location.longitude}")
 
                         Geocoder(this, Locale.KOREA)
                             .getAddress(
@@ -91,8 +91,8 @@ class SignUpActivity:AppCompatActivity() {
                                 location.longitude
                             ) { add: android.location.Address? ->
                                 if (add != null) {
-                                   address=add.getAddressLine(0).split(" ")
-                                    }
+                                    address = add.getAddressLine(0).split(" ")
+                                }
                                 //울산광역시 남구 달동
                                 binding.setLocationTv
                                     .append("${address[1]} ${address[2]}")
@@ -101,7 +101,11 @@ class SignUpActivity:AppCompatActivity() {
                 }
         } else {
             // 권한이 없으므로 권한 요청 알림 보내기
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1
+            )
         }
     }
 
@@ -118,8 +122,7 @@ class SignUpActivity:AppCompatActivity() {
         }
         try {
             address(getFromLocation(latitude, longitude, 1)?.firstOrNull())
-        } catch(e: Exception) {
-            //will catch if there is an internet problem
+        } catch (e: Exception) {
             address(null)
         }
     }
@@ -132,12 +135,12 @@ class SignUpActivity:AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
-        if(requestCode == 1){
-            if(grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Snackbar.make(binding.root, "위치 권한이 동의 되었습니다.", Snackbar.LENGTH_SHORT).show()
-            }
-            else{
-                Snackbar.make(binding.root, "권한에 동의하지 않을 경우 이용할 수 없습니다.", Snackbar.LENGTH_SHORT).show()
+            } else {
+                Snackbar.make(binding.root, "권한에 동의하지 않을 경우 이용할 수 없습니다.", Snackbar.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -146,31 +149,32 @@ class SignUpActivity:AppCompatActivity() {
         binding.submitBtn.setOnClickListener {
             val email = binding.putEmailTv.text.toString()
             val password = binding.putPasswordTv.text.toString()
-            val nickname=binding.putNicknameEv.text.toString()
-            val location=binding.setLocationTv.text.toString()
-            val age=binding.putAgeEv.text.toString()
+            val nickname = binding.putNicknameEv.text.toString()
+            val location = binding.setLocationTv.text.toString()
+            val age = binding.putAgeEv.text.toString()
 
-            if(email.isEmpty() or password.isEmpty() or nickname.isEmpty() or location.isEmpty() or age.isEmpty()) {
-                Toast.makeText(this,"정보를 입력해주세요",Toast.LENGTH_SHORT).show()
-                return@setOnClickListener }
-
-                auth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-
-                            val user = User(email, password, nickname, location,age.toInt())
-
-                            db.child("user").child(auth.uid.toString()).setValue(user)
-
-                            val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
-                            startActivity(intent)
-
-                            Toast.makeText(this, "회원가입에 성공했습니다!", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(this, "이미 존재하는 계정이거나, 회원가입에 실패했습니다.", Toast.LENGTH_SHORT)
-                                .show()
-                        }
+            if (email.isEmpty() or password.isEmpty() or nickname.isEmpty() or location.isEmpty() or age.isEmpty()) {
+                Toast.makeText(this, "정보를 입력해주세요", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+
+                        val user = User(email, password, nickname, location, age.toInt())
+
+                        db.child("user").child(auth.uid.toString()).setValue(user)
+
+                        val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
+                        startActivity(intent)
+
+                        Toast.makeText(this, "회원가입에 성공했습니다!", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(this, "이미 존재하는 계정이거나, 회원가입에 실패했습니다.", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
         }
     }
 

@@ -47,7 +47,7 @@ class ExpandableListAdapter(
         parentTitle.text=parents[parent]
 
         setIcon(parent, binding)
-        setArrow(parent, binding, isExpanded)
+        setArrow(binding, isExpanded)
 
         return binding
     }
@@ -81,7 +81,7 @@ class ExpandableListAdapter(
 
     /* 닫힘, 열림 표시해주는 화살표 설정 */
     @SuppressLint("SuspiciousIndentation")
-    private fun setArrow(parentPosition: Int, parentView: View, isExpanded: Boolean) {
+    private fun setArrow(parentView: View, isExpanded: Boolean) {
 
         val arrowIcon=parentView.findViewById<ImageView>(R.id.arrow_drop_iv)
             if (isExpanded) arrowIcon.setImageResource(R.drawable.icon_arrow_up)

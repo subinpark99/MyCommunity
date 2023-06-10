@@ -11,9 +11,9 @@
             android:id="@+id/ly"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
             android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -21,31 +21,32 @@
                 android:layout_width="35dp"
                 android:layout_height="33dp"
                 android:layout_marginStart="10dp"
-                android:src="@drawable/icon_back"/>
+                android:src="@drawable/icon_back" />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="0.7"/>
+                android:layout_weight="0.7" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/person"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:src="@drawable/icon_person"/>
+                android:src="@drawable/icon_person" />
 
             <TextView
                 android:id="@+id/age_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
                 android:text="@string/_20"
                 android:textColor="@color/black"
-                android:layout_marginStart="7dp"
                 android:textSize="16sp" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"/>
+                android:layout_weight="1" />
 
         </LinearLayout>
 
@@ -54,9 +55,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="20dp"
-            tools:listitem="@layout/item_home_contents"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/ly"/>
+            app:layout_constraintTop_toBottomOf="@id/ly"
+            tools:listitem="@layout/item_home_contents" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

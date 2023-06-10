@@ -17,11 +17,11 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 
-class  LoginActivity:AppCompatActivity() {
+class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var auth: FirebaseAuth
     private val userRef = Firebase.database.getReference("user")
-    private var gson : Gson = Gson()
+    private var gson: Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,26 +51,28 @@ class  LoginActivity:AppCompatActivity() {
                             userRef.child(it1.uid).get().addOnSuccessListener {
                                 if (it != null) {
 
-                                    users= it.getValue(User::class.java)!!
+                                    users = it.getValue(User::class.java)!!
 
-                                    saveData(auth.currentUser!!.uid,users)
+                                    saveData(auth.currentUser!!.uid, users)
                                     val intent = Intent(this, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
-                                } }
+                                }
+                            }
                         }
-                        } else {
-                            Toast.makeText(this, "아이디와 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show() }
-            }
+                    } else {
+                        Toast.makeText(this, "아이디와 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
+                    }
+                }
         }
     }
 
-    private fun saveData(uid:String,user:User){
+    private fun saveData(uid: String, user: User) {
 
-        val userJson=gson.toJson(user)
-        MyApplication.prefs.setUser("user",userJson)  // current user 정보 저장
+        val userJson = gson.toJson(user)
+        MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
 
-        MyApplication.prefs.setUid("uid",uid) // current user uid 저장
+        MyApplication.prefs.setUid("uid", uid) // current user uid 저장
     }
 
     private fun init() {

@@ -21,11 +21,11 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 
-class MyContentsFragment: Fragment() {
+class MyContentsFragment : Fragment() {
     private var _binding: FragmentMycontentsBinding? = null
     private val binding get() = _binding!!
 
-    private val postDB= Firebase.database.getReference("post")
+    private val postDB = Firebase.database.getReference("post")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,47 +40,50 @@ class MyContentsFragment: Fragment() {
         return binding.root
     }
 
-    private fun getMyContents(){
+    private fun getMyContents() {
 
-        val rvAdpater= ContentRVAdpater(requireContext())
+        val rvAdpater = ContentRVAdpater(requireContext())
         binding.mycontentRv.apply {
-            adapter=rvAdpater
-            layoutManager= LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            adapter = rvAdpater
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         }
 
         val userUid = MyApplication.prefs.getUid("uid", "")
 
-        val postdb=postDB.orderByChild("uid").equalTo(userUid)
-        postdb.addValueEventListener(object :ValueEventListener{  // post uid가 current user인 게시물 가져오기
+        val postdb = postDB.orderByChild("uid").equalTo(userUid)
+        postdb.addValueEventListener(object :
+            ValueEventListener {  // post uid가 current user인 게시물 가져오기
             override fun onDataChange(snapshot: DataSnapshot) {
 
-                if (snapshot.exists())
-                {
-                    for( contentSnapshot in snapshot.children.reversed()){ // reversed로 최근 게시물이 위로 오게
+                if (snapshot.exists()) {
+                    for (contentSnapshot in snapshot.children.reversed()) { // reversed로 최근 게시물이 위로 오게
 
-                        val post=contentSnapshot.getValue(Post::class.java)
+                        val post = contentSnapshot.getValue(Post::class.java)
                         if (post != null) {
                             rvAdpater.submitList(post)
                         }
                     }
                 }
             }
+
             override fun onCancelled(error: DatabaseError) {
-                Log.d("getPost",error.toString())
+                Log.d("getPost", error.toString())
             }
         })
 
-        rvAdpater.setItemClickListener(object :ContentRVAdpater.InContentInterface{
+        rvAdpater.setItemClickListener(object : ContentRVAdpater.InContentInterface {
             override fun onContentClicked(post: Post) {
                 onPostClicked(post.postIdx)
-                val arguments=MyContentsFragmentDirections.actionMyContentsFragmentToInContentFragment(post)
+                val arguments =
+                    MyContentsFragmentDirections.actionMyContentsFragmentToInContentFragment(post)
                 findNavController().navigate(arguments)
             }
         })
     }
 
     fun onPostClicked(postIdx: Int) {
-        val updatedPost = FirebaseDatabase.getInstance().getReference("post").child(postIdx.toString()) // 글 조회수 가져와서 증가
+        val updatedPost = FirebaseDatabase.getInstance().getReference("post")
+            .child(postIdx.toString()) // 글 조회수 가져와서 증가
         updatedPost.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val post = snapshot.getValue(Post::class.java)
@@ -91,8 +94,9 @@ class MyContentsFragment: Fragment() {
                     updatedPost.setValue(post)
                 }
             }
+
             override fun onCancelled(error: DatabaseError) {
-                Log.d("onPostClicked",error.toString())
+                Log.d("onPostClicked", error.toString())
             }
         })
     }

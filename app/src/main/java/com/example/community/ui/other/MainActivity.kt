@@ -21,12 +21,11 @@ import com.google.gson.Gson
 
 class MainActivity :
     AppCompatActivity(),
-        NavigationView.OnNavigationItemSelectedListener
-{
+    NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var user: User
-    private val gson : Gson = Gson()
-    private lateinit var drawerLayout:DrawerLayout
+    private val gson: Gson = Gson()
+    private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,26 +33,26 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val userJson= MyApplication.prefs.getUser("user","")
-        user=gson.fromJson(userJson,User::class.java)
+        val userJson = MyApplication.prefs.getUser("user", "")
+        user = gson.fromJson(userJson, User::class.java)
 
         val navHostFragment =   // FragmentContainerView
             supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = navHostFragment.navController
 
-        drawerLayout=binding.drawerLayout
+        drawerLayout = binding.drawerLayout
         initNavi()
         setAge()
     }
 
-    private fun initNavi(){
+    private fun initNavi() {
 
         binding.navBar.setupWithNavController(navController)
         binding.navBar.background = null   // 바텀네비게이션 배경 없애기
 
-        val navView=binding.drawerNav
-        val toolbar=binding.toolbar
-        val headerView= navView.getHeaderView(0)
+        val navView = binding.drawerNav
+        val toolbar = binding.toolbar
+        val headerView = navView.getHeaderView(0)
 
         setSupportActionBar(toolbar)  // toolbar setting
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // 드로어를 꺼낼 홈 버튼 활성화
@@ -64,8 +63,8 @@ class MainActivity :
         val userEmailView = headerView.findViewById<TextView>(R.id.user_email_tv)
         val userAddressView = headerView.findViewById<TextView>(R.id.user_address_tv)
 
-        userEmailView.text=user.email
-        userAddressView.text=user.location
+        userEmailView.text = user.email
+        userAddressView.text = user.location
 
     }
 
@@ -73,31 +72,35 @@ class MainActivity :
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         // 클릭한 툴바 메뉴 아이템 id 마다 다르게 실행하도록 설정
-        when(item.itemId){
-            android.R.id.home->{
+        when (item.itemId) {
+            android.R.id.home -> {
                 // 햄버거 버튼 클릭시 네비게이션 드로어 열기
                 drawerLayout.openDrawer(GravityCompat.START)
             }
         }
         return super.onOptionsItemSelected(item)
     }
-    private fun setAge(){
 
-       val  province=user.location.split(" ")[0] // 광역시,도
-       val  parentList= mutableListOf("$province ' s")
-       val  childList=mutableListOf(mutableListOf("10대", "20대","30대","40대","50대","60대"))
+    private fun setAge() {
 
-        setExpandableList(parentList,childList)
+        val province = user.location.split(" ")[0] // 광역시,도
+        val parentList = mutableListOf("$province ' s")
+        val childList = mutableListOf(mutableListOf("10대", "20대", "30대", "40대", "50대", "60대"))
+
+        setExpandableList(parentList, childList)
     }
 
     /* ExpandableListView 설정 */
-    private fun setExpandableList(parentList:MutableList<String>,childList: MutableList<MutableList<String>>) {
+    private fun setExpandableList(
+        parentList: MutableList<String>,
+        childList: MutableList<MutableList<String>>
+    ) {
 
-        val ageRange=mutableListOf("10대", "20대","30대","40대","50대","60대")
+        val ageRange = mutableListOf("10대", "20대", "30대", "40대", "50대", "60대")
         val expandableAdapter =
             ExpandableListAdapter(this, parentList, childList)
 
-        val menu=binding.expandedMenu
+        val menu = binding.expandedMenu
         menu.setAdapter(expandableAdapter)
 
         menu.setOnGroupClickListener { _, _, _, _ ->
@@ -114,24 +117,27 @@ class MainActivity :
                                 0, 1, 2, 3, 4, 5 -> {
                                     if (childPosition < ageRange.size) {
                                         val ageValue = ageRange[childPosition]
-                                        val bundle=
+                                        val bundle =
                                             bundleOf("age" to ageValue)
 
-                                        navController.navigate(R.id.ageFragment,bundle)
+                                        navController.navigate(R.id.ageFragment, bundle)
                                     } else {
-                                        null  }
+                                        null
+                                    }
                                 }
                                 else -> null
                             }
                             if (replace != null) {
-                                drawerLayout.closeDrawer(GravityCompat.START) }
+                                drawerLayout.closeDrawer(GravityCompat.START)
+                            }
                         }
                     }
                     true
                 }
                 else -> {
-                    Log.d("menuClick","failed")
-                false}
+                    Log.d("menuClick", "failed")
+                    false
+                }
             }
         }
     }
@@ -139,12 +145,12 @@ class MainActivity :
     // drawer menu item click
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
-        when(item.itemId){
-            R.id.ulsan ->{
-                Toast.makeText(this,"ulsan",Toast.LENGTH_SHORT).show()
+        when (item.itemId) {
+            R.id.ulsan -> {
+                Toast.makeText(this, "ulsan", Toast.LENGTH_SHORT).show()
             }
         }
         return false
     }
-    
+
 }
