@@ -75,13 +75,13 @@ class ContentRVAdpater(
         }
     }
 
-    fun decodeImage(item: String): Bitmap {  // Base64 -> bitmap
+    private fun decodeImage(item: String): Bitmap {  // Base64 -> bitmap
         val decodedBytes = Base64.decode(item, Base64.DEFAULT)
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
     }
 
 
-    fun displayImage(item: String, imageView: ImageView) {
+    private fun displayImage(item: String, imageView: ImageView) {
         val decodedImage = decodeImage(item)
 
         Glide.with(context)
