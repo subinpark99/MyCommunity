@@ -49,7 +49,7 @@ class NoticeFragment:Fragment() {
             layoutManager= LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         }
 
-        val postdb=postDB.orderByChild("uid").equalTo(userUid)
+        val postdb=postDB.orderByChild("uid").equalTo(userUid)  // 내가 쓴 글 가져오기
         postdb.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists())
@@ -59,7 +59,8 @@ class NoticeFragment:Fragment() {
                         val post=contentSnapshot.getValue(Post::class.java)
 
                         if (post != null ) {
-                           getCommentNotice(commmentAdpater,post.postIdx)
+                            getCommentNotice(commmentAdpater)  // 내가 쓴 글의 댓글 가져오기
+                            return  // 한 번만
                         }
                     }
                 }
@@ -78,24 +79,23 @@ class NoticeFragment:Fragment() {
 //        })
     }
 
-    fun getCommentNotice(adapter: NoticeAdapter,postIdx: Int){
+    fun getCommentNotice(adapter: NoticeAdapter){
 
-        commentDB.orderByChild("postIdx").equalTo(postIdx.toDouble())
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    val postSnapshot = dataSnapshot.children.first()
-                    val comment = postSnapshot.getValue(Comment::class.java)
-                    if (comment != null && comment.uid!=userUid) {
-                        adapter.submitList(comment)
+        commentDB.addListenerForSingleValueEvent((object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        for( commentSnapshot in dataSnapshot.children.reversed()) {
+                            val comment = commentSnapshot.getValue(Comment::class.java)
+                        if (comment != null && comment.uid!=userUid) {  // 내가 쓴 댓글 알림은 뜨지 않게
+                                adapter.submitList(comment)
+                            }
+                        }
                     }
                 }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.d("getPost",databaseError.toString())
-            }
-        })
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.d("getPost",databaseError.toString())
+                }
+            }))
 
     }
 

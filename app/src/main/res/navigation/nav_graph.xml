@@ -39,7 +39,11 @@
         android:id="@+id/noticeFragment"
         tools:layout="@layout/fragment_notice"
         android:name="com.example.community.ui.notice.NoticeFragment"
-        android:label="NoticeFragment" />
+        android:label="NoticeFragment" >
+        <action
+            android:id="@+id/action_noticeFragment_to_inContentFragment"
+            app:destination="@id/inContentFragment" />
+    </fragment>
     <fragment
         android:id="@+id/myReplyFragment"
         tools:layout="@layout/fragment_myreply"

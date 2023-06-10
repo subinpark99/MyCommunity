@@ -37,9 +37,9 @@ class NoticeAdapter:
         holder.apply {
             bind(items[position])
 
-            binding.layoutClick.setOnClickListener {  // 알림 클릭시 게시물로 이동
-                itemClickListener.onCommentClicked(items[position])
-            }
+//            binding.layoutClick.setOnClickListener {  // 알림 클릭시 게시물로 이동
+//                itemClickListener.onCommentClicked(items[position])
+//            }
         }
     }
 
@@ -49,7 +49,7 @@ class NoticeAdapter:
 
         fun bind(comment: Comment){
 
-          binding.noticeContentTv.text=comment.content
+            binding.noticeContentTv.text=comment.content
             binding.noticeDateTv.text=comment.date
             binding.noticeTimeTv.text=comment.time
 
