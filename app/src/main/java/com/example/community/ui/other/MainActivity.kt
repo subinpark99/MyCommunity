@@ -43,6 +43,7 @@ class MainActivity :
         drawerLayout = binding.drawerLayout
         initNavi()
         setAge()
+
     }
 
     private fun initNavi() {

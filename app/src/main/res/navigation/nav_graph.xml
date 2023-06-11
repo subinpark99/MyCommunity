@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
     app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/homeFragment"
-        tools:layout="@layout/fragment_home"
         android:name="com.example.community.ui.home.HomeFragment"
-        android:label="HomeFragment" >
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_noticeFragment"
+            app:destination="@id/noticeFragment" />
     </fragment>
     <fragment
         android:id="@+id/myPageFragment"
-        tools:layout="@layout/fragment_mypage"
         android:name="com.example.community.ui.mypage.MyPageFragment"
-        android:label="MyPageFragment" >
+        android:label="MyPageFragment"
+        tools:layout="@layout/fragment_mypage">
         <action
             android:id="@+id/action_myPageFragment_to_myReplyFragment"
             app:destination="@id/myReplyFragment" />
@@ -28,36 +31,39 @@
         <action
             android:id="@+id/action_myPageFragment_to_loginActivity"
             app:destination="@id/loginActivity" />
+        <action
+            android:id="@+id/action_myPageFragment_to_dialogChangeLocation"
+            app:destination="@id/dialogChangeLocation" />
     </fragment>
     <fragment
         android:id="@+id/writingFragment"
-        tools:layout="@layout/fragment_writing"
         android:name="com.example.community.ui.writing.WritingFragment"
-        android:label="WritingFragment" />
+        android:label="WritingFragment"
+        tools:layout="@layout/fragment_writing" />
 
     <fragment
         android:id="@+id/noticeFragment"
-        tools:layout="@layout/fragment_notice"
         android:name="com.example.community.ui.notice.NoticeFragment"
-        android:label="NoticeFragment" >
+        android:label="NoticeFragment"
+        tools:layout="@layout/fragment_notice">
         <action
             android:id="@+id/action_noticeFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
     </fragment>
     <fragment
         android:id="@+id/myReplyFragment"
-        tools:layout="@layout/fragment_myreply"
         android:name="com.example.community.ui.mypage.MyReplyFragment"
-        android:label="MyReplyFragment" >
+        android:label="MyReplyFragment"
+        tools:layout="@layout/fragment_myreply">
         <action
             android:id="@+id/action_myReplyFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
     </fragment>
     <fragment
         android:id="@+id/myContentsFragment"
-        tools:layout="@layout/fragment_mycontents"
         android:name="com.example.community.ui.mypage.MyContentsFragment"
-        android:label="MyContentsFragment" >
+        android:label="MyContentsFragment"
+        tools:layout="@layout/fragment_mycontents">
         <action
             android:id="@+id/action_myContentsFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
@@ -65,19 +71,19 @@
 
     <activity
         android:id="@+id/loginActivity"
-        tools:layout="@layout/activity_login"
         android:name="com.example.community.ui.signup_login.LoginActivity"
-        android:label="LoginActivity" />
+        android:label="LoginActivity"
+        tools:layout="@layout/activity_login" />
     <activity
         android:id="@+id/signUpActivity"
-        tools:layout="@layout/activity_signup"
         android:name="com.example.community.ui.signup_login.SignUpActivity"
-        android:label="SignUpActivity" />
+        android:label="SignUpActivity"
+        tools:layout="@layout/activity_signup" />
     <fragment
         android:id="@+id/inContentFragment"
-        tools:layout="@layout/fragment_in_content"
         android:name="com.example.community.ui.home.InContentFragment"
-        android:label="InContentFragment" >
+        android:label="InContentFragment"
+        tools:layout="@layout/fragment_in_content">
         <action
             android:id="@+id/action_inContentFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
@@ -93,9 +99,9 @@
     </fragment>
     <fragment
         android:id="@+id/ageFragment"
-        tools:layout="@layout/fragment_age"
         android:name="com.example.community.ui.other.AgeFragment"
-        android:label="AgeFragment" >
+        android:label="AgeFragment"
+        tools:layout="@layout/fragment_age">
         <action
             android:id="@+id/action_ageFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
@@ -110,5 +116,27 @@
         android:id="@+id/mainActivity"
         android:name="com.example.community.ui.other.MainActivity"
         android:label="MainActivity" />
+    <dialog
+        android:id="@+id/dialogOcr"
+        android:name="com.example.community.ui.mypage.DialogOcr"
+        android:label="DialogOcr"
+        tools:layout="@layout/dialog_ocr" >
+        <action
+            android:id="@+id/action_dialogOcr_to_dialogChangeLocation"
+            app:destination="@id/dialogChangeLocation" />
+    </dialog>
+    <activity
+        android:id="@+id/ocrActivity"
+        android:name="com.example.community.ui.signup_login.OcrActivity"
+        android:label="OcrActivity" />
+    <dialog
+        android:id="@+id/dialogChangeLocation"
+        tools:layout="@layout/dialog_change_location"
+        android:name="com.example.community.ui.mypage.DialogChangeLocation"
+        android:label="DialogChangeLocation" >
+        <action
+            android:id="@+id/action_dialogChangeLocation_to_dialogOcr"
+            app:destination="@id/dialogOcr" />
+    </dialog>
 
 </navigation>

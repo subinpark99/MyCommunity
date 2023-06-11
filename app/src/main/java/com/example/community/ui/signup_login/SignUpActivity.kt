@@ -14,16 +14,20 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.example.community.R
 import com.example.community.data.entity.User
 import com.example.community.databinding.ActivitySignupBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.app
+import com.google.firebase.messaging.FirebaseMessaging
 import java.util.*
 
 
@@ -165,6 +169,7 @@ class SignUpActivity : AppCompatActivity() {
                         val user = User(email, password, nickname, location, age.toInt())
 
                         db.child("user").child(auth.uid.toString()).setValue(user)
+                        fcmToken()
 
                         val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
                         startActivity(intent)
@@ -175,6 +180,28 @@ class SignUpActivity : AppCompatActivity() {
                             .show()
                     }
                 }
+        }
+    }
+
+    private fun fcmToken() {
+        val curUser = auth.currentUser
+        if (curUser != null) {
+
+            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.d("FetchingFCM registration token failed", task.exception.toString())
+                    return@OnCompleteListener
+                }
+                val token = task.result
+                val msg = getString(R.string.msg_token_fmt, token)
+
+                val mFireDatabase = FirebaseDatabase.getInstance(Firebase.app)
+                mFireDatabase.getReference("user")
+                    .child(curUser.uid).child("fcmtoken").child("token")
+                    .setValue(msg)
+
+            })
+
         }
     }
 

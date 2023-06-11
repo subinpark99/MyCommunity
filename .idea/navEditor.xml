@@ -29,6 +29,30 @@
                       </LayoutPositions>
                     </value>
                   </entry>
+                  <entry key="dialogChangeLocation">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-701" />
+                            <option name="y" value="-1" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="dialogOcr">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-446" />
+                            <option name="y" value="-19" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
                   <entry key="homeFragment">
                     <value>
                       <LayoutPositions>
@@ -41,6 +65,11 @@
                         <option name="myPositions">
                           <map>
                             <entry key="action_homeFragment_to_inContentFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_homeFragment_to_noticeFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -62,6 +91,16 @@
                         <option name="myPositions">
                           <map>
                             <entry key="action_inContentFragment_to_homeFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_inContentFragment_to_myContentsFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_inContentFragment_to_myReplyFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -174,7 +213,28 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="259" />
-                            <option name="y" value="346" />
+                            <option name="y" value="348" />
+                          </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_noticeFragment_to_inContentFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="ocrActivity">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-619" />
+                            <option name="y" value="-409" />
                           </Point>
                         </option>
                       </LayoutPositions>

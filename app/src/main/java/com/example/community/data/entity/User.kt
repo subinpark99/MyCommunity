@@ -5,5 +5,6 @@ data class User(
     val pw:String="",
     val nickname:String="",
     val location:String="",
-    val age:Int=0
+    val age:Int=0,
+    val fcmtoken:HashMap<String, Any>? = null  // 토큰 안에 토큰 값
 )

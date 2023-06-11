@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:background="@drawable/signup_border">
+
+        <LinearLayout
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="10dp"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginTop="10dp"
+                android:text="@string/city"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/current_location_iv"
+                    android:layout_width="200dp"
+                    android:layout_height="50dp"
+                    android:layout_marginBottom="10dp"
+                    android:src="@drawable/icon_location" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/identic_location_iv"
+                    android:layout_width="200dp"
+                    android:layout_height="50dp"
+                    android:src="@drawable/icon_identi" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_margin="10dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/set_location_tv"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="40dp"
+                android:background="@drawable/signup_border"
+                android:gravity="center"
+                android:text="@string/setlocation" />
+
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/done_iv"
+            android:src="@drawable/icon_done"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"/>
+
+
+    </LinearLayout>
+
+</layout>

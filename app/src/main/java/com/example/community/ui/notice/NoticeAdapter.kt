@@ -7,17 +7,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.community.data.entity.Comment
 import com.example.community.databinding.ItemNoticeBinding
 
+
 class NoticeAdapter :
     RecyclerView.Adapter<NoticeAdapter.ViewHolder>() {
 
     private val items = arrayListOf<Comment>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitList(comment: List<Comment>) {
+    fun submitList(comment:List<Comment>) {
         this.items.addAll(comment)
         notifyDataSetChanged()
     }
-
     interface NoticeInterface {
         fun onCommentClicked(postIdx: Int) // commentDB의 postIdx
     }

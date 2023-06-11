@@ -9,9 +9,11 @@
     <!-- Android 10 (API level 29) and higher. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
-    <uses-permission android:name="android.permission.CAMERA"/> <!--카메라 권한-->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>    <!--저장소 읽기 권한-->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.CAMERA" /> <!--카메라 권한-->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />    <!--저장소 읽기 권한-->
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />    <!--저장소 쓰기 권한-->
 
     <application
@@ -35,11 +37,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.other.MainActivity"
-            android:windowSoftInputMode="adjustPan"/>
-        <activity android:name=".ui.signup_login.SignUpActivity"/>
-        <activity android:name=".ui.signup_login.OcrActivity"/>
-        <activity android:name=".ui.signup_login.LoginActivity"/>
+        <activity
+            android:name=".ui.other.MainActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.signup_login.SignUpActivity" />
+        <activity android:name=".ui.signup_login.OcrActivity" />
+        <activity android:name=".ui.signup_login.LoginActivity" />
+
+        <service
+            android:name=".ui.notice.fcm.MessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

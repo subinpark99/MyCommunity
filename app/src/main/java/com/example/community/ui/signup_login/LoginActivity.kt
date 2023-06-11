@@ -53,7 +53,9 @@ class LoginActivity : AppCompatActivity() {
 
                                     users = it.getValue(User::class.java)!!
 
-                                    saveData(auth.currentUser!!.uid, users)
+                                    saveData(auth.currentUser!!.uid, users,
+                                        users.fcmtoken?.get("token") as String
+                                    )
                                     val intent = Intent(this, MainActivity::class.java)
                                     startActivity(intent)
                                     finish()
@@ -67,11 +69,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveData(uid: String, user: User) {
+    private fun saveData(uid: String, user: User,token:String) {
 
         val userJson = gson.toJson(user)
         MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
-
+        MyApplication.prefs.setToken("token", token)
         MyApplication.prefs.setUid("uid", uid) // current user uid 저장
     }
 

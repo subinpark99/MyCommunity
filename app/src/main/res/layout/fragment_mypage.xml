@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -74,7 +73,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
-            android:id="@+id/mylocation_tv"
+            android:id="@+id/changelocation_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="23dp"
@@ -92,17 +91,28 @@
             android:text="비밀번호 변경하기"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/mylocation_tv" />
+            app:layout_constraintTop_toBottomOf="@id/changelocation_tv" />
 
         <TextView
             android:id="@+id/set_notice_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="23dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="24dp"
             android:text="알림 설정하기"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/change_pw_tv" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/notice_toggle_btn"
+            android:layout_width="50dp"
+            android:layout_height="35dp"
+            android:layout_marginStart="3dp"
+            app:layout_constraintBottom_toBottomOf="@id/set_notice_tv"
+            app:layout_constraintStart_toEndOf="@id/set_notice_tv"
+            app:layout_constraintTop_toTopOf="@id/set_notice_tv" />
 
         <TextView
             android:id="@+id/logout_tv"

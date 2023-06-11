@@ -1,5 +1,7 @@
 package com.example.community.ui.notice
 
+
+import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,12 +15,16 @@ import com.example.community.data.MyApplication
 import com.example.community.data.entity.Comment
 import com.example.community.data.entity.Post
 import com.example.community.databinding.FragmentNoticeBinding
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.example.community.ui.notice.fcm.RetrofitInstance
+import com.example.community.ui.notice.fcm.model.NotificationData
+import com.example.community.ui.notice.fcm.model.PushNotification
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
 
 class NoticeFragment : Fragment() {
 
@@ -30,7 +36,6 @@ class NoticeFragment : Fragment() {
     private lateinit var userUid: String
     private lateinit var noticeAdapter: NoticeAdapter
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -41,18 +46,21 @@ class NoticeFragment : Fragment() {
 
         userUid = MyApplication.prefs.getUid("uid", "")
         noticeAdapter = NoticeAdapter()
+
         return binding.root
     }
+
 
     private fun getMyComments() {
 
         binding.noticeRv.apply {
             adapter = noticeAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            hasFixedSize()
         }
 
-        val postdb = postDB.orderByChild("uid").equalTo(userUid)  // 내가 쓴 글 가져오기
-        postdb.addValueEventListener(object : ValueEventListener {
+        val postdb = postDB.orderByChild("uid").equalTo(userUid)   // 내가 쓴 글 가져오기
+        postdb.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     for (contentSnapshot in snapshot.children) {
@@ -70,6 +78,32 @@ class NoticeFragment : Fragment() {
                 Log.d("getPost", error.toString())
             }
         })
+    }
+
+
+    private fun getCommentNotice(getCommentPost: Int) {
+
+        commentDB.orderByChild("postIdx").equalTo(getCommentPost.toDouble())
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        val commentList = mutableListOf<Comment>()
+                        for (commentSnapshot in dataSnapshot.children.reversed()) {
+                            val comment = commentSnapshot.getValue(Comment::class.java)
+                            if (comment != null && comment.uid != userUid) {  // 내가 쓴 댓글 알림은 뜨지 않게
+                                commentList.add(comment)
+                                sendPush()
+                            }
+                        }
+                        noticeAdapter.submitList(commentList) // 새로운 데이터를 전달하여 목록 갱신
+
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.d("getPost", databaseError.toString())
+                }
+            })
     }
 
     private fun getInxContent() {  // 댓글 알림 클릭 시, commentDB의 postIdx에 해당하는 post로 이동
@@ -105,31 +139,30 @@ class NoticeFragment : Fragment() {
         })
     }
 
-    fun getCommentNotice(getCommentPost: Int) {
-
-        commentDB.orderByChild("postIdx").equalTo(getCommentPost.toDouble())
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        val commentList = mutableListOf<Comment>()
-                        for (commentSnapshot in dataSnapshot.children.reversed()) {
-                            val comment = commentSnapshot.getValue(Comment::class.java)
-                            if (comment != null && comment.uid != userUid) {  // 내가 쓴 댓글 알림은 뜨지 않게
-                                commentList.add(comment)
-                            }
-                        }
-                        noticeAdapter.submitList(commentList) // 새로운 데이터를 전달하여 목록 갱신
-                    } else {
-                        binding.noItem.visibility = View.VISIBLE
-                        binding.noItem.text = "새 댓글이 없습니다!"  // 댓글 없을 때 표시
-                    }
+    private fun sendNotification(notification: PushNotification) =
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.api.postNotification(notification)
+                if (response.isSuccessful) {
+                    //  Log.d(TAG, "Response: ${Gson().toJson(response)}")
+                } else {
+                    Log.e(ContentValues.TAG, response.errorBody().toString())
                 }
+            } catch (e: Exception) {
+                Log.e(ContentValues.TAG, e.toString())
+            }
+        }
 
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.d("getPost", databaseError.toString())
-                }
-            })
+
+    private fun sendPush() {
+        val userToken = MyApplication.prefs.getToken("token", "")
+        val pushNotification = PushNotification(
+            NotificationData("My Community !", ""),
+            userToken
+        )
+        sendNotification(pushNotification)
     }
+
 
     fun onPostClicked(postIdx: Int) {
         val updatedPost = FirebaseDatabase.getInstance().getReference("post")

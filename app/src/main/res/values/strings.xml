@@ -37,4 +37,9 @@
     <string name="_20">20대</string>
     <string name="mycontent">내가 쓴 글</string>
     <string name="myreply">내가 쓴 댓글</string>
+    <string name="msg_token_fmt" translatable="false">%s</string>
+    <string name="fcm_message">MyCommunity !</string>
+    <string name="currentpw">현재 비밀번호: </string>
+    <string name="newpw">새 비밀번호: </string>
+
 </resources>
