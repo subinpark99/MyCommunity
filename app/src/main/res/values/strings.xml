@@ -41,5 +41,6 @@
     <string name="fcm_message">MyCommunity !</string>
     <string name="currentpw">현재 비밀번호: </string>
     <string name="newpw">새 비밀번호: </string>
+    <string name="reply">대댓글 작성</string>
 
 </resources>

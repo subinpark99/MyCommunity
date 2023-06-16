@@ -166,7 +166,7 @@ class SignUpActivity : AppCompatActivity() {
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
 
-                        val user = User(email, password, nickname, location, age.toInt())
+                        val user = User(email, password, nickname, location, age.toInt(),false)
 
                         db.child("user").child(auth.uid.toString()).setValue(user)
                         fcmToken()

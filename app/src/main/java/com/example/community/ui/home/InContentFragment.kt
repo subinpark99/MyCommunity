@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -15,11 +16,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.community.data.MyApplication
 import com.example.community.data.entity.Comment
 import com.example.community.data.entity.Post
+import com.example.community.data.entity.Reply
 import com.example.community.data.entity.User
 import com.example.community.databinding.FragmentInContentBinding
 import com.example.community.ui.writing.GalleryAdapter
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -34,15 +37,18 @@ class InContentFragment : Fragment() {
 
     private val commentDB = Firebase.database.getReference("comment")
     private val postDB = Firebase.database.getReference("post")
+    private val replyDB = Firebase.database.getReference("reply")
     private lateinit var postData: Post
+    private var currentCommentIdx: Int = 0
 
     private lateinit var user: User
     private val gson: Gson = Gson()
 
     private lateinit var userUid: String
     private lateinit var userJson: String
+    var i=0
 
-
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -56,11 +62,14 @@ class InContentFragment : Fragment() {
 
         userUid = MyApplication.prefs.getUid("uid", "")
         userJson = MyApplication.prefs.getUser("user", "")
+        user = gson.fromJson(userJson, User::class.java)
+
+        saveComment()
 
         return binding.root
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+
     private fun bind() {
 
         binding.backIv.setOnClickListener {// 뒤로가기
@@ -76,9 +85,23 @@ class InContentFragment : Fragment() {
         binding.viewTv.text = postData.view.toString()
 
 
-        binding.replySubmitBnt.setOnClickListener { // 댓글 db에 저장
-            user = gson.fromJson(userJson, User::class.java)
-            val content = binding.replyEt.text.toString()
+        if (userUid == postData.uid) { // 현 사용자 uid와 post uid가 같으면
+            binding.deleteTv.visibility = View.VISIBLE
+
+            binding.deleteTv.setOnClickListener {
+                deletePost() // 게시글 삭제
+            }
+        }
+
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveComment(){
+
+        binding.commentSubmitBnt.setOnClickListener { // 댓글 db에 저장
+
+            val content = binding.commentEt.text.toString()
             if (content.isEmpty()) {
                 return@setOnClickListener
             }
@@ -98,32 +121,64 @@ class InContentFragment : Fragment() {
                     currentTime
                 )
             setPost(comment)
-            binding.replyEt.text = null
+            binding.commentEt.text = null
         }
-
-        val adapter = CommentAdapter(userUid)
-        getComment(adapter)
-        deleteComment(adapter)
-
-        if (userUid == postData.uid) { // 현 사용자 uid와 post uid가 같으면
-            binding.deleteTv.visibility = View.VISIBLE
-
-            binding.deleteTv.setOnClickListener {
-                deletePost() // 게시글 삭제
-            }
-        }
-
-        val imgAdapter = GalleryAdapter(requireContext())
-        postData.imgs?.let { imgAdapter.submitList(it) }
-        binding.imgRv.adapter = imgAdapter
-        binding.imgRv.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun clickReply(adapter:CommentAdapter){
+
+        adapter.setItemClickListener(object :CommentAdapter.ReplyInterface{
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun onReplyClicked(commentIdx: Int) {
+                currentCommentIdx=commentIdx
+                binding.commentLayout.visibility=View.GONE
+                binding.replyLayout.visibility=View.VISIBLE
+
+
+            }
+        })
+        binding.replySubmitBnt.setOnClickListener {
+            val commentIdx=currentCommentIdx
+            saveReply(commentIdx)
+            Toast.makeText(requireContext(),"done",Toast.LENGTH_SHORT).show()
+            binding.commentLayout.visibility=View.VISIBLE
+            binding.replyLayout.visibility=View.GONE
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun saveReply(commentIdx:Int){
+        val content = binding.replyEt.text.toString()
+        if (content.isEmpty()) {
+            return
+        }
+        val formatter = DateTimeFormatter.ofPattern("MM/dd")
+        val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+
+        val currentDate = LocalDateTime.now().format(formatter)
+        val currentTime = LocalDateTime.now().format(timeFormatter)
+        val reply =
+            Reply(
+                userUid,
+                postData.postIdx,
+                user.nickname,
+                currentDate,
+                content,
+                i,
+                commentIdx
+            )
+
+        val replydb = FirebaseDatabase.getInstance().reference
+        replydb.child("reply").child(i.toString()).setValue(reply)
+
+    }
+
 
     private fun getComment(adapter: CommentAdapter) {  // 댓글 데이터 불러와서 화면에 표시
 
-        binding.replyRv.adapter = adapter
-        binding.replyRv.layoutManager =
+        binding.commentRv.adapter = adapter
+        binding.commentRv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         commentDB.addValueEventListener(object : ValueEventListener {
@@ -146,6 +201,8 @@ class InContentFragment : Fragment() {
             }
         })
     }
+
+
 
     private fun deleteComment(adapter: CommentAdapter) {  // 댓글 삭제
         adapter.setItemClickListener(object : CommentAdapter.DeleteInterface {
@@ -213,11 +270,28 @@ class InContentFragment : Fragment() {
         })
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun onRecyclerView(){
+
+        val imgAdapter = GalleryAdapter(requireContext())
+        postData.imgs?.let { imgAdapter.submitList(it) }
+        binding.imgRv.adapter = imgAdapter
+        binding.imgRv.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+
+        val commentAdapter = CommentAdapter(userUid,replyDB,requireContext())
+        getComment(commentAdapter)
+        deleteComment(commentAdapter)
+        clickReply(commentAdapter)
+
+    }
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onStart() {
         super.onStart()
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
         bind()
+        onRecyclerView()
     }
 
 

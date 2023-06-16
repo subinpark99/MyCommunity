@@ -1,12 +1,14 @@
 package com.example.community.ui.notice
 
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -14,16 +16,20 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.community.data.MyApplication
 import com.example.community.data.entity.Comment
 import com.example.community.data.entity.Post
+import com.example.community.data.entity.User
 import com.example.community.databinding.FragmentNoticeBinding
+import com.example.community.ui.mypage.MyPageFragment
 import com.example.community.ui.notice.fcm.RetrofitInstance
 import com.example.community.ui.notice.fcm.model.NotificationData
 import com.example.community.ui.notice.fcm.model.PushNotification
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 
 
 class NoticeFragment : Fragment() {
@@ -33,8 +39,12 @@ class NoticeFragment : Fragment() {
 
     private val commentDB = Firebase.database.getReference("comment")
     private val postDB = Firebase.database.getReference("post")
+    private val userDB = Firebase.database.getReference("user")
     private lateinit var userUid: String
     private lateinit var noticeAdapter: NoticeAdapter
+    private lateinit var user: User
+    private val gson: Gson = Gson()
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,6 +55,8 @@ class NoticeFragment : Fragment() {
         _binding = FragmentNoticeBinding.inflate(inflater, container, false)
 
         userUid = MyApplication.prefs.getUid("uid", "")
+        val userJson = MyApplication.prefs.getUser("user", "")
+        user = gson.fromJson(userJson, User::class.java)
         noticeAdapter = NoticeAdapter()
 
         return binding.root
@@ -85,14 +97,15 @@ class NoticeFragment : Fragment() {
 
         commentDB.orderByChild("postIdx").equalTo(getCommentPost.toDouble())
             .addListenerForSingleValueEvent(object : ValueEventListener {
+                @SuppressLint("SuspiciousIndentation")
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     if (dataSnapshot.exists()) {
                         val commentList = mutableListOf<Comment>()
                         for (commentSnapshot in dataSnapshot.children.reversed()) {
                             val comment = commentSnapshot.getValue(Comment::class.java)
                             if (comment != null && comment.uid != userUid) {  // 내가 쓴 댓글 알림은 뜨지 않게
-                                commentList.add(comment)
-                                sendPush()
+                                    commentList.add(comment)
+                                    getSwitch()
                             }
                         }
                         noticeAdapter.submitList(commentList) // 새로운 데이터를 전달하여 목록 갱신
@@ -106,6 +119,21 @@ class NoticeFragment : Fragment() {
             })
     }
 
+    private fun getSwitch(){
+        userDB.child(userUid).child("alarm")
+            .addListenerForSingleValueEvent(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val alarmEnabled = snapshot.getValue(Boolean::class.java)
+                    if (alarmEnabled == true) {
+                        sendPush()
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("s", "sdfsdfsdf")
+                }
+            })
+    }
     private fun getInxContent() {  // 댓글 알림 클릭 시, commentDB의 postIdx에 해당하는 post로 이동
 
         noticeAdapter.setItemClickListener(object : NoticeAdapter.NoticeInterface {

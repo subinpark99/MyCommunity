@@ -46,7 +46,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="20dp"
-            android:text="@string/userAddress"
             app:layout_constraintStart_toEndOf="@id/location"
             app:layout_constraintTop_toBottomOf="@id/write_title_tv" />
 

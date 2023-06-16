@@ -25,9 +25,8 @@ class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var user: User
-    private val gson: Gson = Gson()
     private val postDB = Firebase.database.getReference("post")
+    private val userDB = Firebase.database.getReference("user")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,22 +34,33 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
-        val userJson = MyApplication.prefs.getUser("user", "")
-        user = gson.fromJson(userJson, User::class.java)
-
-        binding.currentLocationTv.text = user.location
-
+        initLocation()
         return binding.root
     }
 
-    override fun onStart() {
-        super.onStart()
 
-        getPost()
+    private fun initLocation(){
+        val userUid= MyApplication.prefs.getUid("uid", "")
+
+        userDB.child(userUid).child("location")
+            .addListenerForSingleValueEvent(object :ValueEventListener{
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val userLocation=snapshot.getValue(String::class.java)
+                if (userLocation != null) {
+                    binding.currentLocationTv.text=userLocation
+                    getPost(userLocation)
+                }
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("getUser",error.toString())
+            }
+
+        })
     }
 
-    private fun getPost() {
+    private fun getPost(location:String) {
 
         val rvAdpater = ContentRVAdpater(requireContext())
         binding.homeContentsRv.apply {
@@ -58,7 +68,7 @@ class HomeFragment : Fragment() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         }
 
-        val postdb = postDB.orderByChild("location").equalTo(user.location)
+        val postdb = postDB.orderByChild("location").equalTo(location)
         postdb.addValueEventListener(object : ValueEventListener {  // 내 지역에 있는 게시물만 가져오기
             override fun onDataChange(snapshot: DataSnapshot) {
 

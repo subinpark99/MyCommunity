@@ -1,78 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/content_tv"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:text="@string/content"
-                android:textColor="@color/black" />
+            android:layout_margin="10dp"
+            android:orientation="horizontal">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/user_nickname_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/content_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_margin="5dp"
-                    android:text="@string/nickname"
-                    android:textColor="@color/deep_green"
-                    android:textSize="13sp" />
+                    android:text="@string/content"
+                    android:textColor="@color/black" />
 
-                <TextView
-                    android:id="@+id/content_time_tv"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/timecnt"
-                    android:textColor="@color/gray"
-                    android:textSize="13sp" />
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/delete_comment_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginStart="6dp"
-                    android:text="@string/delete"
-                    android:textColor="@color/red"
-                    android:textSize="13sp"
-                    android:visibility="gone" />
+                    <TextView
+                        android:id="@+id/user_nickname_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:text="@string/nickname"
+                        android:textColor="@color/deep_green"
+                        android:textSize="13sp" />
 
+                    <TextView
+                        android:id="@+id/content_time_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:text="@string/timecnt"
+                        android:textColor="@color/gray"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/delete_comment_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginStart="6dp"
+                        android:text="@string/delete"
+                        android:textColor="@color/red"
+                        android:textSize="13sp"
+                        android:visibility="gone" />
+
+
+                </LinearLayout>
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="30dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="7dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/add_reply_iv"
+                    android:layout_width="27dp"
+                    android:layout_height="27dp"
+                    android:src="@drawable/icon_add_reply_24" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="7dp">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/add_reply_iv"
-                android:layout_width="27dp"
-                android:layout_height="27dp"
-                android:src="@drawable/icon_add_reply_24" />
-
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/reply_rv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:listitem="@layout/item_reply"
+                android:background="@drawable/writing_border"
+                android:scrollbars="vertical" />
         </LinearLayout>
 
     </LinearLayout>
+
 </layout>

@@ -42,7 +42,6 @@ class MyPageFragment : Fragment() {
         nav()
         userUid = MyApplication.prefs.getUid("uid", "")
 
-
         return binding.root
     }
 
@@ -80,6 +79,37 @@ class MyPageFragment : Fragment() {
         binding.changelocationTv.setOnClickListener {// 내 위치 변경
             view?.findNavController()?.navigate(R.id.action_myPageFragment_to_dialogChangeLocation)
         }
+
+
+        binding.noticeToggleBtn.setOnCheckedChangeListener { CompoundButton, onSwitch ->
+            //  스위치가 켜지면
+            if (onSwitch) {
+                binding.noticeToggleBtn.isChecked = true
+
+                userDB.child(userUid).child("alarm").setValue(true)
+            }
+            //  스위치가 꺼지면
+            else {
+                binding.noticeToggleBtn.isChecked = false
+                userDB.child(userUid).child("alarm").setValue(false)
+
+            }
+
+        }
+    }
+    private fun setToggle(){
+        userDB.child(userUid).child("alarm").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val alarmEnabled = dataSnapshot.getValue(Boolean::class.java)
+                if (alarmEnabled != null) {
+                    binding.noticeToggleBtn.isChecked = alarmEnabled
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+               Log.d("setToggle",databaseError.toString())
+            }
+        })
     }
 
     private fun deletePost() {
@@ -116,6 +146,7 @@ class MyPageFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
+        setToggle()
     }
 
     override fun onStop() {

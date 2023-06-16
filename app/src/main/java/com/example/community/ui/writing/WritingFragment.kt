@@ -42,6 +42,7 @@ class WritingFragment : Fragment() {
     private lateinit var user: User
     private val gson: Gson = Gson()
     private val postDB = Firebase.database.getReference("post")
+    private val userDB = Firebase.database.getReference("user")
 
     private var imgList = arrayListOf<String>()  // 이미지 리스트 가져오기
 
@@ -56,26 +57,48 @@ class WritingFragment : Fragment() {
 
         val userJson = MyApplication.prefs.getUser("user", "")
         user = gson.fromJson(userJson, User::class.java)
-
-        binding.currentLocationTv.text = user.location
+        initLocation()
 
         binding.addPhotoIv.setOnClickListener {
             getPermission()
         }
+        return binding.root
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun savePost(location: String) {
         binding.writeDoneIv.setOnClickListener {  // 작성 완료
-            addPost()
+            addPost(location)
             binding.writingContentEt.text = null
             binding.writingTitleEt.text = null
             binding.writeGalleryRv.layoutManager = null
         }
-
-        return binding.root
     }
 
+    private fun initLocation() {
+        val userUid = MyApplication.prefs.getUid("uid", "")
+
+        userDB.child(userUid).child("location")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                @RequiresApi(Build.VERSION_CODES.O)
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val userLocation = snapshot.getValue(String::class.java)
+                    if (userLocation != null) {
+                        binding.currentLocationTv.text = userLocation
+                        savePost(userLocation)
+
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("getUser", error.toString())
+                }
+
+            })
+    }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun addPost() {
+    private fun addPost(location: String) {
 
         val title = binding.writingTitleEt.text.toString()
         val content = binding.writingContentEt.text.toString()
@@ -93,7 +116,7 @@ class WritingFragment : Fragment() {
 
             val addpost = Post(
                 0,
-                user.location,
+                location,
                 user.age,
                 userUid,
                 user.nickname,

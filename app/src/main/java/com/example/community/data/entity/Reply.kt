@@ -7,5 +7,6 @@ data class Reply(  // 대댓글
     val nickname: String? = "",
     val date: String? ="",
     var content:String="",
-    var replyIdx:Int=0
+    var replyIdx:Int=0,
+    var commentIdx:Int=0
 )
