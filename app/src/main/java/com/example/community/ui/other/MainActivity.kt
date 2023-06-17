@@ -14,8 +14,8 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.community.R
-import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.User
+import com.example.community.data.local.MyApplication
 import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
@@ -28,9 +28,9 @@ class MainActivity :
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
+    private var gson: Gson = Gson()
 
     private val userViewModel: AuthViewModel by viewModels()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,27 +38,38 @@ class MainActivity :
         setContentView(binding.root)
 
         val userUid = MyApplication.prefs.getUid("uid", "")
-        getUser(userUid) // user 정보 가져오기
 
-        val navHostFragment =   // FragmentContainerView
+        val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = navHostFragment.navController
 
         drawerLayout = binding.drawerLayout
 
+        getUser(userUid)
+
     }
 
-    private fun getUser(userUid:String){
-        userViewModel.getUser(userUid).observe(this){
-            val location=it.location
-            val email=it.email
+    private fun getUser(userUid: String) {
+        userViewModel.getUser(userUid).observe(this) {
+            val location = it.location
+            val email = it.email
+            val token: String = it.fcmToken!!["token"] as String
 
-            initNavi(email,location)
+            initNavi(email, location)
             setAge(location)
+            saveUserPref(it, token)
         }
     }
 
-    private fun initNavi(email:String,location:String) {
+    private fun saveUserPref(user: User, token: String) {
+
+        val userJson = gson.toJson(user)
+        MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
+        MyApplication.prefs.setToken("token", token)
+
+    }
+
+    private fun initNavi(email: String, location: String) {
 
         binding.navBar.setupWithNavController(navController)
         binding.navBar.background = null   // 바텀네비게이션 배경 없애기

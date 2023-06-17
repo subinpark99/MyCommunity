@@ -58,10 +58,10 @@ class MyContentsFragment : Fragment() {
                 if (snapshot.exists()) {
                     for (contentSnapshot in snapshot.children.reversed()) { // reversed로 최근 게시물이 위로 오게
 
-                        val post = contentSnapshot.getValue(Post::class.java)
-                        if (post != null) {
-                            rvAdpater.submitList(post)
-                        }
+//                        val post = contentSnapshot.getValue(Post::class.java)
+//                        if (post != null) {
+//                            rvAdpater.submitList(post)
+//                        }
                     }
                 }
             }

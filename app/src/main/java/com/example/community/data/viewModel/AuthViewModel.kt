@@ -22,7 +22,7 @@ class AuthViewModel : ViewModel() {
 
     fun registerUser(
         nickname: String, email: String, password: String,
-        location: String, age: String, alarm: Boolean
+        location: String, age: Int, alarm: Boolean
     ) =
         viewModelScope.launch {
             if (checkRegisterNull(email, password, location, age)) {
@@ -43,10 +43,10 @@ class AuthViewModel : ViewModel() {
         email: String,
         password: String,
         location: String,
-        age: String
+        age: Int
     ): Boolean {
         return !(email.isEmpty() && password.isEmpty() &&
-                location.isEmpty() && age.isEmpty())
+                location.isEmpty() && age.toString().isEmpty())
     }
 
 

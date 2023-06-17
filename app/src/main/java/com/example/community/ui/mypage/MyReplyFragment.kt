@@ -99,7 +99,7 @@ class MyReplyFragment : Fragment() {
                     val postSnapshot = dataSnapshot.children.first()
                     val post = postSnapshot.getValue(Post::class.java)
                     if (post != null) {
-                        adapter.submitList(post)
+                      //  adapter.submitList(post)
                     }
                 }
             }

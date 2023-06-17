@@ -24,8 +24,14 @@ class ContentRVAdpater(
     private val items = ArrayList<Post>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitList(post: Post) {
-        this.items.add(post)
+    fun ageList(post: List<Post>) {
+        this.items.addAll(post)
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun locationList(post: List<Post>) {
+        this.items.addAll(post)
         notifyDataSetChanged()
     }
 

@@ -151,7 +151,7 @@ class SignUpActivity : AppCompatActivity() {
             val password = binding.putPasswordTv.text.toString()
             val nickname = binding.putNicknameEv.text.toString()
             val location = binding.setLocationTv.text.toString()
-            val age = binding.putAgeEv.text.toString()
+            val age = binding.putAgeEv.text.toString().toInt()
 
             authViewModel.registerUser(nickname, email, password, location, age, false)
         }

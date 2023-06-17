@@ -3,7 +3,6 @@ package com.example.community.ui.signup_login
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
@@ -39,7 +38,7 @@ class LoginActivity : AppCompatActivity() {
         loginViewModel.loginState.observe(this) { state ->
             when (state) {
                 true -> {  // 로그인 성공하면 메인으로 이동
-                    saveData()
+                    saveUidPref()
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     finish()
@@ -51,12 +50,10 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    private fun saveData() {
+    private fun saveUidPref() {
 
         val user = Firebase.auth.currentUser!!.uid
         MyApplication.prefs.setUid("uid", user)
-
-        Log.d("save", user)
     }
 
     private fun init() {
