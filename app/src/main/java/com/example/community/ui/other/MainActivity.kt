@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -13,8 +14,9 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.community.R
-import com.example.community.data.MyApplication
+import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.User
+import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
@@ -23,30 +25,40 @@ class MainActivity :
     AppCompatActivity(),
     NavigationView.OnNavigationItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
-    private lateinit var user: User
-    private val gson: Gson = Gson()
+
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
+
+    private val userViewModel: AuthViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val userJson = MyApplication.prefs.getUser("user", "")
-        user = gson.fromJson(userJson, User::class.java)
+        val userUid = MyApplication.prefs.getUid("uid", "")
+        getUser(userUid) // user 정보 가져오기
 
         val navHostFragment =   // FragmentContainerView
             supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = navHostFragment.navController
 
         drawerLayout = binding.drawerLayout
-        initNavi()
-        setAge()
 
     }
 
-    private fun initNavi() {
+    private fun getUser(userUid:String){
+        userViewModel.getUser(userUid).observe(this){
+            val location=it.location
+            val email=it.email
+
+            initNavi(email,location)
+            setAge(location)
+        }
+    }
+
+    private fun initNavi(email:String,location:String) {
 
         binding.navBar.setupWithNavController(navController)
         binding.navBar.background = null   // 바텀네비게이션 배경 없애기
@@ -64,8 +76,8 @@ class MainActivity :
         val userEmailView = headerView.findViewById<TextView>(R.id.user_email_tv)
         val userAddressView = headerView.findViewById<TextView>(R.id.user_address_tv)
 
-        userEmailView.text = user.email
-        userAddressView.text = user.location
+        userEmailView.text = email
+        userAddressView.text = location
 
     }
 
@@ -82,9 +94,9 @@ class MainActivity :
         return super.onOptionsItemSelected(item)
     }
 
-    private fun setAge() {
+    private fun setAge(location: String) {
 
-        val province = user.location.split(" ")[0] // 광역시,도
+        val province = location.split(" ")[0] // 광역시,도
         val parentList = mutableListOf("$province ' s")
         val childList = mutableListOf(mutableListOf("10대", "20대", "30대", "40대", "50대", "60대"))
 

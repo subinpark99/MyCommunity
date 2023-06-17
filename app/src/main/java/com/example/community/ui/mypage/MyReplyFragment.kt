@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.community.data.MyApplication
+import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.Comment
 import com.example.community.data.entity.Post
 import com.example.community.databinding.FragmentMyreplyBinding

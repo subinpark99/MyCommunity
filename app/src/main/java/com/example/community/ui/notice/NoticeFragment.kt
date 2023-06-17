@@ -8,17 +8,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.community.data.MyApplication
+import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.Comment
 import com.example.community.data.entity.Post
 import com.example.community.data.entity.User
 import com.example.community.databinding.FragmentNoticeBinding
-import com.example.community.ui.mypage.MyPageFragment
 import com.example.community.ui.notice.fcm.RetrofitInstance
 import com.example.community.ui.notice.fcm.model.NotificationData
 import com.example.community.ui.notice.fcm.model.PushNotification
@@ -29,7 +27,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.properties.Delegates
 
 
 class NoticeFragment : Fragment() {

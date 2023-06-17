@@ -17,7 +17,7 @@
         tools:ignore="ScopedStorage" />    <!--저장소 쓰기 권한-->
 
     <application
-        android:name=".data.MyApplication"
+        android:name=".data.local.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

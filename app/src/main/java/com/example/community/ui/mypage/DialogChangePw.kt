@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import com.example.community.data.MyApplication
+import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.User
 import com.example.community.databinding.DialogChangePwBinding
 import com.google.android.material.snackbar.Snackbar
@@ -54,7 +54,7 @@ class DialogChangePw  : DialogFragment(), View.OnClickListener {
             val curPw=binding.putCurrentPw.text.toString()
             val newPw=binding.putNewPw.text.toString()
 
-            if (curPw!=user.pw){
+            if (curPw!=user.password){
                 Snackbar.make(binding.root, "비밀번호가 일치하지 않습니다", Snackbar.LENGTH_SHORT).show()
                 return@setOnClickListener
             }

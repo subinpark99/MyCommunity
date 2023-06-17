@@ -20,7 +20,7 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import com.example.community.R
-import com.example.community.data.MyApplication
+import com.example.community.data.local.MyApplication
 import com.example.community.databinding.DialogChangeLocationBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices

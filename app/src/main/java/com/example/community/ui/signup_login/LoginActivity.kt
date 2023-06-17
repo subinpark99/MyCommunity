@@ -3,78 +3,60 @@ package com.example.community.ui.signup_login
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.example.community.data.MyApplication
-import com.example.community.data.entity.User
+import com.example.community.data.local.MyApplication
+import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.ActivityLoginBinding
 import com.example.community.ui.other.MainActivity
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
-    private lateinit var auth: FirebaseAuth
-    private val userRef = Firebase.database.getReference("user")
-    private var gson: Gson = Gson()
-
+    private val loginViewModel: AuthViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
         init()
 
-        auth = Firebase.auth
         initLoginButton()
     }
 
     private fun initLoginButton() {
+
         binding.loginBtn.setOnClickListener {
+
             val email = binding.putEmailTv.text.toString()
             val password = binding.putPasswordTv.text.toString()
-
-            if (email.isEmpty() or password.isEmpty()) {
-                return@setOnClickListener
-            }
-
-            auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        var users: User
-
-                        auth.currentUser?.let { it1 ->
-                            userRef.child(it1.uid).get().addOnSuccessListener {
-                                if (it != null) {
-
-                                    users = it.getValue(User::class.java)!!
-
-                                    saveData(auth.currentUser!!.uid, users,
-                                        users.fcmtoken?.get("token") as String
-                                    )
-                                    val intent = Intent(this, MainActivity::class.java)
-                                    startActivity(intent)
-                                    finish()
-                                }
-                            }
-                        }
-                    } else {
-                        Toast.makeText(this, "아이디와 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
-                    }
-                }
+            loginViewModel.loginUser(email, password)
         }
+        loginViewModel.loginState.observe(this) { state ->
+            when (state) {
+                true -> {  // 로그인 성공하면 메인으로 이동
+                    saveData()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                else -> Toast.makeText(this, "아이디와 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
+
+            }
+        }
+
     }
 
-    private fun saveData(uid: String, user: User,token:String) {
+    private fun saveData() {
 
-        val userJson = gson.toJson(user)
-        MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
-        MyApplication.prefs.setToken("token", token)
-        MyApplication.prefs.setUid("uid", uid) // current user uid 저장
+        val user = Firebase.auth.currentUser!!.uid
+        MyApplication.prefs.setUid("uid", user)
+
+        Log.d("save", user)
     }
 
     private fun init() {
@@ -83,6 +65,7 @@ class LoginActivity : AppCompatActivity() {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
+
         // 상태바 없애기
         @Suppress("DEPRECATION")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {

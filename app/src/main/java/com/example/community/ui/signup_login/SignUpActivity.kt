@@ -11,31 +11,26 @@ import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.example.community.R
-import com.example.community.data.entity.User
+import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.ActivitySignupBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.app
-import com.google.firebase.messaging.FirebaseMessaging
 import java.util.*
 
 
 class SignUpActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivitySignupBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private lateinit var auth: FirebaseAuth
-    private lateinit var db: DatabaseReference
+
+    private val authViewModel: AuthViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +38,7 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
         init()
+
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this) // 등록
 
@@ -60,8 +56,6 @@ class SignUpActivity : AppCompatActivity() {
             binding.setLocationTv.text = intent.getStringExtra("location")
         }
 
-        auth = Firebase.auth
-        db = FirebaseDatabase.getInstance().reference
 
         initSignupButton() // 회원가입 버튼 클릭
     }
@@ -150,62 +144,40 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun initSignupButton() {
+
         binding.submitBtn.setOnClickListener {
+
             val email = binding.putEmailTv.text.toString()
             val password = binding.putPasswordTv.text.toString()
             val nickname = binding.putNicknameEv.text.toString()
             val location = binding.setLocationTv.text.toString()
             val age = binding.putAgeEv.text.toString()
 
-            if (email.isEmpty() or password.isEmpty() or nickname.isEmpty() or location.isEmpty() or age.isEmpty()) {
-                Toast.makeText(this, "정보를 입력해주세요", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            authViewModel.registerUser(nickname, email, password, location, age, false)
+        }
+
+        authViewModel.registerState.observe(this) { state ->
+            when (state) {
+                true -> {
+                    val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
+                    startActivity(intent)
+
+                    val user = Firebase.auth.currentUser!!.uid
+                    authViewModel.getFcmToken(user)
+
+                    Toast.makeText(this, "회원가입에 성공했습니다!", Toast.LENGTH_SHORT).show()
+                }
+                else -> Toast.makeText(this, "이미 존재하는 계정이거나, 회원가입에 실패했습니다.", Toast.LENGTH_SHORT)
+                    .show()
+
             }
-
-            auth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-
-                        val user = User(email, password, nickname, location, age.toInt(),false)
-
-                        db.child("user").child(auth.uid.toString()).setValue(user)
-                        fcmToken()
-
-                        val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
-                        startActivity(intent)
-
-                        Toast.makeText(this, "회원가입에 성공했습니다!", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(this, "이미 존재하는 계정이거나, 회원가입에 실패했습니다.", Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                }
         }
+
     }
 
-    private fun fcmToken() {
-        val curUser = auth.currentUser
-        if (curUser != null) {
-
-            FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.d("FetchingFCM registration token failed", task.exception.toString())
-                    return@OnCompleteListener
-                }
-                val token = task.result
-                val msg = getString(R.string.msg_token_fmt, token)
-
-                val mFireDatabase = FirebaseDatabase.getInstance(Firebase.app)
-                mFireDatabase.getReference("user")
-                    .child(curUser.uid).child("fcmtoken").child("token")
-                    .setValue(msg)
-
-            })
-
-        }
-    }
 
     private fun init() {
+
 
         // 상태바 없애기
         @Suppress("DEPRECATION")

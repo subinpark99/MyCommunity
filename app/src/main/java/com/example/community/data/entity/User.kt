@@ -2,10 +2,10 @@ package com.example.community.data.entity
 
 data class User(
     val email:String="",
-    val pw:String="",
+    val password:String="",
     val nickname:String="",
     val location:String="",
-    val age:Int=0,
+    val age:String="",
     val alarm:Boolean=false,
-    val fcmtoken:HashMap<String, Any>? = null  // 토큰 안에 토큰 값
+    val fcmToken:HashMap<String, Any>? = null  // 토큰 안에 토큰 값
 )
