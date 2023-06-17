@@ -2,7 +2,9 @@ package com.example.community.data.repository
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.fragment.findNavController
 import com.example.community.data.entity.Post
+import com.example.community.ui.home.InContentFragmentDirections
 import com.google.firebase.database.*
 
 
@@ -89,6 +91,13 @@ class PostRepository {
 
     }
 
+    fun deletePost(postIdx: Int,state: (Boolean) -> Unit){
+
+        val deleteRef = database.child("post")
+        deleteRef.child(postIdx.toString()).removeValue()
+            .addOnSuccessListener { state(true) }.addOnFailureListener { state(false) }
+
+    }
 
 }
 

@@ -16,6 +16,9 @@ class PostViewModel : ViewModel() {
     private var _addPostState = MutableLiveData<Boolean>()
     val addPostState: LiveData<Boolean> = _addPostState
 
+    private var _deletePostState = MutableLiveData<Boolean>()
+    val deletePostState: LiveData<Boolean> = _deletePostState
+
     fun getLatestPost(): MutableLiveData<MutableList<Post>?> {
         return postRepo.getLatestPost()
     }
@@ -64,6 +67,18 @@ class PostViewModel : ViewModel() {
     fun updatePostCnt(postIdx: Int) {
         viewModelScope.launch {
             postRepo.updatePostCnt(postIdx)
+        }
+    }
+
+    fun deletePost(postIdx: Int){
+        viewModelScope.launch {
+            postRepo.deletePost(postIdx) { success ->
+                if (success) {
+                    _deletePostState.postValue(true)
+                } else {
+                    _deletePostState.postValue(false)
+                }
+            }
         }
     }
 }
