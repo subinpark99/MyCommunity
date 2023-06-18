@@ -21,7 +21,7 @@ class CommentViewModel: ViewModel() {
     private var _deletePostCommentState = MutableLiveData<Boolean>()
     val deletePostCommentState: LiveData<Boolean> = _deletePostCommentState
 
-    fun getLatestComment(): MutableLiveData<MutableList<Comment>?> {
+    fun getLatestComment(): MutableLiveData<Comment?> {
         return commmentRepo.getLatestComment()
     }
 

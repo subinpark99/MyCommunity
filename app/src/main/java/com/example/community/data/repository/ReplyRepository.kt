@@ -8,20 +8,20 @@ import com.google.firebase.database.*
 class ReplyRepository {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    fun getLatestReply(): MutableLiveData<MutableList<Reply>?> {
-        val replyLiveData = MutableLiveData<MutableList<Reply>?>()
+    fun getLatestReply(): MutableLiveData<Reply?> {
+        val replyLiveData = MutableLiveData<Reply?>()
 
-        val replyRef = database.child("reply")
+        val replyRef = database.child("reply").orderByChild("replyIdx").limitToLast(1)
         replyRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val replyList = mutableListOf<Reply>()
+                var latestReply: Reply? = null
                 for (childSnapshot in snapshot.children) {
                     val reply = childSnapshot.getValue(Reply::class.java)
                     if (reply != null) {
-                        replyList.add(reply)
+                        latestReply = reply
                     }
                 }
-                replyLiveData.value = replyList
+                replyLiveData.value = latestReply
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -44,14 +44,15 @@ class ReplyRepository {
 
         val replyLiveData = MutableLiveData<MutableList<Reply>>()
 
-        val replyRef = database.child("reply")
+        val replyRef =
+            database.child("reply").orderByChild("commentIdx").equalTo(commentIdx.toDouble())
         replyRef.addValueEventListener(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val replyList = mutableListOf<Reply>()
                 for (replySnapshot in snapshot.children) {
                     val reply = replySnapshot.getValue(Reply::class.java)
-                    if (reply != null && reply.commentIdx == commentIdx) replyList.add(reply)
+                    if (reply != null) replyList.add(reply)
                 }
                 replyLiveData.value = replyList
             }

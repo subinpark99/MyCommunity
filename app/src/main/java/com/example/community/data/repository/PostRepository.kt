@@ -2,9 +2,7 @@ package com.example.community.data.repository
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.fragment.findNavController
 import com.example.community.data.entity.Post
-import com.example.community.ui.home.InContentFragmentDirections
 import com.google.firebase.database.*
 
 
@@ -12,20 +10,20 @@ class PostRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    fun getLatestPost(): MutableLiveData<MutableList<Post>?> {
-        val postLiveData = MutableLiveData<MutableList<Post>?>()
+    fun getLatestPost(): MutableLiveData<Post?> {
+        val postLiveData = MutableLiveData<Post?>()
 
-        val postRef = database.child("post")
+        val postRef = database.child("post").orderByChild("postIdx").limitToLast(1)
         postRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val postList = mutableListOf<Post>()
+                var latestPost: Post? = null
                 for (childSnapshot in snapshot.children) {
                     val post = childSnapshot.getValue(Post::class.java)
                     if (post != null) {
-                        postList.add(post)
+                        latestPost = post
                     }
                 }
-                postLiveData.value = postList
+                postLiveData.value = latestPost
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -91,7 +89,7 @@ class PostRepository {
 
     }
 
-    fun deletePost(postIdx: Int,state: (Boolean) -> Unit){
+    fun deletePost(postIdx: Int, state: (Boolean) -> Unit) {
 
         val deleteRef = database.child("post")
         deleteRef.child(postIdx.toString()).removeValue()

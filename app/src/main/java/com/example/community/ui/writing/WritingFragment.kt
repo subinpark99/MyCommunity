@@ -34,7 +34,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.properties.Delegates
 
 
 class WritingFragment : Fragment() {
@@ -43,8 +42,6 @@ class WritingFragment : Fragment() {
 
     private val gson: Gson = Gson()
     private val postViewModel: PostViewModel by viewModels()
-
-    private var updatePostIdx by Delegates.notNull<Int>()
 
     private var imgList = arrayListOf<String>()  // 이미지 리스트 가져오기
 
@@ -84,12 +81,14 @@ class WritingFragment : Fragment() {
         val title = binding.writingTitleEt.text.toString()
         val content = binding.writingContentEt.text.toString()
 
-        postViewModel.getLatestPost().observe(this) { postList ->
-            if (postList != null && postList.isNotEmpty()) {
-                val latestPost = postList.maxByOrNull { it.postIdx }
-                updatePostIdx = latestPost!!.postIdx.plus(1)
-                updatePost(user, userUid, location, updatePostIdx, title, content)
-            } else updatePost(user, userUid, location, 0, title, content)
+        postViewModel.getLatestPost().observe(this) { post ->
+
+            val updatePostIdx = if (post != null) { // 제일 최근 postIdx +1
+                post.postIdx + 1
+            } else {
+                0
+            }
+            updatePost(user, userUid, location, updatePostIdx, title, content)
         }
 
     }

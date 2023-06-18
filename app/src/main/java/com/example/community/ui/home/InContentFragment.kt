@@ -25,7 +25,7 @@ import com.example.community.ui.writing.GalleryAdapter
 import com.google.gson.Gson
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.properties.Delegates
+
 
 class InContentFragment : Fragment() {
 
@@ -34,9 +34,6 @@ class InContentFragment : Fragment() {
 
     private lateinit var postData: Post
     private var currentCommentIdx: Int = 0
-
-    private var updateCommentIdx by Delegates.notNull<Int>()
-    private var updateReplyIdx by Delegates.notNull<Int>()
 
     private val commentViewModel: CommentViewModel by viewModels()
     private val postViewModel: PostViewModel by viewModels()
@@ -104,12 +101,13 @@ class InContentFragment : Fragment() {
             val content = binding.commentEt.text.toString()
 
             commentViewModel.getLatestComment()
-                .observe(this) { commentList -> // 제일 최근 commentIdx 가져와서 +1
-                    if (commentList != null && commentList.isNotEmpty()) {
-                        val latestComment = commentList.maxByOrNull { it.commentIdx }
-                        updateCommentIdx = latestComment!!.commentIdx.plus(1)
-                        updateComment(userUid, updateCommentIdx, content)
-                    } else updateComment(userUid, 0, content)
+                .observe(this) { comment -> // 제일 최근 commentIdx 가져와서 +1
+                    val updateCommentIdx = if (comment != null) {
+                        comment.commentIdx + 1
+                    } else {
+                        0
+                    }
+                    updateComment(userUid, updateCommentIdx, content)
                 }
 
             binding.commentEt.text = null
@@ -252,12 +250,13 @@ class InContentFragment : Fragment() {
             return
         }
 
-        replyViewModel.getLatestReply().observe(this) { replyList ->  // 최신 대댓글 idx +1
-            if (replyList != null && replyList.isNotEmpty()) {
-                val latestReply = replyList.maxByOrNull { it.replyIdx }
-                updateReplyIdx = latestReply!!.replyIdx.plus(1)
-                updateReply(userUid, updateReplyIdx, content, commentIdx)
-            } else updateReply(userUid, 0, content, commentIdx)
+        replyViewModel.getLatestReply().observe(this) { reply ->  // // 제일 최근 replyIdx 가져와서 +1
+            val updateReplyIdx = if (reply != null) {
+                reply.replyIdx + 1
+            } else {
+                0
+            }
+            updateReply(userUid, updateReplyIdx, content, commentIdx)
         }
     }
 
@@ -274,7 +273,7 @@ class InContentFragment : Fragment() {
         val currentTime = LocalDateTime.now().format(timeFormatter)
 
 
-        replyViewModel.addReply(  //  대댓글 추가
+        replyViewModel.addReply(
             userUid,
             postData.postIdx,
             user.nickname,

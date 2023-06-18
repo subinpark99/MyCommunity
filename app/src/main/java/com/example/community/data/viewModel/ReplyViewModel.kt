@@ -17,7 +17,7 @@ class ReplyViewModel : ViewModel() {
     private var _deleteReplyState = MutableLiveData<Boolean>()
     val deleteReplyState: LiveData<Boolean> = _deleteReplyState
 
-    fun getLatestReply(): MutableLiveData<MutableList<Reply>?> {
+    fun getLatestReply(): MutableLiveData<Reply?> {
         return replyRepo.getLatestReply()
     }
 

@@ -2,29 +2,28 @@ package com.example.community.data.repository
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.navigation.fragment.findNavController
 import com.example.community.data.entity.Comment
-import com.example.community.ui.home.InContentFragmentDirections
 import com.google.firebase.database.*
 
 class CommentRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    fun getLatestComment(): MutableLiveData<MutableList<Comment>?> {
-        val commentLiveData = MutableLiveData<MutableList<Comment>?>()
+    fun getLatestComment(): MutableLiveData<Comment?> {
+        val commentLiveData = MutableLiveData<Comment?>()
 
-        val commentRef = database.child("comment")
+        val commentRef = database.child("comment").orderByChild("commentIdx").limitToLast(1)
         commentRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val commentList = mutableListOf<Comment>()
+                var latestComment: Comment? = null
                 for (childSnapshot in snapshot.children) {
                     val comment = childSnapshot.getValue(Comment::class.java)
+
                     if (comment != null) {
-                        commentList.add(comment)
+                        latestComment = comment
                     }
                 }
-                commentLiveData.value = commentList
+                commentLiveData.value = latestComment
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -44,18 +43,19 @@ class CommentRepository {
     }
 
 
-    fun getComment(postIdx:Int): MutableLiveData<MutableList<Comment>> { // postIdx에 해당하는 댓글 가져오기
+    fun getComment(postIdx: Int): MutableLiveData<MutableList<Comment>> { // postIdx에 해당하는 댓글 가져오기
 
         val commentLiveData = MutableLiveData<MutableList<Comment>>()
 
-        val commentRef = database.child("comment")
+        val commentRef =
+            database.child("comment").orderByChild("postIdx").equalTo(postIdx.toDouble())
         commentRef.addValueEventListener(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val commentList = mutableListOf<Comment>()
                 for (comSnapshot in snapshot.children) {
                     val comment = comSnapshot.getValue(Comment::class.java)
-                    if (comment != null&& comment.postIdx==postIdx) commentList.add(comment)
+                    if (comment != null) commentList.add(comment)
                 }
                 commentLiveData.value = commentList
             }
@@ -74,10 +74,11 @@ class CommentRepository {
             .addOnSuccessListener { state(true) }.addOnFailureListener { state(false) }
     }
 
-    fun deletePostComment(postIdx: Int, state: (Boolean) -> Unit){
+    fun deletePostComment(postIdx: Int, state: (Boolean) -> Unit) {
 
-        val deleteComment=database.child("comment").orderByChild("postIdx").equalTo(postIdx.toDouble())
-        deleteComment.addListenerForSingleValueEvent(object :ValueEventListener{
+        val deleteComment =
+            database.child("comment").orderByChild("postIdx").equalTo(postIdx.toDouble())
+        deleteComment.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (commentSnapshot in snapshot.children) { // 각 댓글에 대한 데이터
                     commentSnapshot.ref.removeValue()
