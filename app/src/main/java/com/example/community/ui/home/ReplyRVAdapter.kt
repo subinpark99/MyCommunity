@@ -15,7 +15,7 @@ class ReplyRVAdapter(private val userUid: String) :
 
     @SuppressLint("NotifyDataSetChanged")
     fun addReplies(reply: List<Reply>) {
-        this.items.clear() // 기존 댓글 삭제
+        this.items.clear()
         this.items.addAll(reply)
         notifyDataSetChanged()
     }
@@ -53,7 +53,7 @@ class ReplyRVAdapter(private val userUid: String) :
 
     inner class ViewHolder(val binding: ItemReplyBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(reply:Reply) {
+        fun bind(reply: Reply) {
             binding.contentTimeTv.text = reply.date
             binding.contentTv.text = reply.content
             binding.userNicknameTv.text = reply.nickname

@@ -7,33 +7,33 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
+import android.widget.Toast
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.community.data.entity.Comment
-import com.example.community.data.entity.Reply
+import com.example.community.data.viewModel.ReplyViewModel
 import com.example.community.databinding.ItemCommentBinding
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
 
 
 class CommentAdapter(
     private val userUid: String,
-    private val replyDB:DatabaseReference,
-    val context: Context
+    val context: Context,
+    val replyViewModel: ReplyViewModel,
+    val lifecycleOwner: LifecycleOwner
 ) :
     RecyclerView.Adapter<CommentAdapter.ViewHolder>() {
 
     private val items = arrayListOf<Comment>()
 
+
     @SuppressLint("NotifyDataSetChanged")
     fun submitList(comment: List<Comment>) {
-        this.items.clear() // 기존 댓글 삭제
+        this.items.clear()
         this.items.addAll(comment)
         notifyDataSetChanged()
     }
+
 
     interface DeleteInterface {  // 댓글 삭제
         fun onDeleteClicked(commentIdx: Int)
@@ -87,31 +87,33 @@ class CommentAdapter(
             binding.contentTv.text = comment.content
             binding.userNicknameTv.text = comment.nickname
 
-            val adapter=ReplyRVAdapter(userUid)
+            val adapter = ReplyRVAdapter(userUid)
             binding.replyRv.adapter = adapter
             binding.replyRv.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
+            replyViewModel.getReply(comment.commentIdx).observe(lifecycleOwner) {
+                adapter.addReplies(it)  // 대댓글 가져오기
+            }
 
-            replyDB.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val reply = ArrayList<Reply>() // 새로운 댓글
-                    if (snapshot.exists()) {
-                        for (cmSnapShot in snapshot.children) {
-                            val data = cmSnapShot.getValue(Reply::class.java)
-
-                            if (data != null && data.commentIdx == comment.commentIdx) {
-                                reply.add(data)
-                            }
-                        }
-                    }
-                    adapter.addReplies(reply)  // 댓글 전체 update
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d("getCommentFail", error.toString())
+            adapter.setItemClickListener(object : ReplyRVAdapter.DeleteInterface {
+                override fun onDeleteClicked(replyIdx: Int) {
+                    replyViewModel.deleteReply(replyIdx)  // 대댓글 삭제
+                    deleteReplyState()
                 }
             })
+        }
+    }
+
+    private fun deleteReplyState() {
+        replyViewModel.deleteReplyState.observe(lifecycleOwner) { state ->
+            when (state) {
+                true -> {
+                    Toast.makeText(context, "삭제되었습니다", Toast.LENGTH_SHORT).show()
+                }
+                else -> Log.d("deleteReply", "failed")
+
+            }
         }
     }
 }

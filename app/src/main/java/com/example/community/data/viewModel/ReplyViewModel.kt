@@ -2,13 +2,12 @@ package com.example.community.data.viewModel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-
-import com.example.community.data.entity.Post
+import androidx.lifecycle.ViewModel
 import com.example.community.data.entity.Reply
 import com.example.community.data.repository.ReplyRepository
 
 
-class ReplyViewModel {
+class ReplyViewModel : ViewModel() {
 
     private val replyRepo = ReplyRepository()
 
@@ -18,24 +17,24 @@ class ReplyViewModel {
     private var _deleteReplyState = MutableLiveData<Boolean>()
     val deleteReplyState: LiveData<Boolean> = _deleteReplyState
 
-
     fun getLatestReply(): MutableLiveData<MutableList<Reply>?> {
         return replyRepo.getLatestReply()
     }
 
     fun addReply(
-        uid:String,
+        uid: String,
         postIdx: Int,
         nickname: String,
         date: String,
-        content:String,
-        replyIdx:Int,
-        commentIdx:Int
+        time: String,
+        content: String,
+        replyIdx: Int,
+        commentIdx: Int
     ) {
         if (checkAddNull(content)) {
             val reply =
-                Reply(uid, postIdx, nickname, date, content, replyIdx, commentIdx)
-            replyRepo.addReply(replyIdx,reply) { success ->
+                Reply(uid, postIdx, nickname, date, time, content, replyIdx, commentIdx)
+            replyRepo.addReply(replyIdx, reply) { success ->
                 if (success) {
                     _addReplyState.postValue(true)
                 } else {
@@ -60,14 +59,21 @@ class ReplyViewModel {
     }
 
 
-
-    fun deleteReply(replyIdx: Int){
-        return replyRepo.deleteReply(replyIdx){ success ->
+    fun deleteReply(replyIdx: Int) {
+        return replyRepo.deleteReply(replyIdx) { success ->
             if (success) {
                 _deleteReplyState.postValue(true)
             } else {
                 _deleteReplyState.postValue(false)
             }
         }
+    }
+
+    fun deleteAllCommentReply(commentIdx: Int) {
+        return replyRepo.deleteCommentReply(commentIdx)
+    }
+
+    fun deleteAllPostReply(postIdx: Int) {
+        replyRepo.deletePostReply(postIdx)
     }
 }

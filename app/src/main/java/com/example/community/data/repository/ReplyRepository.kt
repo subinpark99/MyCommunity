@@ -21,7 +21,7 @@ class ReplyRepository {
                         replyList.add(reply)
                     }
                 }
-                replyLiveData.value =replyList
+                replyLiveData.value = replyList
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -40,7 +40,7 @@ class ReplyRepository {
     }
 
 
-    fun getReply(commentIdx:Int): MutableLiveData<MutableList<Reply>> { // commentIdx에 해당하는 대댓글 가져오기
+    fun getReply(commentIdx: Int): MutableLiveData<MutableList<Reply>> { // commentIdx에 해당하는 대댓글 가져오기
 
         val replyLiveData = MutableLiveData<MutableList<Reply>>()
 
@@ -51,7 +51,7 @@ class ReplyRepository {
                 val replyList = mutableListOf<Reply>()
                 for (replySnapshot in snapshot.children) {
                     val reply = replySnapshot.getValue(Reply::class.java)
-                    if (reply != null && reply.commentIdx==commentIdx) replyList.add(reply)
+                    if (reply != null && reply.commentIdx == commentIdx) replyList.add(reply)
                 }
                 replyLiveData.value = replyList
             }
@@ -65,11 +65,46 @@ class ReplyRepository {
     }
 
 
-    fun deleteReply(replyIdx: Int,state: (Boolean) -> Unit){
+    fun deleteReply(replyIdx: Int, state: (Boolean) -> Unit) {
 
         val deleteRef = database.child("reply")
         deleteRef.child(replyIdx.toString()).removeValue()
             .addOnSuccessListener { state(true) }.addOnFailureListener { state(false) }
+    }
+
+    fun deleteCommentReply(commentIdx: Int) {
+
+        val deleteReply =
+            database.child("reply").orderByChild("commentIdx").equalTo(commentIdx.toDouble())
+        deleteReply.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (replySnapshot in snapshot.children) { // 각 댓글에 대한 데이터
+                    replySnapshot.ref.removeValue()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("deleteAllReply", error.toString())
+            }
+        })
+
+    }
+
+    fun deletePostReply(postIdx: Int) {
+
+        val deleteReply =
+            database.child("reply").orderByChild("postIdx").equalTo(postIdx.toDouble())
+        deleteReply.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (replySnapshot in snapshot.children) { // 각 댓글에 대한 데이터
+                    replySnapshot.ref.removeValue()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("deleteAllReply", error.toString())
+            }
+        })
 
     }
 

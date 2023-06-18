@@ -16,15 +16,12 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.Post
-import com.example.community.data.entity.Reply
 import com.example.community.data.entity.User
 import com.example.community.data.viewModel.CommentViewModel
 import com.example.community.data.viewModel.PostViewModel
+import com.example.community.data.viewModel.ReplyViewModel
 import com.example.community.databinding.FragmentInContentBinding
 import com.example.community.ui.writing.GalleryAdapter
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -35,21 +32,22 @@ class InContentFragment : Fragment() {
     private var _binding: FragmentInContentBinding? = null
     private val binding get() = _binding!!
 
-    private val replyDB = Firebase.database.getReference("reply")
     private lateinit var postData: Post
     private var currentCommentIdx: Int = 0
 
     private var updateCommentIdx by Delegates.notNull<Int>()
+    private var updateReplyIdx by Delegates.notNull<Int>()
 
     private val commentViewModel: CommentViewModel by viewModels()
     private val postViewModel: PostViewModel by viewModels()
+    private val replyViewModel: ReplyViewModel by viewModels()
 
     private lateinit var user: User
     private val gson: Gson = Gson()
 
     private lateinit var userUid: String
     private lateinit var userJson: String
-    var i=0
+
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -96,23 +94,23 @@ class InContentFragment : Fragment() {
             }
         }
 
-
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun saveComment(userUid: String){
+    private fun saveComment(userUid: String) {
 
-        binding.commentSubmitBnt.setOnClickListener { // 댓글 db에 저장
+        binding.commentSubmitBnt.setOnClickListener {
 
             val content = binding.commentEt.text.toString()
 
-            commentViewModel.getLatestComment().observe(this) { commentList ->
-                if (commentList != null && commentList.isNotEmpty()) {
-                    val latestComment= commentList.maxByOrNull { it.commentIdx }
-                    updateCommentIdx = latestComment!!.commentIdx.plus(1)
-                    updateComment(userUid,updateCommentIdx,content)
-                } else updateComment(userUid,0,content)
-            }
+            commentViewModel.getLatestComment()
+                .observe(this) { commentList -> // 제일 최근 commentIdx 가져와서 +1
+                    if (commentList != null && commentList.isNotEmpty()) {
+                        val latestComment = commentList.maxByOrNull { it.commentIdx }
+                        updateCommentIdx = latestComment!!.commentIdx.plus(1)
+                        updateComment(userUid, updateCommentIdx, content)
+                    } else updateComment(userUid, 0, content)
+                }
 
             binding.commentEt.text = null
         }
@@ -128,8 +126,10 @@ class InContentFragment : Fragment() {
         val currentDate = LocalDateTime.now().format(formatter)
         val currentTime = LocalDateTime.now().format(timeFormatter)
 
-        commentViewModel.addComment(userUid,postData.postIdx,content,updateCommentIdx,postData.nickname,
-        currentDate,currentTime)
+        commentViewModel.addComment(  // comment 추가
+            userUid, postData.postIdx, content, updateCommentIdx, postData.nickname,
+            currentDate, currentTime
+        )
 
         setCommentState()
     }
@@ -155,50 +155,51 @@ class InContentFragment : Fragment() {
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
 
-        commentViewModel.getComment(postData.postIdx).observe(this){
-            if (it!=null){
+        commentViewModel.getComment(postData.postIdx).observe(this) {
+            if (it != null) {
                 adapter.submitList(it)
             }
         }
     }
 
 
-    private fun deleteComment(adapter: CommentAdapter) {  // 댓글 삭제
+    private fun deleteComment(adapter: CommentAdapter) {
         adapter.setItemClickListener(object : CommentAdapter.DeleteInterface {
             override fun onDeleteClicked(commentIdx: Int) {
 
-                commentViewModel.deleteComment(commentIdx)
-
+                replyViewModel.deleteAllCommentReply(commentIdx)  // 연관 대댓글 모두 삭제
+                commentViewModel.deleteComment(commentIdx)  // 댓글 삭제
                 deleteCommentState()
             }
         })
     }
 
-    private fun deleteCommentState(){
+
+    private fun deleteCommentState() {
         commentViewModel.deleteCommentState.observe(this) { state ->
             when (state) {
                 true -> {
                     Toast.makeText(requireContext(), "삭제되었습니다", Toast.LENGTH_SHORT).show()
                 }
-                else -> Log.d("deleteComment", "failed")
-
+                else -> Log.d("deletePostComments", "failed")
             }
         }
     }
 
     private fun deletePost() {
 
-        val postIdx = postData.postIdx // 게시글 삭제
+        val postIdx = postData.postIdx
 
-        commentViewModel.deleteAllPostComment(postIdx)
+        commentViewModel.deleteAllPostComment(postIdx)  // 게시글 모든 댓글 삭제
         deletePostCommentsState(postIdx)
     }
 
-    private fun deletePostCommentsState(postIdx:Int){  // 게시글 연관 댓글 모두 삭제
+    private fun deletePostCommentsState(postIdx: Int) {
         commentViewModel.deletePostCommentState.observe(this) { state ->
             when (state) {
                 true -> {
-                    postViewModel.deletePost(postIdx)
+                    postViewModel.deletePost(postIdx) // 게시글 삭제
+                    replyViewModel.deleteAllPostReply(postIdx) // 게시글 모든 대댓글 삭제
                     deletePostState()
                 }
                 else -> Log.d("deletePostComments", "failed")
@@ -206,12 +207,12 @@ class InContentFragment : Fragment() {
         }
     }
 
-    private fun deletePostState(){
+    private fun deletePostState() {
         postViewModel.deletePostState.observe(this) { state ->
             when (state) {
                 true -> {
                     val arguments =
-                        InContentFragmentDirections.actionInContentFragmentToHomeFragment()
+                        InContentFragmentDirections.actionInContentFragmentToHomeFragment()  // 게시글 삭제되면 메인 화면으로 이동
                     findNavController().navigate(arguments)
                     Toast.makeText(requireContext(), "삭제되었습니다", Toast.LENGTH_SHORT).show()
                 }
@@ -222,71 +223,87 @@ class InContentFragment : Fragment() {
     }
 
 
-
-
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun clickReply(adapter:CommentAdapter){
+    private fun clickReply(adapter: CommentAdapter) {
 
-        adapter.setItemClickListener(object :CommentAdapter.ReplyInterface{
+        adapter.setItemClickListener(object : CommentAdapter.ReplyInterface {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onReplyClicked(commentIdx: Int) {
-                currentCommentIdx=commentIdx
-                binding.commentLayout.visibility=View.GONE
-                binding.replyLayout.visibility=View.VISIBLE
+                currentCommentIdx = commentIdx
+                binding.commentLayout.visibility = View.GONE
+                binding.replyLayout.visibility = View.VISIBLE
 
 
             }
         })
         binding.replySubmitBnt.setOnClickListener {
-            val commentIdx=currentCommentIdx
+            val commentIdx = currentCommentIdx
             saveReply(commentIdx)
-            Toast.makeText(requireContext(),"done",Toast.LENGTH_SHORT).show()
-            binding.commentLayout.visibility=View.VISIBLE
-            binding.replyLayout.visibility=View.GONE
+            binding.commentLayout.visibility = View.VISIBLE
+            binding.replyLayout.visibility = View.GONE
+            binding.replyEt.text = null
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun saveReply(commentIdx:Int){
+    private fun saveReply(commentIdx: Int) {
         val content = binding.replyEt.text.toString()
         if (content.isEmpty()) {
             return
         }
+
+        replyViewModel.getLatestReply().observe(this) { replyList ->  // 최신 대댓글 idx +1
+            if (replyList != null && replyList.isNotEmpty()) {
+                val latestReply = replyList.maxByOrNull { it.replyIdx }
+                updateReplyIdx = latestReply!!.replyIdx.plus(1)
+                updateReply(userUid, updateReplyIdx, content, commentIdx)
+            } else updateReply(userUid, 0, content, commentIdx)
+        }
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun updateReply(
+        userUid: String, updateReplyIdx: Int, content: String, commentIdx: Int
+    ) {
+
         val formatter = DateTimeFormatter.ofPattern("MM/dd")
         val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
         val currentDate = LocalDateTime.now().format(formatter)
         val currentTime = LocalDateTime.now().format(timeFormatter)
-        val reply =
-            Reply(
-                userUid,
-                postData.postIdx,
-                user.nickname,
-                currentDate,
-                content,
-                i,
-                commentIdx
-            )
 
-        val replydb = FirebaseDatabase.getInstance().reference
-        replydb.child("reply").child(i.toString()).setValue(reply)
 
+        replyViewModel.addReply(  //  대댓글 추가
+            userUid,
+            postData.postIdx,
+            user.nickname,
+            currentDate,
+            currentTime,
+            content,
+            updateReplyIdx,
+            commentIdx
+        )
+
+        setReplyState()
     }
 
 
+    private fun setReplyState() {
+        replyViewModel.addReplyState.observe(this) { state ->
+            when (state) {
+                true -> {
+                    Toast.makeText(requireContext(), "완료", Toast.LENGTH_SHORT).show()
+                }
+                else -> Log.d("setReply", "failed")
 
-
-
-
-
-
-
-
-
+            }
+        }
+    }
 
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private fun onRecyclerView(){
+    private fun onRecyclerView() {
 
         val imgAdapter = GalleryAdapter(requireContext())
         postData.imgs?.let { imgAdapter.submitList(it) }
@@ -294,7 +311,10 @@ class InContentFragment : Fragment() {
         binding.imgRv.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
 
-        val commentAdapter = CommentAdapter(userUid,replyDB,requireContext())
+
+        val lifecycleOwner = viewLifecycleOwner
+        val commentAdapter =
+            CommentAdapter(userUid, requireContext(), replyViewModel, lifecycleOwner)
         getComment(commentAdapter)
         deleteComment(commentAdapter)
         clickReply(commentAdapter)
