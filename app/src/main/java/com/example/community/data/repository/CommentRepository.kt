@@ -74,7 +74,7 @@ class CommentRepository {
             .addOnSuccessListener { state(true) }.addOnFailureListener { state(false) }
     }
 
-    fun deletePostComment(postIdx: Int, state: (Boolean) -> Unit) {
+    fun deletePostComment(postIdx: Int) {
 
         val deleteComment =
             database.child("comment").orderByChild("postIdx").equalTo(postIdx.toDouble())
@@ -82,16 +82,81 @@ class CommentRepository {
             override fun onDataChange(snapshot: DataSnapshot) {
                 for (commentSnapshot in snapshot.children) { // 각 댓글에 대한 데이터
                     commentSnapshot.ref.removeValue()
-                    state(true)
+
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.d("deleteAllComment", error.toString())
-                state(false)
+
             }
         })
 
     }
 
+    fun getNoticeComment(
+        postIdx: Int,
+        userUid: String
+    ): MutableLiveData<MutableList<Comment>> {  // 내가 쓴 게시물의 댓글
+
+        val commentLiveData = MutableLiveData<MutableList<Comment>>()
+
+        val commentRef =
+            database.child("comment").orderByChild("postIdx").equalTo(postIdx.toDouble())
+
+        commentRef.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val commentList = mutableListOf<Comment>()
+                for (comSnapshot in snapshot.children) {
+                    val comment = comSnapshot.getValue(Comment::class.java)
+                    if (comment != null && comment.uid != userUid) commentList.add(comment)
+                }
+                commentLiveData.value = commentList
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("getComment", error.toString())
+            }
+        })
+
+        return commentLiveData
+
+    }
+
+    fun getMyComments(userUid: String, state: (Boolean) -> Unit): MutableLiveData<Comment?> {
+
+        val commentLiveData = MutableLiveData<Comment?>()
+        val postSet = HashSet<Int>()
+        val myComment = database.child("comment").orderByChild("uid").equalTo(userUid)
+
+        myComment.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (contentSnapshot in snapshot.children.reversed()) {
+
+                        val comment = contentSnapshot.getValue(Comment::class.java)
+
+                        if (comment != null) {
+
+                            if (!postSet.contains(comment.postIdx)) {
+                                postSet.add(comment.postIdx)
+                                commentLiveData.value = comment
+
+                            }
+                            state(true)
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                state(false)
+                Log.d("getComment", error.toString())
+            }
+        })
+        return commentLiveData
+    }
+
 }
+

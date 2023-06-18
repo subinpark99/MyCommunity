@@ -5,21 +5,34 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.community.data.entity.Comment
+import com.example.community.data.entity.Reply
 import com.example.community.databinding.ItemNoticeBinding
 
 
 class NoticeAdapter :
     RecyclerView.Adapter<NoticeAdapter.ViewHolder>() {
 
-    private val items = arrayListOf<Comment>()
+    private val commentItems = arrayListOf<Comment>()
+    private val replyItems = arrayListOf<Reply>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitList(comment:List<Comment>) {
-        this.items.addAll(comment)
+    fun commentList(comment: List<Comment>) {
+        this.commentItems.clear()
+        this.commentItems.addAll(comment)
         notifyDataSetChanged()
     }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun replyList(reply: List<Reply>) {
+        this.replyItems.clear()
+        this.replyItems.addAll(reply)
+        notifyDataSetChanged()
+    }
+
+
     interface NoticeInterface {
         fun onCommentClicked(postIdx: Int) // commentDB의 postIdx
+        fun onReplyClicked(postIdx: Int) // replyDB의 postIdx
     }
 
     private lateinit var itemClickListener: NoticeInterface
@@ -35,15 +48,17 @@ class NoticeAdapter :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        holder.apply {
-            bind(items[position])
-            binding.layoutClick.setOnClickListener {  // 알림 클릭시 게시물로 이동
-                itemClickListener.onCommentClicked(items[position].postIdx)
+        if (position < commentItems.size) {
+            holder.bind(commentItems[position])
+        } else {
+            val replyPosition = position - commentItems.size
+            if (replyPosition < replyItems.size) {
+                holder.bind(replyItems[replyPosition])
             }
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = commentItems.size + replyItems.size
 
     inner class ViewHolder(val binding: ItemNoticeBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -53,6 +68,20 @@ class NoticeAdapter :
             binding.noticeDateTv.text = comment.date
             binding.noticeTimeTv.text = comment.time
 
+            binding.layoutClick.setOnClickListener {  // 알림 클릭시 게시물로 이동
+                itemClickListener.onCommentClicked(comment.postIdx)
+            }
+        }
+
+        fun bind(reply: Reply) {
+
+            binding.noticeContentTv.text = reply.content
+            binding.noticeDateTv.text = reply.date
+            binding.noticeTimeTv.text = reply.time
+
+            binding.layoutClick.setOnClickListener {  // 알림 클릭시 게시물로 이동
+                itemClickListener.onReplyClicked(reply.postIdx)
+            }
         }
     }
 }

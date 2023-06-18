@@ -10,7 +10,7 @@ class PostRepository {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
-    fun getLatestPost(): MutableLiveData<Post?> {
+    fun getLatestPost(): MutableLiveData<Post?> { // 가장 최근 게시물 가져오기
         val postLiveData = MutableLiveData<Post?>()
 
         val postRef = database.child("post").orderByChild("postIdx").limitToLast(1)
@@ -51,7 +51,7 @@ class PostRepository {
 
             override fun onDataChange(snapshot: DataSnapshot) {
                 val postList = mutableListOf<Post>()
-                for (postSnapshot in snapshot.children) {
+                for (postSnapshot in snapshot.children.reversed()) {
                     val post = postSnapshot.getValue(Post::class.java)
                     if (post != null) postList.add(post)
                 }
@@ -97,6 +97,62 @@ class PostRepository {
 
     }
 
+    fun getMyPost(userUid: String, state: (Boolean) -> Unit): MutableLiveData<Post?> {
+
+        val postLiveData = MutableLiveData<Post?>()
+
+        val myPost = database.child("post").orderByChild("uid").equalTo(userUid)
+
+        myPost.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (contentSnapshot in snapshot.children.reversed()) {
+
+                        val post = contentSnapshot.getValue(Post::class.java)
+
+                        if (post != null) postLiveData.value = post
+                        state(true)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                state(false)
+                Log.d("getPost", error.toString())
+            }
+        })
+        return postLiveData
+    }
+
+
+    fun getNoticePost(postIdx: Int, state: (Boolean) -> Unit): MutableLiveData<Post?> {
+
+        val postLiveData = MutableLiveData<Post?>()
+
+        val getNoticePost =
+            database.child("post").orderByChild("postIdx").equalTo(postIdx.toDouble())
+
+        getNoticePost.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    for (contentSnapshot in snapshot.children) {
+
+                        val post = contentSnapshot.getValue(Post::class.java)
+
+                        if (post != null) postLiveData.value = post
+                        state(true)
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                state(false)
+                Log.d("getNoticePost", error.toString())
+            }
+        })
+        return postLiveData
+
+    }
 }
 
 

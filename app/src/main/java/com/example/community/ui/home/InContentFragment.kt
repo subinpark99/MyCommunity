@@ -71,7 +71,7 @@ class InContentFragment : Fragment() {
     private fun bind() {
 
         binding.backIv.setOnClickListener {// 뒤로가기
-            findNavController().popBackStack()
+            findNavController().navigateUp()
         }
 
         // post값 가져와서 보여주기
@@ -189,21 +189,11 @@ class InContentFragment : Fragment() {
         val postIdx = postData.postIdx
 
         commentViewModel.deleteAllPostComment(postIdx)  // 게시글 모든 댓글 삭제
-        deletePostCommentsState(postIdx)
+        postViewModel.deletePost(postIdx) // 게시글 삭제
+        replyViewModel.deleteAllPostReply(postIdx) // 게시글 모든 대댓글 삭제
+        deletePostState()
     }
 
-    private fun deletePostCommentsState(postIdx: Int) {
-        commentViewModel.deletePostCommentState.observe(this) { state ->
-            when (state) {
-                true -> {
-                    postViewModel.deletePost(postIdx) // 게시글 삭제
-                    replyViewModel.deleteAllPostReply(postIdx) // 게시글 모든 대댓글 삭제
-                    deletePostState()
-                }
-                else -> Log.d("deletePostComments", "failed")
-            }
-        }
-    }
 
     private fun deletePostState() {
         postViewModel.deletePostState.observe(this) { state ->

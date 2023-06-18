@@ -1,7 +1,6 @@
 package com.example.community.ui.mypage
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,21 +11,12 @@ import androidx.navigation.findNavController
 import com.example.community.R
 import com.example.community.data.local.MyApplication
 import com.example.community.databinding.FragmentMypageBinding
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMypageBinding? = null
     private val binding get() = _binding!!
-    private lateinit var auth: FirebaseAuth
-    private val userDB = Firebase.database.getReference("user")
-    private val postDB = Firebase.database.getReference("post")
-    private val commentDB = Firebase.database.getReference("comment")
+
+
     private lateinit var userUid: String
 
     override fun onCreateView(
@@ -36,8 +26,6 @@ class MyPageFragment : Fragment() {
     ): View {
 
         _binding = FragmentMypageBinding.inflate(inflater, container, false)
-
-        auth = Firebase.auth
 
         nav()
         userUid = MyApplication.prefs.getUid("uid", "")
@@ -57,16 +45,14 @@ class MyPageFragment : Fragment() {
         }
 
         binding.logoutTv.setOnClickListener { // 로그아웃
-            auth.signOut()
+           // auth.signOut()
             view?.findNavController()?.navigate(R.id.action_myPageFragment_to_loginActivity)
         }
 
         binding.withdrawTv.setOnClickListener { // 회원탈퇴
 
-            deleteComment()
-            deletePost()
-            auth.currentUser?.delete() // 계정 삭제
-            userDB.child(userUid).removeValue() // 파이어베이스에 저장된 계정 삭제
+//            auth.currentUser?.delete() // 계정 삭제
+//            userDB.child(userUid).removeValue() // 파이어베이스에 저장된 계정 삭제
             Toast.makeText(requireContext(), "회원탈퇴 되었습니다.", Toast.LENGTH_SHORT).show()
 
             activity?.finish()
@@ -81,67 +67,37 @@ class MyPageFragment : Fragment() {
         }
 
 
-        binding.noticeToggleBtn.setOnCheckedChangeListener { CompoundButton, onSwitch ->
-            //  스위치가 켜지면
-            if (onSwitch) {
-                binding.noticeToggleBtn.isChecked = true
-
-                userDB.child(userUid).child("alarm").setValue(true)
-            }
-            //  스위치가 꺼지면
-            else {
-                binding.noticeToggleBtn.isChecked = false
-                userDB.child(userUid).child("alarm").setValue(false)
-
-            }
-
-        }
+//        binding.noticeToggleBtn.setOnCheckedChangeListener { CompoundButton, onSwitch ->
+//            //  스위치가 켜지면
+//            if (onSwitch) {
+//                binding.noticeToggleBtn.isChecked = true
+//
+//                userDB.child(userUid).child("alarm").setValue(true)
+//            }
+//            //  스위치가 꺼지면
+//            else {
+//                binding.noticeToggleBtn.isChecked = false
+//                userDB.child(userUid).child("alarm").setValue(false)
+//
+//            }
+//
+//        }
     }
     private fun setToggle(){
-        userDB.child(userUid).child("alarm").addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val alarmEnabled = dataSnapshot.getValue(Boolean::class.java)
-                if (alarmEnabled != null) {
-                    binding.noticeToggleBtn.isChecked = alarmEnabled
-                }
-            }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-               Log.d("setToggle",databaseError.toString())
-            }
-        })
+//        userDB.child(userUid).child("alarm").addListenerForSingleValueEvent(object : ValueEventListener {
+//            override fun onDataChange(dataSnapshot: DataSnapshot) {
+//                val alarmEnabled = dataSnapshot.getValue(Boolean::class.java)
+//                if (alarmEnabled != null) {
+//                    binding.noticeToggleBtn.isChecked = alarmEnabled
+//                }
+//            }
+//
+//            override fun onCancelled(databaseError: DatabaseError) {
+//               Log.d("setToggle",databaseError.toString())
+//            }
+//        })
     }
 
-    private fun deletePost() {
-        postDB.orderByChild("uid").equalTo(userUid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (postSnapshot in snapshot.children) {
-                        postSnapshot.ref.removeValue()
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d("deletePost", error.toString())
-                }
-            })
-    }
-
-    private fun deleteComment() {
-        commentDB.orderByChild("uid").equalTo(userUid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (commentSnapshot in snapshot.children) {
-                        commentSnapshot.ref.removeValue()
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d("deleteComment", error.toString())
-                }
-
-            })
-    }
 
     override fun onStart() {
         super.onStart()

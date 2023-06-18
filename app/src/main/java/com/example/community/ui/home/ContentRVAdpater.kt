@@ -35,6 +35,12 @@ class ContentRVAdpater(
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun getMyList(post: Post) {
+        this.items.add(post)
+        notifyDataSetChanged()
+    }
+
     interface InContentInterface {
         fun onContentClicked(post: Post)
     }

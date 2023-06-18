@@ -76,4 +76,8 @@ class ReplyViewModel : ViewModel() {
     fun deleteAllPostReply(postIdx: Int) {
         replyRepo.deletePostReply(postIdx)
     }
+
+    fun getNoticeReply(postIdx: Int, userUid: String): MutableLiveData<MutableList<Reply>> {
+        return replyRepo.getNoticeReply(postIdx, userUid)
+    }
 }

@@ -43,7 +43,7 @@ class ReplyRVAdapter(private val userUid: String) :
         if (userUid == items[position].uid) {
             holder.binding.deleteReplyTv.visibility = View.VISIBLE
             holder.binding.deleteReplyTv.setOnClickListener {
-                itemClickListener.onDeleteClicked(items[position].commentIdx)
+                itemClickListener.onDeleteClicked(items[position].replyIdx)
             }
         }
 

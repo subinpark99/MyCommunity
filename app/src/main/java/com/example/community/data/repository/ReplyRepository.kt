@@ -109,4 +109,30 @@ class ReplyRepository {
 
     }
 
+    fun getNoticeReply(postIdx: Int, userUid: String): MutableLiveData<MutableList<Reply>> {
+
+        val replyLiveData = MutableLiveData<MutableList<Reply>>()
+
+        val replyRef =
+            database.child("reply").orderByChild("postIdx").equalTo(postIdx.toDouble())
+
+        replyRef.addValueEventListener(object : ValueEventListener {
+
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val replyList = mutableListOf<Reply>()
+                for (repSnapshot in snapshot.children) {
+                    val reply = repSnapshot.getValue(Reply::class.java)
+                    if (reply != null && reply.uid != userUid) replyList.add(reply)
+                }
+                replyLiveData.value = replyList
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("getNoticeReply", error.toString())
+            }
+        })
+
+        return replyLiveData
+
+    }
 }

@@ -19,6 +19,12 @@ class PostViewModel : ViewModel() {
     private var _deletePostState = MutableLiveData<Boolean>()
     val deletePostState: LiveData<Boolean> = _deletePostState
 
+    private var _getMyPostState = MutableLiveData<Boolean>()
+    val getMyPostState: LiveData<Boolean> = _getMyPostState
+
+    private var _getNoticePostState = MutableLiveData<Boolean>()
+    val getNoticePostState: LiveData<Boolean> = _getNoticePostState
+
     fun getLatestPost(): MutableLiveData<Post?> {
         return postRepo.getLatestPost()
     }
@@ -78,6 +84,26 @@ class PostViewModel : ViewModel() {
                 } else {
                     _deletePostState.postValue(false)
                 }
+            }
+        }
+    }
+
+    fun getMyPosts(userUid: String): MutableLiveData<Post?> {
+        return postRepo.getMyPost(userUid) { success ->
+            if (success) {
+                _getMyPostState.postValue(true)
+            } else {
+                _getMyPostState.postValue(false)
+            }
+        }
+    }
+
+    fun getNoticePost(postIdx: Int): MutableLiveData<Post?> {
+        return postRepo.getNoticePost(postIdx) { success ->
+            if (success) {
+                _getNoticePostState.postValue(true)
+            } else {
+                _getNoticePostState.postValue(false)
             }
         }
     }

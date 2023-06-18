@@ -1,7 +1,6 @@
 package com.example.community.ui.notice
 
 
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
@@ -10,20 +9,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.community.data.local.MyApplication
-import com.example.community.data.entity.Comment
 import com.example.community.data.entity.Post
-import com.example.community.data.entity.User
+import com.example.community.data.viewModel.CommentViewModel
+import com.example.community.data.viewModel.PostViewModel
+import com.example.community.data.viewModel.ReplyViewModel
 import com.example.community.databinding.FragmentNoticeBinding
 import com.example.community.ui.notice.fcm.RetrofitInstance
 import com.example.community.ui.notice.fcm.model.NotificationData
 import com.example.community.ui.notice.fcm.model.PushNotification
-import com.google.firebase.database.*
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -34,14 +31,12 @@ class NoticeFragment : Fragment() {
     private var _binding: FragmentNoticeBinding? = null
     private val binding get() = _binding!!
 
-    private val commentDB = Firebase.database.getReference("comment")
-    private val postDB = Firebase.database.getReference("post")
-    private val userDB = Firebase.database.getReference("user")
+    private val postViewModel: PostViewModel by viewModels()
+    private val commentViewModel: CommentViewModel by viewModels()
+    private val replyViewModel: ReplyViewModel by viewModels()
+
     private lateinit var userUid: String
     private lateinit var noticeAdapter: NoticeAdapter
-    private lateinit var user: User
-    private val gson: Gson = Gson()
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -52,15 +47,13 @@ class NoticeFragment : Fragment() {
         _binding = FragmentNoticeBinding.inflate(inflater, container, false)
 
         userUid = MyApplication.prefs.getUid("uid", "")
-        val userJson = MyApplication.prefs.getUser("user", "")
-        user = gson.fromJson(userJson, User::class.java)
         noticeAdapter = NoticeAdapter()
 
         return binding.root
     }
 
 
-    private fun getMyComments() {
+    private fun getMyPosts() {
 
         binding.noticeRv.apply {
             adapter = noticeAdapter
@@ -68,101 +61,95 @@ class NoticeFragment : Fragment() {
             hasFixedSize()
         }
 
-        val postdb = postDB.orderByChild("uid").equalTo(userUid)   // 내가 쓴 글 가져오기
-        postdb.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    for (contentSnapshot in snapshot.children) {
+        postViewModel.getMyPosts(userUid).observe(this) { // 내가 쓴 게시물 가져오기
+            if (it != null)
+                getMyPostState(it.postIdx)
+        }
 
-                        val post = contentSnapshot.getValue(Post::class.java)
+    }
 
-                        if (post != null) {
-                            getCommentNotice(post.postIdx)  // 내가 쓴 글의 댓글 가져오기
-                        }
-                    }
+    private fun getMyPostState(postIdx: Int) {
+        postViewModel.getMyPostState.observe(this) { state ->
+            when (state) {
+                true -> { // 내가 쓴 게시물의 댓글, 대댓글 가져오기
+                    getCommentNotice(postIdx)
+                    getReplyNotice(postIdx)
                 }
+                else -> Log.d("getmypost", "failed")
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("getPost", error.toString())
-            }
-        })
+        }
     }
 
 
-    private fun getCommentNotice(getCommentPost: Int) {
+    private fun getCommentNotice(getMyPostIdx: Int) {
 
-        commentDB.orderByChild("postIdx").equalTo(getCommentPost.toDouble())
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                @SuppressLint("SuspiciousIndentation")
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        val commentList = mutableListOf<Comment>()
-                        for (commentSnapshot in dataSnapshot.children.reversed()) {
-                            val comment = commentSnapshot.getValue(Comment::class.java)
-                            if (comment != null && comment.uid != userUid) {  // 내가 쓴 댓글 알림은 뜨지 않게
-                                    commentList.add(comment)
-                                    getSwitch()
-                            }
-                        }
-                        noticeAdapter.submitList(commentList) // 새로운 데이터를 전달하여 목록 갱신
-
-                    }
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.d("getPost", databaseError.toString())
-                }
-            })
+        commentViewModel.getNoticeComment(getMyPostIdx, userUid).observe(this) {
+            if (it != null) noticeAdapter.commentList(it)
+        }
     }
 
-    private fun getSwitch(){
-        userDB.child(userUid).child("alarm")
-            .addListenerForSingleValueEvent(object : ValueEventListener{
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val alarmEnabled = snapshot.getValue(Boolean::class.java)
-                    if (alarmEnabled == true) {
-                        sendPush()
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d("s", "sdfsdfsdf")
-                }
-            })
+    private fun getReplyNotice(getMyPostIdx: Int) {
+        replyViewModel.getNoticeReply(getMyPostIdx, userUid).observe(this) {
+            if (it != null) noticeAdapter.replyList(it)
+        }
     }
-    private fun getInxContent() {  // 댓글 알림 클릭 시, commentDB의 postIdx에 해당하는 post로 이동
+
+    private fun getSwitch() {
+//        userDB.child(userUid).child("alarm")
+//            .addListenerForSingleValueEvent(object : ValueEventListener {
+//                override fun onDataChange(snapshot: DataSnapshot) {
+//                    val alarmEnabled = snapshot.getValue(Boolean::class.java)
+//                    if (alarmEnabled == true) {
+//                        sendPush()
+//                    }
+//                }
+//
+//                override fun onCancelled(error: DatabaseError) {
+//                    Log.d("s", "sdfsdfsdf")
+//                }
+//            })
+    }
+
+    private fun getInContent() {  // 댓글 알림 클릭 시, commentDB와 replyDB의 postIdx에 해당하는 post로 이동
 
         noticeAdapter.setItemClickListener(object : NoticeAdapter.NoticeInterface {
             override fun onCommentClicked(postIdx: Int) {  // 여기서 postIdx는 commentDB의 postIdx
 
-                val postdb =
-                    postDB.orderByChild("postIdx")
-                        .equalTo(postIdx.toDouble())  // postDB의 idx가 commentDB의 idx와 같을 때
-                postdb.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        if (snapshot.exists()) {
-                            for (contentSnapshot in snapshot.children.reversed()) {
-                                val post = contentSnapshot.getValue(Post::class.java)
-                                if (post != null) {
-                                    onPostClicked(postIdx)
-                                    val arguments =
-                                        NoticeFragmentDirections.actionNoticeFragmentToInContentFragment(
-                                            post
-                                        )
-                                    findNavController().navigate(arguments) // 해당 게시글로 이동
-                                }
-                            }
-                        }
+                postViewModel.getNoticePost(postIdx).observe(this@NoticeFragment) {
+                    onPostClicked(postIdx)
+                    if (it != null) {
+                        getNoticePostState(it)
                     }
+                }
+            }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.d("getCommentPost", error.toString())
+            override fun onReplyClicked(postIdx: Int) { // 여기서 postIdx는 replyDB의 postIdx
+                postViewModel.getNoticePost(postIdx).observe(this@NoticeFragment) {
+                    onPostClicked(postIdx)
+                    if (it != null) {
+                        getNoticePostState(it)
                     }
-                })
+                }
             }
         })
     }
+
+    private fun getNoticePostState(post: Post) {
+        postViewModel.getNoticePostState.observe(this) { state ->
+            when (state) {
+                true -> {
+
+                    val arguments =
+                        NoticeFragmentDirections.actionNoticeFragmentToInContentFragment(
+                            post
+                        )
+                    findNavController().navigate(arguments) // 해당 게시글로 이동
+                }
+                else -> Log.d("getnoticepost", "failed")
+            }
+        }
+    }
+
 
     private fun sendNotification(notification: PushNotification) =
         CoroutineScope(Dispatchers.IO).launch {
@@ -190,30 +177,14 @@ class NoticeFragment : Fragment() {
 
 
     fun onPostClicked(postIdx: Int) {
-        val updatedPost = FirebaseDatabase.getInstance().getReference("post")
-            .child(postIdx.toString()) // 글 조회수 가져와서 증가
-        updatedPost.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val post = snapshot.getValue(Post::class.java)
-                if (post != null) {
-                    // 조회수 증가
-                    post.view = post.view + 1
-                    // 데이터베이스에 업데이트
-                    updatedPost.setValue(post)
-                }
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                Log.d("onPostClicked", error.toString())
-            }
-        })
+        postViewModel.updatePostCnt(postIdx)
     }
 
     override fun onStart() {
         super.onStart()
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
-        getMyComments()
-        getInxContent()
+        getMyPosts()
+        getInContent()
     }
 
     override fun onStop() {
