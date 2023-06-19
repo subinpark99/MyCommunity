@@ -38,6 +38,27 @@
                             <option name="y" value="-1" />
                           </Point>
                         </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_dialogChangeLocation_to_dialogOcr">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="dialogChangePw">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="-212" />
+                            <option name="y" value="349" />
+                          </Point>
+                        </option>
                       </LayoutPositions>
                     </value>
                   </entry>
@@ -49,6 +70,15 @@
                             <option name="x" value="-446" />
                             <option name="y" value="-19" />
                           </Point>
+                        </option>
+                        <option name="myPositions">
+                          <map>
+                            <entry key="action_dialogOcr_to_dialogChangeLocation">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                          </map>
                         </option>
                       </LayoutPositions>
                     </value>
@@ -101,6 +131,11 @@
                               </value>
                             </entry>
                             <entry key="action_inContentFragment_to_myReplyFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_inContentFragment_to_noticeFragment">
                               <value>
                                 <LayoutPositions />
                               </value>
@@ -166,6 +201,16 @@
                         </option>
                         <option name="myPositions">
                           <map>
+                            <entry key="action_myPageFragment_to_dialogChangeLocation">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
+                            <entry key="action_myPageFragment_to_homeFragment">
+                              <value>
+                                <LayoutPositions />
+                              </value>
+                            </entry>
                             <entry key="action_myPageFragment_to_loginActivity">
                               <value>
                                 <LayoutPositions />

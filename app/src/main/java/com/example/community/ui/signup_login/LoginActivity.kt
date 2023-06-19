@@ -63,6 +63,7 @@ class LoginActivity : AppCompatActivity() {
             MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
             MyApplication.prefs.setToken("token", token)
             MyApplication.prefs.setUid("uid", userUid)
+            MyApplication.prefs.setAutoLogin("login", true)
 
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)

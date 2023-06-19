@@ -34,7 +34,8 @@ class SplashActivity : AppCompatActivity() {
 
     private fun autoLogin() {
         val uid = MyApplication.prefs.getUid("uid", "")
-        if (uid.isEmpty()) {
+        val autoLogin = MyApplication.prefs.getAutoLogin("login")
+        if (uid.isEmpty() || !autoLogin) {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()

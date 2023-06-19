@@ -146,5 +146,13 @@
             android:id="@+id/action_dialogChangeLocation_to_dialogOcr"
             app:destination="@id/dialogOcr" />
     </dialog>
+    <dialog
+        android:id="@+id/dialogChangePw"
+        android:name="com.example.community.ui.mypage.DialogChangePw"
+        android:label="DialogChangePw" >
+        <action
+            android:id="@+id/action_dialogChangePw_to_loginActivity"
+            app:destination="@id/loginActivity" />
+    </dialog>
 
 </navigation>

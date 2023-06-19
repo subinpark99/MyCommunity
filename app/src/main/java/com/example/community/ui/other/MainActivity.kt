@@ -34,16 +34,19 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        val userJson = MyApplication.prefs.getUser("user", "")
-        val user = gson.fromJson(userJson, User::class.java)
-
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         navController = navHostFragment.navController
 
         drawerLayout = binding.drawerLayout
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val userJson = MyApplication.prefs.getUser("user", "")
+        val user = gson.fromJson(userJson, User::class.java)
         initNavi(user.email, user.location)
         setAge(user.location)
     }

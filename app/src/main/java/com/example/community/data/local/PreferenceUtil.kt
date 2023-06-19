@@ -43,5 +43,13 @@ class PreferenceUtil(context: Context) {
         prefs.edit().remove(str).apply()
     }
 
+    fun setAutoLogin(str: String, autologin: Boolean) {
+        prefs.edit().putBoolean(str, autologin).apply()
+    }
+
+    fun getAutoLogin(str: String): Boolean {
+        return prefs.getBoolean(str, false)
+    }
+
 
 }

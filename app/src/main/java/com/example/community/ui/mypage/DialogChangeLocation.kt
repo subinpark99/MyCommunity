@@ -2,6 +2,7 @@ package com.example.community.ui.mypage
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -18,15 +19,18 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.community.R
+import com.example.community.data.entity.User
 import com.example.community.data.local.MyApplication
+import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.DialogChangeLocationBinding
+import com.example.community.ui.other.MainActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 import java.util.*
 
 class DialogChangeLocation
@@ -34,8 +38,8 @@ class DialogChangeLocation
 
     lateinit var binding: DialogChangeLocationBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val userDB = Firebase.database.getReference("user")
-
+    private val userViewModel: AuthViewModel by viewModels()
+    private val gson: Gson = Gson()
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(
@@ -56,6 +60,7 @@ class DialogChangeLocation
             binding.setLocationTv.text = requireArguments().getString("ocr", "")
         }
 
+
         bind()
 
         return binding.root
@@ -64,8 +69,10 @@ class DialogChangeLocation
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun bind() {
         val userUid = MyApplication.prefs.getUid("uid", "")
-        val setlocation = binding.setLocationTv.text.toString()
+        val userJson = MyApplication.prefs.getUser("user", "")
+        val user = gson.fromJson(userJson, User::class.java)
 
+        val setlocation = binding.setLocationTv.text.toString()
         binding.currentLocationIv.setOnClickListener { // 현재 위치 가져오기
             binding.setLocationTv.text = ""
             checkLocationPermission()
@@ -78,17 +85,35 @@ class DialogChangeLocation
 
         binding.doneIv.setOnClickListener {
 
-            if (setlocation.isEmpty()) {
-                Toast.makeText(requireContext(), "위치를 설정해주세요.", Toast.LENGTH_SHORT)
+            if (setlocation == "지역을 설정해주세요") {
+                Toast.makeText(requireContext(), "변경될 값이 없습니다.", Toast.LENGTH_SHORT)
                     .show()
+                return@setOnClickListener
             }
 
-            userDB.child(userUid).child("location").setValue(setlocation)
+            changeLocationPref(user, setlocation)
+            userViewModel.changeLocation(userUid, setlocation)
+
             Toast.makeText(requireContext(), "${setlocation}로 설정됨", Toast.LENGTH_SHORT).show()
-            findNavController().popBackStack(R.id.myPageFragment, false)
+
+            val navController = findNavController()
+            navController.popBackStack(R.id.homeFragment, false)
+
+            val intent = Intent(requireContext(), MainActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
 
         }
 
+    }
+
+    private fun changeLocationPref(user: User, location: String) {
+        val changedUser = User(
+            user.email, user.password, user.nickname,
+            location, user.age, user.alarm, user.fcmToken
+        )
+        val userJson = gson.toJson(changedUser)
+        MyApplication.prefs.setUser("user", userJson)
     }
 
 

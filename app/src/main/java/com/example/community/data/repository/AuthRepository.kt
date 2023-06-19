@@ -61,7 +61,7 @@ class AuthRepository {
         userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(User::class.java)
-                if (user!==null) userLiveData.value = user
+                if (user !== null) userLiveData.value = user
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -97,12 +97,12 @@ class AuthRepository {
 
     fun withdraw(userUid: String, state: (Boolean) -> Unit) {  // 계정 삭제
 
-        auth.currentUser!!.delete() .addOnSuccessListener {
+        auth.currentUser!!.delete().addOnSuccessListener {
             database.child("user").child(userUid).removeValue()
-            state(true) }
+            state(true)
+        }
             .addOnFailureListener { state(false) }
     }
-
 
 
     fun deleteAllMyComment(userUid: String) {
@@ -151,6 +151,30 @@ class AuthRepository {
                 Log.d("deleteAllMyPost", error.toString())
             }
         })
+    }
+
+    fun changeLocation(userUid: String, setLocation: String) {
+        val user = database.child("user").child(userUid).child("location")
+        user.setValue(setLocation)
+    }
+
+    fun changePassword(userUid: String, newPw: String, state: (Boolean) -> Unit) {
+
+        val user = database.child("user").child(userUid).child("password")
+        changeDBPw(newPw)
+
+        user.setValue(newPw)
+            .addOnSuccessListener {
+                state(true)
+            }
+            .addOnFailureListener {
+                state(false)
+            }
+
+    }
+
+    private fun changeDBPw(newPw: String) {
+        auth.currentUser?.updatePassword(newPw) // 파이어베이스 계정 비번 업데이트
     }
 
 }

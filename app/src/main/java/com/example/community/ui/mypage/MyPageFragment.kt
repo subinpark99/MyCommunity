@@ -33,7 +33,6 @@ class MyPageFragment : Fragment() {
 
         nav()
         userUid = MyApplication.prefs.getUid("uid", "")
-        Log.d("pos", "MypageF")
 
         return binding.root
     }
@@ -51,6 +50,7 @@ class MyPageFragment : Fragment() {
 
         binding.logoutTv.setOnClickListener { // 로그아웃
             userViewModel.logout()
+            MyApplication.prefs.setAutoLogin("login", false)
             view?.findNavController()?.navigate(R.id.action_myPageFragment_to_loginActivity)
         }
 
@@ -99,8 +99,8 @@ class MyPageFragment : Fragment() {
 //        }
     }
 
-    private fun withdrawState(){
-        userViewModel.withDrawState.observe(this){ state ->
+    private fun withdrawState() {
+        userViewModel.withDrawState.observe(this) { state ->
             when (state) {
                 true -> {
                     Log.d("withdrawState", "success")
@@ -111,7 +111,7 @@ class MyPageFragment : Fragment() {
         }
     }
 
-    private fun setToggle(){
+    private fun setToggle() {
 //        userDB.child(userUid).child("alarm").addListenerForSingleValueEvent(object : ValueEventListener {
 //            override fun onDataChange(dataSnapshot: DataSnapshot) {
 //                val alarmEnabled = dataSnapshot.getValue(Boolean::class.java)

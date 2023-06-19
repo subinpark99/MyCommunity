@@ -20,6 +20,9 @@ class AuthViewModel : ViewModel() {
     private var _withDrawState = MutableLiveData<Boolean>()
     val withDrawState: LiveData<Boolean> = _withDrawState
 
+    private var _changePwState = MutableLiveData<Boolean>()
+    val changePwState: LiveData<Boolean> = _changePwState
+
 
     private val authRepo = AuthRepository()
 
@@ -81,12 +84,12 @@ class AuthViewModel : ViewModel() {
         return authRepo.getUser(userUid)
     }
 
-    fun logout(){
+    fun logout() {
         return authRepo.logout()
     }
 
-    fun withdraw(userUid: String){
-        return authRepo.withdraw(userUid){ success ->
+    fun withdraw(userUid: String) {
+        return authRepo.withdraw(userUid) { success ->
             if (success) {
                 _withDrawState.postValue(true)
             } else {
@@ -95,17 +98,34 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-
-    fun deleteAllMyComment(uid:String){
+    fun deleteAllMyComment(uid: String) {
         return authRepo.deleteAllMyComment(uid)
     }
 
-    fun deleteAllMyPost(uid:String){
+    fun deleteAllMyPost(uid: String) {
         return authRepo.deleteAllMyPost(uid)
     }
 
-    fun deleteAllMyReply(uid:String){
+    fun deleteAllMyReply(uid: String) {
         return authRepo.deleteAllMyReply(uid)
+    }
+
+    fun changeLocation(userUid: String, setLocation: String) {
+        viewModelScope.launch {
+            authRepo.changeLocation(userUid, setLocation)
+        }
+    }
+
+    fun changePassword(userUid: String, newPw: String) {
+        viewModelScope.launch {
+            authRepo.changePassword(userUid, newPw) { success ->
+                if (success) {
+                    _changePwState.postValue(true)
+                } else {
+                    _changePwState.postValue(false)
+                }
+            }
+        }
     }
 
 }

@@ -1,30 +1,34 @@
 package com.example.community.ui.mypage
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.example.community.R
 import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.User
+import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.DialogChangePwBinding
+import com.example.community.ui.signup_login.LoginActivity
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 
-class DialogChangePw  : DialogFragment(), View.OnClickListener {
+class DialogChangePw : DialogFragment(), View.OnClickListener {
 
     lateinit var binding: DialogChangePwBinding
     private lateinit var user: User
     private val gson: Gson = Gson()
     private lateinit var userUid: String
-    private val userDB = Firebase.database.getReference("user")
+    private val userViewModel: AuthViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,11 +54,10 @@ class DialogChangePw  : DialogFragment(), View.OnClickListener {
 
         binding.doneIv.setOnClickListener {
 
-            val auth=Firebase.auth
-            val curPw=binding.putCurrentPw.text.toString()
-            val newPw=binding.putNewPw.text.toString()
+            val curPw = binding.putCurrentPw.text.toString()
+            val newPw = binding.putNewPw.text.toString()
 
-            if (curPw!=user.password){
+            if (curPw != user.password) {
                 Snackbar.make(binding.root, "비밀번호가 일치하지 않습니다", Snackbar.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -64,12 +67,47 @@ class DialogChangePw  : DialogFragment(), View.OnClickListener {
                 return@setOnClickListener
             }
 
-            auth.currentUser?.updatePassword(newPw)
-            userDB.child(userUid).child("pw").setValue(newPw)
-            Toast.makeText(requireContext(),"비밀번호 변경 완료, 재로그인 해주세요",Toast.LENGTH_SHORT).show()
-            auth.signOut() // logout
-            requireActivity().finish()
+            userViewModel.changePassword(userUid, newPw)
+
+            changeLocationPref(user, newPw)
+            updatePasswordState()
+
+
+        }
+    }
+
+    private fun updatePasswordState() {
+        userViewModel.changePwState.observe(this) { state ->
+            when (state) {
+                true -> {
+                    Toast.makeText(requireContext(), "비밀번호 변경 완료, 재로그인 해주세요", Toast.LENGTH_SHORT)
+                        .show()
+
+                    userViewModel.logout()
+
+                    MyApplication.prefs.setAutoLogin("login", false)
+
+                    val navController = findNavController()
+                    navController.popBackStack(R.id.homeFragment, false)
+
+                    val intent = Intent(requireContext(), LoginActivity::class.java)
+                    startActivity(intent)
+                    requireActivity().finish()
+
+                }
+                else -> Log.d("updatePw", "failed")
+
             }
+        }
+    }
+
+    private fun changeLocationPref(user: User, newPassword: String) {
+        val changedUser = User(
+            user.email, newPassword, user.nickname,
+            user.location, user.age, user.alarm, user.fcmToken
+        )
+        val userJson = gson.toJson(changedUser)
+        MyApplication.prefs.setUser("user", userJson)
     }
 
 
