@@ -52,16 +52,16 @@ class AuthRepository {
     }
 
 
-    fun getUser(userUid: String): MutableLiveData<User> { // user 정보 가져오기
+    fun getUser(userUid: String): MutableLiveData<User?> { // user 정보 가져오기
 
-        val userLiveData = MutableLiveData<User>()
+        val userLiveData = MutableLiveData<User?>()
 
         val userRef = database.child("user").child(userUid)
 
         userRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val user = snapshot.getValue(User::class.java)
-                userLiveData.value = user!!
+                if (user!==null) userLiveData.value = user
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -91,5 +91,66 @@ class AuthRepository {
         })
     }
 
+    fun logout() {
+        auth.signOut()
+    }
+
+    fun withdraw(userUid: String, state: (Boolean) -> Unit) {  // 계정 삭제
+
+        auth.currentUser!!.delete() .addOnSuccessListener {
+            database.child("user").child(userUid).removeValue()
+            state(true) }
+            .addOnFailureListener { state(false) }
+    }
+
+
+
+    fun deleteAllMyComment(userUid: String) {
+        val deleteRef = database.child("comment").orderByChild("uid").equalTo(userUid)
+
+        deleteRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (Snapshot in snapshot.children) {
+                    Snapshot.ref.removeValue()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("deleteAllMyComment", error.toString())
+            }
+        })
+    }
+
+    fun deleteAllMyPost(userUid: String) {
+        val deleteRef = database.child("post").orderByChild("uid").equalTo(userUid)
+
+        deleteRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (Snapshot in snapshot.children) {
+                    Snapshot.ref.removeValue()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("deleteAllMyPost", error.toString())
+            }
+        })
+    }
+
+    fun deleteAllMyReply(userUid: String) {
+        val deleteRef = database.child("reply").orderByChild("uid").equalTo(userUid)
+
+        deleteRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (Snapshot in snapshot.children) {
+                    Snapshot.ref.removeValue()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("deleteAllMyPost", error.toString())
+            }
+        })
+    }
 
 }

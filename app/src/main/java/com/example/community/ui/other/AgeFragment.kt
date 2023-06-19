@@ -44,6 +44,7 @@ class AgeFragment : Fragment() {
         binding.backIv.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
             startActivity(intent)
+            requireActivity().finish()
         }
 
         ageRange = arguments?.getString("age", "").toString()

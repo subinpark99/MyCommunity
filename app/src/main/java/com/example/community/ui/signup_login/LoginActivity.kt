@@ -14,10 +14,13 @@ import com.example.community.databinding.ActivityLoginBinding
 import com.example.community.ui.other.MainActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.gson.Gson
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val loginViewModel: AuthViewModel by viewModels()
+    private var gson: Gson = Gson()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -34,14 +37,15 @@ class LoginActivity : AppCompatActivity() {
             val email = binding.putEmailTv.text.toString()
             val password = binding.putPasswordTv.text.toString()
             loginViewModel.loginUser(email, password)
+
         }
         loginViewModel.loginState.observe(this) { state ->
             when (state) {
                 true -> {  // 로그인 성공하면 메인으로 이동
-                    saveUidPref()
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+
+                    val user = Firebase.auth.currentUser!!.uid
+                    saveUser(user)
+
                 }
                 else -> Toast.makeText(this, "아이디와 비밀번호를 확인해주세요.", Toast.LENGTH_SHORT).show()
 
@@ -50,11 +54,24 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    private fun saveUidPref() {
+    private fun saveUser(userUid: String) {
+        loginViewModel.getUser(userUid).observe(this) {
 
-        val user = Firebase.auth.currentUser!!.uid
-        MyApplication.prefs.setUid("uid", user)
+            val token: String = it?.fcmToken!!["token"] as String
+            val userJson = gson.toJson(it)
+
+            MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
+            MyApplication.prefs.setToken("token", token)
+            MyApplication.prefs.setUid("uid", userUid)
+
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+
+        }
+
     }
+
 
     private fun init() {
 

@@ -159,13 +159,13 @@ class SignUpActivity : AppCompatActivity() {
         authViewModel.registerState.observe(this) { state ->
             when (state) {
                 true -> {
-                    val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
-                    startActivity(intent)
-
                     val user = Firebase.auth.currentUser!!.uid
                     authViewModel.getFcmToken(user)
 
                     Toast.makeText(this, "회원가입에 성공했습니다!", Toast.LENGTH_SHORT).show()
+                    val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동
+                    startActivity(intent)
+                    finish()
                 }
                 else -> Toast.makeText(this, "이미 존재하는 계정이거나, 회원가입에 실패했습니다.", Toast.LENGTH_SHORT)
                     .show()

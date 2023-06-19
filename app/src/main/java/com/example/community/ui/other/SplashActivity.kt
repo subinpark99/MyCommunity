@@ -9,6 +9,7 @@ import android.os.Looper
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.example.community.data.local.MyApplication
 import com.example.community.databinding.ActivitySplashBinding
 import com.example.community.ui.signup_login.LoginActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -26,13 +27,14 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        init()
 
         auth = Firebase.auth
+        init()
     }
 
     private fun autoLogin() {
-        if (auth.currentUser == null) {
+        val uid = MyApplication.prefs.getUid("uid", "")
+        if (uid.isEmpty()) {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
             finish()

@@ -59,6 +59,7 @@ class OcrActivity : AppCompatActivity() {
                 val intent = Intent(this, SignUpActivity::class.java)
                 intent.putExtra("location", ocrTv.text.toString())
                 startActivity(intent)
+                finish()
             }
         }
 

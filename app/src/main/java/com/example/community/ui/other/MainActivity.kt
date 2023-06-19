@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -16,7 +15,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.community.R
 import com.example.community.data.entity.User
 import com.example.community.data.local.MyApplication
-import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
 import com.google.gson.Gson
@@ -28,16 +26,17 @@ class MainActivity :
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
-    private var gson: Gson = Gson()
 
-    private val userViewModel: AuthViewModel by viewModels()
+    private val gson: Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val userUid = MyApplication.prefs.getUid("uid", "")
+
+        val userJson = MyApplication.prefs.getUser("user", "")
+        val user = gson.fromJson(userJson, User::class.java)
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
@@ -45,29 +44,10 @@ class MainActivity :
 
         drawerLayout = binding.drawerLayout
 
-        getUser(userUid)
-
+        initNavi(user.email, user.location)
+        setAge(user.location)
     }
 
-    private fun getUser(userUid: String) {
-        userViewModel.getUser(userUid).observe(this) {
-            val location = it.location
-            val email = it.email
-            val token: String = it.fcmToken!!["token"] as String
-
-            initNavi(email, location)
-            setAge(location)
-            saveUserPref(it, token)
-        }
-    }
-
-    private fun saveUserPref(user: User, token: String) {
-
-        val userJson = gson.toJson(user)
-        MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
-        MyApplication.prefs.setToken("token", token)
-
-    }
 
     private fun initNavi(email: String, location: String) {
 

@@ -17,8 +17,11 @@ class AuthViewModel : ViewModel() {
     private var _loginState = MutableLiveData<Boolean>()
     val loginState: LiveData<Boolean> = _loginState
 
-    private val authRepo = AuthRepository()
+    private var _withDrawState = MutableLiveData<Boolean>()
+    val withDrawState: LiveData<Boolean> = _withDrawState
 
+
+    private val authRepo = AuthRepository()
 
     fun registerUser(
         nickname: String, email: String, password: String,
@@ -74,8 +77,35 @@ class AuthViewModel : ViewModel() {
         return !(email.isEmpty() && password.isEmpty())
     }
 
-    fun getUser(userUid: String): MutableLiveData<User> {
+    fun getUser(userUid: String): MutableLiveData<User?> {
         return authRepo.getUser(userUid)
+    }
+
+    fun logout(){
+        return authRepo.logout()
+    }
+
+    fun withdraw(userUid: String){
+        return authRepo.withdraw(userUid){ success ->
+            if (success) {
+                _withDrawState.postValue(true)
+            } else {
+                _withDrawState.postValue(false)
+            }
+        }
+    }
+
+
+    fun deleteAllMyComment(uid:String){
+        return authRepo.deleteAllMyComment(uid)
+    }
+
+    fun deleteAllMyPost(uid:String){
+        return authRepo.deleteAllMyPost(uid)
+    }
+
+    fun deleteAllMyReply(uid:String){
+        return authRepo.deleteAllMyReply(uid)
     }
 
 }

@@ -30,4 +30,18 @@ class PreferenceUtil(context: Context) {
     fun setToken(key: String, str: String) {  // user token 저장
         prefs.edit().putString(key, str).apply()
     }
+
+    fun deleteUid(str: String) {
+        prefs.edit().remove(str).apply()
+    }
+
+    fun deleteUser(str: String) {
+        prefs.edit().remove(str).apply()
+    }
+
+    fun deleteToken(str: String) {
+        prefs.edit().remove(str).apply()
+    }
+
+
 }

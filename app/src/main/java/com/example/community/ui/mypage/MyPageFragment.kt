@@ -1,21 +1,25 @@
 package com.example.community.ui.mypage
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.example.community.R
 import com.example.community.data.local.MyApplication
+import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.FragmentMypageBinding
 
 class MyPageFragment : Fragment() {
     private var _binding: FragmentMypageBinding? = null
     private val binding get() = _binding!!
 
+    private val userViewModel: AuthViewModel by viewModels()
 
     private lateinit var userUid: String
 
@@ -29,6 +33,7 @@ class MyPageFragment : Fragment() {
 
         nav()
         userUid = MyApplication.prefs.getUid("uid", "")
+        Log.d("pos", "MypageF")
 
         return binding.root
     }
@@ -45,18 +50,28 @@ class MyPageFragment : Fragment() {
         }
 
         binding.logoutTv.setOnClickListener { // 로그아웃
-           // auth.signOut()
+            userViewModel.logout()
             view?.findNavController()?.navigate(R.id.action_myPageFragment_to_loginActivity)
         }
 
         binding.withdrawTv.setOnClickListener { // 회원탈퇴
 
-//            auth.currentUser?.delete() // 계정 삭제
-//            userDB.child(userUid).removeValue() // 파이어베이스에 저장된 계정 삭제
-            Toast.makeText(requireContext(), "회원탈퇴 되었습니다.", Toast.LENGTH_SHORT).show()
+//            userViewModel.deleteAllMyComment(userUid)
+//            userViewModel.deleteAllMyPost(userUid)
+//            userViewModel.deleteAllMyReply(userUid) // 적용할까....말까....
 
-            activity?.finish()
+            userViewModel.withdraw(userUid)
+
+            MyApplication.prefs.deleteUid("uid")
+            MyApplication.prefs.deleteToken("token")
+            MyApplication.prefs.deleteUser("user")
+
+            Toast.makeText(requireContext(), "회원탈퇴 되었습니다.", Toast.LENGTH_SHORT).show()
+            withdrawState()
+            activity!!.finish()
+
         }
+
 
         binding.changePwTv.setOnClickListener {  // 비밀번호 변경
             DialogChangePw().show(parentFragmentManager, "changepw")
@@ -83,6 +98,19 @@ class MyPageFragment : Fragment() {
 //
 //        }
     }
+
+    private fun withdrawState(){
+        userViewModel.withDrawState.observe(this){ state ->
+            when (state) {
+                true -> {
+                    Log.d("withdrawState", "success")
+                }
+                else -> Log.d("withdrawState", "failed")
+
+            }
+        }
+    }
+
     private fun setToggle(){
 //        userDB.child(userUid).child("alarm").addListenerForSingleValueEvent(object : ValueEventListener {
 //            override fun onDataChange(dataSnapshot: DataSnapshot) {
