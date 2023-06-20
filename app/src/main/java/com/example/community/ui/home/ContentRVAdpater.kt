@@ -2,14 +2,19 @@ package com.example.community.ui.home
 
 
 import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.community.data.entity.Post
@@ -19,30 +24,45 @@ import com.example.community.databinding.ItemHomeContentsBinding
 class ContentRVAdpater(
     private val context: Context
 ) :
-    RecyclerView.Adapter<ContentRVAdpater.ViewHolder>() {
+    RecyclerView.Adapter<ContentRVAdpater.ViewHolder>(), Filterable {
 
-    private val items = ArrayList<Post>()
+    private val items = ArrayList<Post>()  // 원본
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun ageList(post: List<Post>) {
-        this.items.addAll(post)
-        notifyDataSetChanged()
+    var filterItem = ArrayList<Post>()  // 검색결과
+    var setFilter = ItemFilter()
+
+    init {
+        filterItem.addAll(items)
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun locationList(post: List<Post>) {
-        this.items.addAll(post)
+        items.clear()
+        items.addAll(post)
+        filterItem.clear()
+        filterItem.addAll(post)
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun ageList(post: List<Post>) {
+        filterItem.clear()
+        filterItem.addAll(post)
         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun getMyList(post: Post) {
-        this.items.add(post)
+        filterItem.add(post)
         notifyDataSetChanged()
     }
 
     interface InContentInterface {
         fun onContentClicked(post: Post)
+    }
+
+    override fun getFilter(): Filter {
+        return setFilter
     }
 
     private lateinit var itemClickListener: InContentInterface
@@ -62,23 +82,23 @@ class ContentRVAdpater(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.apply {
-            bind(items[position])
+            bind(filterItem[position])
 
             binding.layoutClick.setOnClickListener {  // 게시물 클릭시 조회수 증가
-                val views = items[position].view + 1
-                val update = items[position].copy(view = views)
+                val views = filterItem[position].view + 1
+                val update = filterItem[position].copy(view = views)
                 itemClickListener.onContentClicked(update)
             }
 
-            if (items[position].imgs != null) {
+            if (filterItem[position].imgs != null) {
                 img.visibility = View.VISIBLE
 
-                items[position].imgs?.get(0)?.let { displayImage(it, binding.imageExIv) }
+                filterItem[position].imgs?.get(0)?.let { displayImage(it, binding.imageExIv) }
             }
         }
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = filterItem.size
 
     inner class ViewHolder(val binding: ItemHomeContentsBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -106,5 +126,54 @@ class ContentRVAdpater(
         Glide.with(context)
             .load(decodedImage)
             .into(imageView)
+    }
+
+
+    inner class ItemFilter : Filter() {
+        override fun performFiltering(charSequence: CharSequence): FilterResults {
+            val filterString = charSequence.toString()
+            val results = FilterResults()
+            Log.d(TAG, "charSequence : $charSequence")
+
+
+            val filteredList: ArrayList<Post> = ArrayList<Post>()  // 원본 복제
+            //공백제외 아무런 값이 없을 경우 -> 원본 배열
+            if (filterString.trim { it <= ' ' }.isEmpty()) {
+                results.values = items
+                results.count = items.size
+
+                return results
+                //공백제외 2글자 이하인 경우 -> 제목으로만 검색
+            } else if (filterString.trim { it <= ' ' }.length <= 2) {
+                for (post in items) {
+                    if (post.title.contains(filterString)) {
+                        filteredList.add(post)
+                    }
+                }
+                //그 외의 경우(공백제외 2글자 초과) -> 제목, 내용으로 검색
+            } else {
+                for (post in items) {
+                    if (post.title.contains(filterString) || post.content.contains(filterString)) {
+                        filteredList.add(post)
+                    }
+                }
+            }
+            results.values = filteredList
+            results.count = filteredList.size
+
+            return results
+        }
+
+        @SuppressLint("NotifyDataSetChanged")
+        override fun publishResults(char: CharSequence?, result: FilterResults?) {
+
+            filterItem.clear()
+            filterItem.addAll(result?.values as ArrayList<Post>)
+
+            if (filterItem.isEmpty()) {
+                Toast.makeText(context, "검색결과가 없어요!", Toast.LENGTH_SHORT).show()
+            }
+            notifyDataSetChanged()
+        }
     }
 }

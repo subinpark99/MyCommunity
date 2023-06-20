@@ -11,11 +11,16 @@
         <LinearLayout
             android:id="@+id/ly"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="30dp"
             android:layout_marginTop="16dp"
             android:gravity="center"
             android:orientation="horizontal"
             app:layout_constraintTop_toTopOf="parent">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/location"
@@ -26,10 +31,23 @@
             <TextView
                 android:id="@+id/current_location_tv"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginStart="7dp"
+                android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.8" />
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/search_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="10dp"
+                app:queryHint="검색어를 입력해주세요" />
 
         </LinearLayout>
 

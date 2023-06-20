@@ -1,9 +1,9 @@
 package com.example.community.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -22,8 +22,11 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val postViewModel: PostViewModel by viewModels()
+    private lateinit var contentAdapter: ContentRVAdpater
 
     private val gson: Gson = Gson()
+
+    @SuppressLint("RestrictedApi")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -34,16 +37,54 @@ class HomeFragment : Fragment() {
         val userJson = MyApplication.prefs.getUser("user", "")
         val user = gson.fromJson(userJson, User::class.java)
 
+        contentAdapter = ContentRVAdpater(requireContext())
+
+        binding.searchBar.setOnQueryTextListener(searchViewTextListener)
+
         binding.currentLocationTv.text = user.location
         getPost(user.location)
+
+        setSearchView()
 
         return binding.root
     }
 
+    private fun setSearchView() {
+        val searchView = binding.searchBar
+        searchView.isSubmitButtonEnabled = true
 
+        searchView.setOnSearchClickListener {
+            binding.location.visibility = View.GONE
+            binding.currentLocationTv.visibility = View.GONE
+        }
+
+        searchView.setOnCloseListener {
+            binding.location.visibility = View.VISIBLE
+            binding.currentLocationTv.visibility = View.VISIBLE
+            false
+        }
+    }
+
+    private var searchViewTextListener: SearchView.OnQueryTextListener =
+
+        object : SearchView.OnQueryTextListener {
+
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onQueryTextSubmit(s: String): Boolean {
+                contentAdapter.filter.filter(s)
+                return false
+            }
+
+            // 텍스트 입력, 수정 시에 호출
+            @SuppressLint("NotifyDataSetChanged")
+            override fun onQueryTextChange(s: String): Boolean {
+                return false
+            }
+        }
+
+    @SuppressLint("NotifyDataSetChanged")
     private fun getPost(location: String) {
 
-        val contentAdapter = ContentRVAdpater(requireContext())
         binding.homeContentsRv.apply {
             adapter = contentAdapter
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -68,9 +109,4 @@ class HomeFragment : Fragment() {
         postViewModel.updatePostCnt(postIdx)
     }
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 }
