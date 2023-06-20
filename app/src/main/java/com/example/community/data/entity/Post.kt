@@ -8,7 +8,6 @@ data class Post(  // 게시글
     val uid: String = "",
     val nickname: String = "",
     val date: String ="",
-    val time:String="",
     var view: Int = 0,
     val title: String = "",
     val content: String = "",

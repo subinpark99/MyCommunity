@@ -71,7 +71,7 @@ class InContentFragment : Fragment() {
     private fun bind() {
 
         binding.backIv.setOnClickListener {// 뒤로가기
-            findNavController().navigateUp()
+            findNavController().popBackStack()
         }
 
         // post값 가져와서 보여주기
@@ -126,7 +126,7 @@ class InContentFragment : Fragment() {
 
         commentViewModel.addComment(  // comment 추가
             userUid, postData.postIdx, content, updateCommentIdx, postData.nickname,
-            currentDate, currentTime
+            "$currentDate $currentTime"
         )
 
         setCommentState()
@@ -262,13 +262,11 @@ class InContentFragment : Fragment() {
         val currentDate = LocalDateTime.now().format(formatter)
         val currentTime = LocalDateTime.now().format(timeFormatter)
 
-
         replyViewModel.addReply(
             userUid,
             postData.postIdx,
             user.nickname,
-            currentDate,
-            currentTime,
+            "$currentDate $currentTime",
             content,
             updateReplyIdx,
             commentIdx

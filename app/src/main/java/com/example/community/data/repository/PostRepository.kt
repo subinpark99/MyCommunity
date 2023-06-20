@@ -97,27 +97,25 @@ class PostRepository {
 
     }
 
-    fun getMyPost(userUid: String, state: (Boolean) -> Unit): MutableLiveData<Post?> {
+    fun getMyPost(userUid: String): MutableLiveData<MutableList<Post>?> {
 
-        val postLiveData = MutableLiveData<Post?>()
+        val postLiveData = MutableLiveData<MutableList<Post>?>()
 
         val myPost = database.child("post").orderByChild("uid").equalTo(userUid)
 
         myPost.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    for (contentSnapshot in snapshot.children.reversed()) {
 
-                        val post = contentSnapshot.getValue(Post::class.java)
-
-                        if (post != null) postLiveData.value = post
-                        state(true)
-                    }
+                val postList = mutableListOf<Post>()
+                for (postSnapshot in snapshot.children.reversed()) {
+                    val post = postSnapshot.getValue(Post::class.java)
+                    if (post != null) postList.add(post)
                 }
+                postLiveData.value = postList
+
             }
 
             override fun onCancelled(error: DatabaseError) {
-                state(false)
                 Log.d("getPost", error.toString())
             }
         })

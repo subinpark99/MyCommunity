@@ -52,6 +52,12 @@ class NoticeFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        getMyPosts()
+        getInContent()
+    }
 
     private fun getMyPosts() {
 
@@ -61,30 +67,21 @@ class NoticeFragment : Fragment() {
             hasFixedSize()
         }
 
-        postViewModel.getMyPosts(userUid).observe(this) { // 내가 쓴 게시물 가져오기
-            if (it != null)
-                getMyPostState(it.postIdx)
-        }
-
-    }
-
-    private fun getMyPostState(postIdx: Int) {
-        postViewModel.getMyPostState.observe(this) { state ->
-            when (state) {
-                true -> { // 내가 쓴 게시물의 댓글, 대댓글 가져오기
-                    getCommentNotice(postIdx)
-                    getReplyNotice(postIdx)
+        postViewModel.getMyPosts(userUid).observe(viewLifecycleOwner) {post-> // 내가 쓴 게시물 가져오기
+            if (post != null) {
+                for (postIdx in post){
+                    getCommentNotice(postIdx.postIdx)
                 }
-                else -> Log.d("getmypost", "failed")
             }
         }
     }
 
+    private fun getCommentNotice(getMyPostIdx:Int ) {
 
-    private fun getCommentNotice(getMyPostIdx: Int) {
-
-        commentViewModel.getNoticeComment(getMyPostIdx, userUid).observe(this) {
-            if (it != null) noticeAdapter.commentList(it)
+        commentViewModel.getNoticeComment(getMyPostIdx, userUid).observe(viewLifecycleOwner) {
+            if (it != null) {
+                noticeAdapter.commentList(it)
+            }
         }
     }
 
@@ -119,6 +116,7 @@ class NoticeFragment : Fragment() {
                     onPostClicked(postIdx)
                     if (it != null) {
                         getNoticePostState(it)
+                        Log.d("post",it.toString())
                     }
                 }
             }
@@ -183,8 +181,7 @@ class NoticeFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         (activity as AppCompatActivity?)!!.supportActionBar!!.hide()
-        getMyPosts()
-        getInContent()
+
     }
 
     override fun onStop() {

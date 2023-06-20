@@ -52,7 +52,14 @@ class ContentRVAdpater(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun getMyList(post: Post) {
+    fun getMyList(post: List<Post>) {
+        filterItem.clear()
+        filterItem.addAll(post)
+        notifyDataSetChanged()
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun getReplyList(post:Post){
         filterItem.add(post)
         notifyDataSetChanged()
     }

@@ -12,20 +12,19 @@ import com.example.community.databinding.ItemNoticeBinding
 class NoticeAdapter :
     RecyclerView.Adapter<NoticeAdapter.ViewHolder>() {
 
-    private val commentItems = arrayListOf<Comment>()
+    private var commentItems = arrayListOf<Comment>()
     private val replyItems = arrayListOf<Reply>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun commentList(comment: List<Comment>) {
-        this.commentItems.clear()
-        this.commentItems.addAll(comment)
+    fun commentList(comment: Comment) {
+        commentItems.add(comment)
         notifyDataSetChanged()
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun replyList(reply: List<Reply>) {
-        this.replyItems.clear()
-        this.replyItems.addAll(reply)
+        replyItems.clear()
+        replyItems.addAll(reply)
         notifyDataSetChanged()
     }
 
@@ -48,17 +47,19 @@ class NoticeAdapter :
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        if (position < commentItems.size) {
-            holder.bind(commentItems[position])
-        } else {
-            val replyPosition = position - commentItems.size
-            if (replyPosition < replyItems.size) {
-                holder.bind(replyItems[replyPosition])
-            }
-        }
+//        if (position < commentItems.size) {
+//            holder.bind(commentItems[position])
+//        } else {
+//            val replyPosition = position - commentItems.size
+//            if (replyPosition < replyItems.size) {
+//                holder.bind(replyItems[replyPosition])
+//            }
+//        }
+        holder.bind(commentItems[position])
+
     }
 
-    override fun getItemCount(): Int = commentItems.size + replyItems.size
+    override fun getItemCount(): Int = commentItems.size +replyItems.size
 
     inner class ViewHolder(val binding: ItemNoticeBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -66,7 +67,6 @@ class NoticeAdapter :
 
             binding.noticeContentTv.text = comment.content
             binding.noticeDateTv.text = comment.date
-            binding.noticeTimeTv.text = comment.time
 
             binding.layoutClick.setOnClickListener {  // 알림 클릭시 게시물로 이동
                 itemClickListener.onCommentClicked(comment.postIdx)
@@ -77,7 +77,6 @@ class NoticeAdapter :
 
             binding.noticeContentTv.text = reply.content
             binding.noticeDateTv.text = reply.date
-            binding.noticeTimeTv.text = reply.time
 
             binding.layoutClick.setOnClickListener {  // 알림 클릭시 게시물로 이동
                 itemClickListener.onReplyClicked(reply.postIdx)

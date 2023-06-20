@@ -26,14 +26,13 @@ class ReplyViewModel : ViewModel() {
         postIdx: Int,
         nickname: String,
         date: String,
-        time: String,
         content: String,
         replyIdx: Int,
         commentIdx: Int
     ) {
         if (checkAddNull(content)) {
             val reply =
-                Reply(uid, postIdx, nickname, date, time, content, replyIdx, commentIdx)
+                Reply(uid, postIdx, nickname, date, content, replyIdx, commentIdx)
             replyRepo.addReply(replyIdx, reply) { success ->
                 if (success) {
                     _addReplyState.postValue(true)

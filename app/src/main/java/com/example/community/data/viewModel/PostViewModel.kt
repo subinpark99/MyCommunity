@@ -19,9 +19,6 @@ class PostViewModel : ViewModel() {
     private var _deletePostState = MutableLiveData<Boolean>()
     val deletePostState: LiveData<Boolean> = _deletePostState
 
-    private var _getMyPostState = MutableLiveData<Boolean>()
-    val getMyPostState: LiveData<Boolean> = _getMyPostState
-
     private var _getNoticePostState = MutableLiveData<Boolean>()
     val getNoticePostState: LiveData<Boolean> = _getNoticePostState
 
@@ -36,7 +33,6 @@ class PostViewModel : ViewModel() {
         uid: String,
         nickname: String,
         date: String,
-        time: String,
         view: Int,
         title: String,
         content: String,
@@ -44,7 +40,7 @@ class PostViewModel : ViewModel() {
     ) {
         if (checkAddNull(title, content)) {
             val post =
-                Post(postIdx, age, location, uid, nickname, date, time, view, title, content, imgs)
+                Post(postIdx, age, location, uid, nickname, date,  view, title, content, imgs)
             postRepo.addPost(postIdx, post) { success ->
                 if (success) {
                     _addPostState.postValue(true)
@@ -88,14 +84,8 @@ class PostViewModel : ViewModel() {
         }
     }
 
-    fun getMyPosts(userUid: String): MutableLiveData<Post?> {
-        return postRepo.getMyPost(userUid) { success ->
-            if (success) {
-                _getMyPostState.postValue(true)
-            } else {
-                _getMyPostState.postValue(false)
-            }
-        }
+    fun getMyPosts(userUid: String): MutableLiveData<MutableList<Post>?> {
+        return postRepo.getMyPost(userUid)
     }
 
     fun getNoticePost(postIdx: Int): MutableLiveData<Post?> {

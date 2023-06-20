@@ -68,7 +68,7 @@ class MyReplyFragment : Fragment() {
 
         postViewModel.getNoticePost(postIdx).observe(this) {
             if (it != null) {
-                rvAdpater.getMyList(it)
+                rvAdpater.getReplyList(it)
             }
         }
     }

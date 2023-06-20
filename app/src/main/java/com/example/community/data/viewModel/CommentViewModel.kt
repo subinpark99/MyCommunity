@@ -18,19 +18,16 @@ class CommentViewModel: ViewModel() {
     private var _deleteCommentState = MutableLiveData<Boolean>()
     val deleteCommentState: LiveData<Boolean> = _deleteCommentState
 
-    private var _getMyCommentState = MutableLiveData<Boolean>()
-    val getMyCommentState: LiveData<Boolean> = _getMyCommentState
-
 
     fun getLatestComment(): MutableLiveData<Comment?> {
         return commmentRepo.getLatestComment()
     }
 
     fun addComment(
-        uid:String,postIdx:Int,content:String,commentIdx:Int,nickname:String,date:String,time:String
+        uid:String,postIdx:Int,content:String,commentIdx:Int,nickname:String,date:String
     ) {
         if (checkAddNull(content)) {
-            val comment= Comment(uid, postIdx, content, commentIdx, nickname, date, time)
+            val comment= Comment(uid, postIdx, content, commentIdx, nickname, date)
             commmentRepo.addComment(commentIdx,comment){ success ->
                 if (success) {
                     _addCommentState.postValue(true)
@@ -70,18 +67,12 @@ class CommentViewModel: ViewModel() {
 
     }
 
-    fun getNoticeComment(postIdx: Int,userUid:String): MutableLiveData<MutableList<Comment>> {
+    fun getNoticeComment(postIdx: Int,userUid:String): MutableLiveData<Comment?> {
         return commmentRepo.getNoticeComment(postIdx,userUid)
     }
 
     fun getMyComments(userUid:String):MutableLiveData<Comment?>{
-        return commmentRepo.getMyComments(userUid){ success ->
-            if (success) {
-                _getMyCommentState.postValue(true)
-            } else {
-                _getMyCommentState.postValue(false)
-            }
-        }
+        return commmentRepo.getMyComments(userUid)
     }
 
 }
