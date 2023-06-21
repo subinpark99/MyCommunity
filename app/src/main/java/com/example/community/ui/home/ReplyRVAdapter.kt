@@ -54,9 +54,7 @@ class ReplyRVAdapter(private val userUid: String) :
     inner class ViewHolder(val binding: ItemReplyBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(reply: Reply) {
-            binding.contentTimeTv.text = reply.date
-            binding.contentTv.text = reply.content
-            binding.userNicknameTv.text = reply.nickname
+            binding.reply=reply
         }
     }
 }

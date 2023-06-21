@@ -83,9 +83,8 @@ class CommentAdapter(
     inner class ViewHolder(val binding: ItemCommentBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(comment: Comment) {
-            binding.contentTimeTv.text = comment.date
-            binding.contentTv.text = comment.content
-            binding.userNicknameTv.text = comment.nickname
+
+            binding.comment = comment
 
             val adapter = ReplyRVAdapter(userUid)
             binding.replyRv.adapter = adapter

@@ -59,7 +59,7 @@ class ContentRVAdpater(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun getReplyList(post:Post){
+    fun getReplyList(post: Post) {
         filterItem.add(post)
         notifyDataSetChanged()
     }
@@ -111,13 +111,7 @@ class ContentRVAdpater(
         RecyclerView.ViewHolder(binding.root) {
         val img = binding.imageExIv
         fun bind(post: Post) {
-
-            binding.contentTimeTv.text = post.date
-            binding.homeContentTv.text = post.content
-            binding.homeTitleTv.text = post.title
-            binding.userNicknameTv.text = post.nickname
-            binding.contentViewsTv.text = post.view.toString()
-
+            binding.post = post
         }
     }
 

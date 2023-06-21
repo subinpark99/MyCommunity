@@ -128,6 +128,23 @@ class AuthViewModel : ViewModel() {
         }
     }
 
+
+    fun setSwitchOn(userUid: String) {
+        viewModelScope.launch {
+            authRepo.setSwitchOn(userUid)
+        }
+    }
+
+    fun setSwitchOff(userUid: String) {
+        viewModelScope.launch {
+            authRepo.setSwitchOff(userUid)
+        }
+    }
+
+    fun setToggle(userUid: String): MutableLiveData<Boolean?> {
+        return authRepo.setToggle(userUid)
+    }
+
 }
 
 

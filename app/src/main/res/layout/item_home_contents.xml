@@ -2,6 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="post"
+            type="com.example.community.data.entity.Post" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_click"
         android:layout_width="match_parent"
@@ -14,7 +21,7 @@
             android:layout_marginTop="5dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="@string/title"
+            android:text="@{post.title}"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -29,7 +36,7 @@
             android:layout_marginEnd="20dp"
             android:ellipsize="end"
             android:maxLines="3"
-            android:text="@string/content"
+            android:text="@{post.content}"
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/image_ex_iv"
@@ -53,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="@string/timecnt"
+            android:text="@{post.date}"
             android:textColor="@color/deep_green"
             android:textSize="13sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +82,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
             android:layout_marginTop="7dp"
-            android:text="@string/nickname"
+            android:text="@{post.nickname}"
             android:textColor="@color/gray"
             android:textSize="13sp"
             app:layout_constraintStart_toEndOf="@id/ver_line"
@@ -96,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="7dp"
-            android:text="@string/views"
+            android:text="@{Integer.toString(post.view)}"
             android:textColor="@color/gray"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@id/user_nickname_tv"

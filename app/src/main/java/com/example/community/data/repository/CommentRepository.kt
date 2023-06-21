@@ -1,9 +1,17 @@
 package com.example.community.data.repository
 
+import android.content.ContentValues
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.community.data.entity.Comment
+import com.example.community.data.local.MyApplication
+import com.example.community.ui.notice.fcm.RetrofitInstance
+import com.example.community.ui.notice.fcm.model.NotificationData
+import com.example.community.ui.notice.fcm.model.PushNotification
 import com.google.firebase.database.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CommentRepository {
 
@@ -95,7 +103,8 @@ class CommentRepository {
 
     fun getNoticeComment(
         postIdx: Int,
-        userUid: String
+        userUid: String,
+        alarm: Boolean
     ): MutableLiveData<Comment?> {  // 내가 쓴 게시물의 댓글
 
         val commentLiveData = MutableLiveData<Comment?>()
@@ -107,10 +116,13 @@ class CommentRepository {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
                 val comment = snapshot.getValue(Comment::class.java)
-                if (comment != null && comment.uid != userUid)
+                if (comment != null && comment.uid != userUid) {
                     commentLiveData.value = comment
+                    if (alarm) sendPush(comment.content)
+                }
 
             }
+
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onChildRemoved(snapshot: DataSnapshot) {}
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -151,6 +163,48 @@ class CommentRepository {
             }
         })
         return commentLiveData
+    }
+
+    fun getSwitch(userUid: String): MutableLiveData<Boolean?> {
+        val userLiveData = MutableLiveData<Boolean?>()
+        val userRef = database.child("user").child(userUid).child("alarm")
+        userRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val alarmEnabled = snapshot.getValue(Boolean::class.java)
+                if (alarmEnabled == true) {
+                    userLiveData.value = alarmEnabled
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("getSwitch", error.toString())
+            }
+
+        })
+        return userLiveData
+    }
+
+    private fun sendNotification(notification: PushNotification) =
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.api.postNotification(notification)
+                if (response.isSuccessful) {
+                    //  Log.d(TAG, "Response: ${Gson().toJson(response)}")
+                } else {
+                    Log.e(ContentValues.TAG, response.errorBody().toString())
+                }
+            } catch (e: Exception) {
+                Log.e(ContentValues.TAG, e.toString())
+            }
+        }
+
+    private fun sendPush(message: String) {
+        val userToken = MyApplication.prefs.getToken("token", "")
+        val pushNotification = PushNotification(
+            NotificationData("My Community !", message),
+            userToken
+        )
+        sendNotification(pushNotification)
     }
 
 

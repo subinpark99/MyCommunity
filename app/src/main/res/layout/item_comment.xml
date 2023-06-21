@@ -3,6 +3,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="comment"
+            type="com.example.community.data.entity.Comment" />
+    </data>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -25,7 +32,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
-                    android:text="@string/content"
+                    android:text="@{comment.content}"
                     android:textColor="@color/black" />
 
                 <LinearLayout
@@ -38,7 +45,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:text="@string/nickname"
+                        android:text="@{comment.nickname}"
                         android:textColor="@color/deep_green"
                         android:textSize="13sp" />
 
@@ -47,7 +54,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:text="@string/timecnt"
+                        android:text="@{comment.date}"
                         android:textColor="@color/gray"
                         android:textSize="13sp" />
 
@@ -89,9 +96,9 @@
                 android:id="@+id/reply_rv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                tools:listitem="@layout/item_reply"
                 android:background="@drawable/writing_border"
-                android:scrollbars="vertical" />
+                android:scrollbars="vertical"
+                tools:listitem="@layout/item_reply" />
         </LinearLayout>
 
     </LinearLayout>

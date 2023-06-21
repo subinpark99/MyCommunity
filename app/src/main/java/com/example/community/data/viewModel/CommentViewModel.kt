@@ -7,8 +7,7 @@ import com.example.community.data.entity.Comment
 import com.example.community.data.repository.CommentRepository
 
 
-
-class CommentViewModel: ViewModel() {
+class CommentViewModel : ViewModel() {
 
     private val commmentRepo = CommentRepository()
 
@@ -24,11 +23,11 @@ class CommentViewModel: ViewModel() {
     }
 
     fun addComment(
-        uid:String,postIdx:Int,content:String,commentIdx:Int,nickname:String,date:String
+        uid: String, postIdx: Int, content: String, commentIdx: Int, nickname: String, date: String
     ) {
         if (checkAddNull(content)) {
-            val comment= Comment(uid, postIdx, content, commentIdx, nickname, date)
-            commmentRepo.addComment(commentIdx,comment){ success ->
+            val comment = Comment(uid, postIdx, content, commentIdx, nickname, date)
+            commmentRepo.addComment(commentIdx, comment) { success ->
                 if (success) {
                     _addCommentState.postValue(true)
                 } else {
@@ -52,8 +51,8 @@ class CommentViewModel: ViewModel() {
         return commmentRepo.getComment(postIdx)
     }
 
-    fun deleteComment(commentIdx: Int){
-        return commmentRepo.deleteComment(commentIdx){ success ->
+    fun deleteComment(commentIdx: Int) {
+        return commmentRepo.deleteComment(commentIdx) { success ->
             if (success) {
                 _deleteCommentState.postValue(true)
             } else {
@@ -62,17 +61,21 @@ class CommentViewModel: ViewModel() {
         }
     }
 
-    fun deleteAllPostComment(postIdx: Int){
+    fun deleteAllPostComment(postIdx: Int) {
         return commmentRepo.deletePostComment(postIdx)
 
     }
 
-    fun getNoticeComment(postIdx: Int,userUid:String): MutableLiveData<Comment?> {
-        return commmentRepo.getNoticeComment(postIdx,userUid)
+    fun getNoticeComment(postIdx: Int, userUid: String, alarm: Boolean): MutableLiveData<Comment?> {
+        return commmentRepo.getNoticeComment(postIdx, userUid, alarm)
     }
 
-    fun getMyComments(userUid:String):MutableLiveData<Comment?>{
+    fun getMyComments(userUid: String): MutableLiveData<Comment?> {
         return commmentRepo.getMyComments(userUid)
+    }
+
+    fun getSwitch(userUid: String): MutableLiveData<Boolean?> {
+        return commmentRepo.getSwitch(userUid)
     }
 
 }

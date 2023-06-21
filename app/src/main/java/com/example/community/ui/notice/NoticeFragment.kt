@@ -1,7 +1,6 @@
 package com.example.community.ui.notice
 
 
-import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,12 +17,6 @@ import com.example.community.data.viewModel.CommentViewModel
 import com.example.community.data.viewModel.PostViewModel
 import com.example.community.data.viewModel.ReplyViewModel
 import com.example.community.databinding.FragmentNoticeBinding
-import com.example.community.ui.notice.fcm.RetrofitInstance
-import com.example.community.ui.notice.fcm.model.NotificationData
-import com.example.community.ui.notice.fcm.model.PushNotification
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 class NoticeFragment : Fragment() {
@@ -34,6 +27,7 @@ class NoticeFragment : Fragment() {
     private val postViewModel: PostViewModel by viewModels()
     private val commentViewModel: CommentViewModel by viewModels()
     private val replyViewModel: ReplyViewModel by viewModels()
+    var alarm: Boolean = false
 
     private lateinit var userUid: String
     private lateinit var noticeAdapter: NoticeAdapter
@@ -48,6 +42,7 @@ class NoticeFragment : Fragment() {
 
         userUid = MyApplication.prefs.getUid("uid", "")
         noticeAdapter = NoticeAdapter()
+        getSwitch()
 
         return binding.root
     }
@@ -67,22 +62,23 @@ class NoticeFragment : Fragment() {
             hasFixedSize()
         }
 
-        postViewModel.getMyPosts(userUid).observe(viewLifecycleOwner) {post-> // 내가 쓴 게시물 가져오기
+        postViewModel.getMyPosts(userUid).observe(viewLifecycleOwner) { post -> // 내가 쓴 게시물 가져오기
             if (post != null) {
-                for (postIdx in post){
+                for (postIdx in post) {
                     getCommentNotice(postIdx.postIdx)
                 }
             }
         }
     }
 
-    private fun getCommentNotice(getMyPostIdx:Int ) {
+    private fun getCommentNotice(getMyPostIdx: Int) {
 
-        commentViewModel.getNoticeComment(getMyPostIdx, userUid).observe(viewLifecycleOwner) {
-            if (it != null) {
-                noticeAdapter.commentList(it)
+        commentViewModel.getNoticeComment(getMyPostIdx, userUid, alarm)
+            .observe(viewLifecycleOwner) {
+                if (it != null) {
+                    noticeAdapter.commentList(it)
+                }
             }
-        }
     }
 
     private fun getReplyNotice(getMyPostIdx: Int) {
@@ -92,19 +88,11 @@ class NoticeFragment : Fragment() {
     }
 
     private fun getSwitch() {
-//        userDB.child(userUid).child("alarm")
-//            .addListenerForSingleValueEvent(object : ValueEventListener {
-//                override fun onDataChange(snapshot: DataSnapshot) {
-//                    val alarmEnabled = snapshot.getValue(Boolean::class.java)
-//                    if (alarmEnabled == true) {
-//                        sendPush()
-//                    }
-//                }
-//
-//                override fun onCancelled(error: DatabaseError) {
-//                    Log.d("s", "sdfsdfsdf")
-//                }
-//            })
+        commentViewModel.getSwitch(userUid).observe(this) {
+            if (it != null) {
+                alarm = it
+            }
+        }
     }
 
     private fun getInContent() {  // 댓글 알림 클릭 시, commentDB와 replyDB의 postIdx에 해당하는 post로 이동
@@ -116,7 +104,7 @@ class NoticeFragment : Fragment() {
                     onPostClicked(postIdx)
                     if (it != null) {
                         getNoticePostState(it)
-                        Log.d("post",it.toString())
+                        Log.d("post", it.toString())
                     }
                 }
             }
@@ -146,31 +134,6 @@ class NoticeFragment : Fragment() {
                 else -> Log.d("getnoticepost", "failed")
             }
         }
-    }
-
-
-    private fun sendNotification(notification: PushNotification) =
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = RetrofitInstance.api.postNotification(notification)
-                if (response.isSuccessful) {
-                    //  Log.d(TAG, "Response: ${Gson().toJson(response)}")
-                } else {
-                    Log.e(ContentValues.TAG, response.errorBody().toString())
-                }
-            } catch (e: Exception) {
-                Log.e(ContentValues.TAG, e.toString())
-            }
-        }
-
-
-    private fun sendPush() {
-        val userToken = MyApplication.prefs.getToken("token", "")
-        val pushNotification = PushNotification(
-            NotificationData("My Community !", ""),
-            userToken
-        )
-        sendNotification(pushNotification)
     }
 
 

@@ -82,21 +82,20 @@ class MyPageFragment : Fragment() {
         }
 
 
-//        binding.noticeToggleBtn.setOnCheckedChangeListener { CompoundButton, onSwitch ->
-//            //  스위치가 켜지면
-//            if (onSwitch) {
-//                binding.noticeToggleBtn.isChecked = true
-//
-//                userDB.child(userUid).child("alarm").setValue(true)
-//            }
-//            //  스위치가 꺼지면
-//            else {
-//                binding.noticeToggleBtn.isChecked = false
-//                userDB.child(userUid).child("alarm").setValue(false)
-//
-//            }
-//
-//        }
+        binding.noticeToggleBtn.setOnCheckedChangeListener { _, onSwitch ->
+            //  스위치가 켜지면
+            if (onSwitch) {
+                binding.noticeToggleBtn.isChecked = true
+                userViewModel.setSwitchOn(userUid)
+            }
+            //  스위치가 꺼지면
+            else {
+                binding.noticeToggleBtn.isChecked = false
+                userViewModel.setSwitchOff(userUid)
+
+            }
+
+        }
     }
 
     private fun withdrawState() {
@@ -112,18 +111,11 @@ class MyPageFragment : Fragment() {
     }
 
     private fun setToggle() {
-//        userDB.child(userUid).child("alarm").addListenerForSingleValueEvent(object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                val alarmEnabled = dataSnapshot.getValue(Boolean::class.java)
-//                if (alarmEnabled != null) {
-//                    binding.noticeToggleBtn.isChecked = alarmEnabled
-//                }
-//            }
-//
-//            override fun onCancelled(databaseError: DatabaseError) {
-//               Log.d("setToggle",databaseError.toString())
-//            }
-//        })
+        userViewModel.setToggle(userUid).observe(viewLifecycleOwner) {
+            if (it != null) {
+                binding.noticeToggleBtn.isChecked = it
+            }
+        }
     }
 
 

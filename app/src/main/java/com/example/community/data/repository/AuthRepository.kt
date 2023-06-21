@@ -10,13 +10,14 @@ import com.google.firebase.database.*
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.ktx.messaging
+import javax.inject.Inject
 
 
-class AuthRepository {
-
-    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
-    private val auth: FirebaseAuth = Firebase.auth
+class AuthRepository @Inject constructor(
+    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference,
+    private val auth: FirebaseAuth = Firebase.auth,
     private val fcm: FirebaseMessaging = Firebase.messaging
+) {
 
     fun registerUser(
         email: String, password: String, user: User,
@@ -176,5 +177,33 @@ class AuthRepository {
     private fun changeDBPw(newPw: String) {
         auth.currentUser?.updatePassword(newPw) // 파이어베이스 계정 비번 업데이트
     }
+
+    fun setSwitchOn(userUid: String) {
+        database.child("user").child(userUid).child("alarm").setValue(true)
+    }
+
+    fun setSwitchOff(userUid: String) {
+        database.child("user").child(userUid).child("alarm").setValue(false)
+    }
+
+    fun setToggle(userUid: String): MutableLiveData<Boolean?> {
+        val userLiveData = MutableLiveData<Boolean?>()
+        val userRef = database.child("user").child(userUid).child("alarm")
+        userRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val alarmEnabled = snapshot.getValue(Boolean::class.java)
+                if (alarmEnabled != null) {
+                    userLiveData.value = alarmEnabled
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("setToggle", error.toString())
+            }
+
+        })
+        return userLiveData
+    }
+
 
 }
