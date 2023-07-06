@@ -14,11 +14,9 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.community.R
-import com.example.community.data.entity.User
 import com.example.community.data.local.MyApplication
 import com.example.community.databinding.ActivityMainBinding
 import com.google.android.material.navigation.NavigationView
-import com.google.gson.Gson
 
 class MainActivity :
     AppCompatActivity(),
@@ -27,8 +25,6 @@ class MainActivity :
 
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
-
-    private val gson: Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +42,14 @@ class MainActivity :
     override fun onResume() {
         super.onResume()
 
-        val userJson = MyApplication.prefs.getUser("user", "")
-        val user = gson.fromJson(userJson, User::class.java)
-        initNavi(user.email, user.location)
-        setAge(user.location)
+
+        val user = MyApplication.prefs.getUser()
+        if (user != null) {
+            initNavi(user.email, user.location)
+        }
+        if (user != null) {
+            setAge(user.location)
+        }
     }
 
 

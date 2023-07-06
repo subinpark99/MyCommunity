@@ -8,10 +8,6 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
-import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.example.community.R
 import com.example.community.ui.other.MainActivity
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -38,29 +34,6 @@ class MessagingService : FirebaseMessagingService() {
                 )
             }
         }
-    }
-
-    override fun onNewToken(token: String) {
-        super.onNewToken(token)
-        sendRegistrationToServer(token)
-    }
-
-    private fun scheduleJob() {
-        val work = OneTimeWorkRequest.Builder(MyWorker::class.java)
-            .build()
-        WorkManager.getInstance(this)
-            .beginWith(work)
-            .enqueue()
-    }
-
-
-    private fun handleNow() {
-        Log.d(TAG, "Short lived task is done.")
-    }
-
-
-    private fun sendRegistrationToServer(token: String?) {
-        Log.d(TAG, "sendRegistrationTokenToServer($token)")
     }
 
     private fun sendNotification(title: String, body: String) {
@@ -100,10 +73,4 @@ class MessagingService : FirebaseMessagingService() {
         private const val TAG = "MyFirebaseMsgService"
     }
 
-    internal class MyWorker(appContext: Context, workerParams: WorkerParameters) :
-        Worker(appContext, workerParams) {
-        override fun doWork(): Result {
-            return Result.success()
-        }
-    }
 }

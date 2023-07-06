@@ -28,7 +28,6 @@ import com.example.community.data.entity.User
 import com.example.community.data.viewModel.PostViewModel
 import com.example.community.databinding.FragmentWritingBinding
 import com.google.firebase.database.*
-import com.google.gson.Gson
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -40,7 +39,6 @@ class WritingFragment : Fragment() {
     private var _binding: FragmentWritingBinding? = null
     private val binding get() = _binding!!
 
-    private val gson: Gson = Gson()
     private val postViewModel: PostViewModel by viewModels()
 
     private var imgList = arrayListOf<String>()  // 이미지 리스트 가져오기
@@ -54,19 +52,21 @@ class WritingFragment : Fragment() {
 
         _binding = FragmentWritingBinding.inflate(inflater, container, false)
 
-        val userJson = MyApplication.prefs.getUser("user", "")
+
         val userUid = MyApplication.prefs.getUid("uid", "")
-        val user = gson.fromJson(userJson, User::class.java)
+        val user = MyApplication.prefs.getUser()
 
         binding.writeDoneIv.setOnClickListener {  // 작성 완료
-            addPost(user, userUid, user.location)
+            if (user != null) {
+                addPost(user, userUid, user.location)
+            }
             binding.writingContentEt.text = null
             binding.writingTitleEt.text = null
             binding.writeGalleryRv.layoutManager = null
         }
 
 
-        binding.currentLocationTv.text = user.location
+        binding.currentLocationTv.text = user!!.location
 
         binding.addPhotoIv.setOnClickListener {
             getPermission()

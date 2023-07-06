@@ -56,8 +56,8 @@ class AuthViewModel : ViewModel() {
     }
 
 
-    fun getFcmToken(userUid: String) {
-        return authRepo.getFcmToken(userUid)
+    fun getFcmToken() {
+        return authRepo.getFcmToken()
     }
 
     fun loginUser(email: String, password: String) =

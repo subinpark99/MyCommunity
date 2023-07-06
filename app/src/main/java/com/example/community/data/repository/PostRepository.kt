@@ -3,7 +3,12 @@ package com.example.community.data.repository
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.community.data.entity.Post
+import com.example.community.data.entity.User
+import com.example.community.ui.notice.fcm.RetrofitInstance
+import com.example.community.ui.notice.fcm.model.NotificationData
+import com.example.community.ui.notice.fcm.model.PushNotification
 import com.google.firebase.database.*
+import kotlinx.coroutines.runBlocking
 
 
 class PostRepository {
@@ -39,6 +44,58 @@ class PostRepository {
         postRef.setValue(post).addOnSuccessListener {
             state(true)
         }.addOnFailureListener { state(false) }
+    }
+
+
+    fun sendPushAlarm(postIdx: Int) {
+
+        database.child("post").orderByChild("postIdx").equalTo(postIdx.toDouble())
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (childSnapshot in snapshot.children) {
+                        val post = childSnapshot.getValue(Post::class.java)
+                        val userUid = post?.uid
+
+                        if (userUid != null) {
+                            val userRef = database.child("user").child(userUid)
+                            userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(userSnapshot: DataSnapshot) {
+                                    val user = userSnapshot.getValue(User::class.java)
+                                    val alarmStatus = user?.alarm
+
+                                    if (alarmStatus == true) {
+                                        runBlocking {
+                                            sendFcmNotification("새로운 댓글을 확인하세요", user.token)
+                                        }
+                                    }
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Log.d("sendPushalarm", "failed")
+                                }
+
+                            })
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d("getPostIdx","failed")
+                }
+
+            })
+
+    }
+
+
+    suspend fun sendFcmNotification(message: String, token: String) {
+
+        PushNotification(
+            data = NotificationData("새로운 댓글이 달렸어요!", message),
+            to = token
+        ).also {
+            RetrofitInstance.api.postNotification(it)
+        }
     }
 
 

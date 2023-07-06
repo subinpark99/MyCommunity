@@ -40,7 +40,18 @@ class PostViewModel : ViewModel() {
     ) {
         if (checkAddNull(title, content)) {
             val post =
-                Post(postIdx, age, location, uid, nickname, date,  view, title, content, imgs)
+                Post(
+                    postIdx,
+                    age,
+                    location,
+                    uid,
+                    nickname,
+                    date,
+                    view,
+                    title,
+                    content,
+                    imgs
+                )
             postRepo.addPost(postIdx, post) { success ->
                 if (success) {
                     _addPostState.postValue(true)
@@ -53,6 +64,7 @@ class PostViewModel : ViewModel() {
         }
 
     }
+
 
     private fun checkAddNull(
         title: String,
@@ -71,6 +83,13 @@ class PostViewModel : ViewModel() {
             postRepo.updatePostCnt(postIdx)
         }
     }
+
+    fun sendPushAlarm(postIdx: Int) {
+        viewModelScope.launch {
+            postRepo.sendPushAlarm(postIdx)
+        }
+    }
+
 
     fun deletePost(postIdx: Int) {
         viewModelScope.launch {

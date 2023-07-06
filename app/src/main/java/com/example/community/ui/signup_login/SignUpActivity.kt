@@ -20,8 +20,6 @@ import com.example.community.databinding.ActivitySignupBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 import java.util.*
 
 
@@ -159,8 +157,8 @@ class SignUpActivity : AppCompatActivity() {
         authViewModel.registerState.observe(this) { state ->
             when (state) {
                 true -> {
-                    val user = Firebase.auth.currentUser!!.uid
-                    authViewModel.getFcmToken(user)
+
+                    authViewModel.getFcmToken()
 
                     Toast.makeText(this, "회원가입에 성공했습니다!", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, LoginActivity::class.java)  // 로그인 액티비티로 이동

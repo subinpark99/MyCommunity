@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.example.community.R
+import com.example.community.data.entity.User
 import com.example.community.data.local.MyApplication
 import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.FragmentMypageBinding
@@ -20,6 +21,7 @@ class MyPageFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val userViewModel: AuthViewModel by viewModels()
+    private lateinit var user: User
 
     private lateinit var userUid: String
 
@@ -33,6 +35,7 @@ class MyPageFragment : Fragment() {
 
         nav()
         userUid = MyApplication.prefs.getUid("uid", "")
+        user= MyApplication.prefs.getUser()!!
 
         return binding.root
     }
@@ -63,7 +66,6 @@ class MyPageFragment : Fragment() {
             userViewModel.withdraw(userUid)
 
             MyApplication.prefs.deleteUid("uid")
-            MyApplication.prefs.deleteToken("token")
             MyApplication.prefs.deleteUser("user")
 
             Toast.makeText(requireContext(), "회원탈퇴 되었습니다.", Toast.LENGTH_SHORT).show()
@@ -87,9 +89,24 @@ class MyPageFragment : Fragment() {
             if (onSwitch) {
                 binding.noticeToggleBtn.isChecked = true
                 userViewModel.setSwitchOn(userUid)
+
+                val changedUser = User(
+                    user.email, user.password, user.nickname,
+                    user.location, user.age, true, user.token
+                )
+                MyApplication.prefs.setUser(changedUser)
+
+
             }
             //  스위치가 꺼지면
             else {
+
+                val changedUser = User(
+                    user.email, user.password, user.nickname,
+                    user.location, user.age, false, user.token
+                )
+                MyApplication.prefs.setUser(changedUser)
+
                 binding.noticeToggleBtn.isChecked = false
                 userViewModel.setSwitchOff(userUid)
 

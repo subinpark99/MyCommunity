@@ -40,6 +40,11 @@ class CommentViewModel : ViewModel() {
 
     }
 
+    fun getNoticeComment(postIdx: Int, userUid: String): MutableLiveData<Comment?> {
+        return commmentRepo.getNoticeComment(postIdx, userUid)
+    }
+
+
     private fun checkAddNull(
         content: String
     ): Boolean {
@@ -66,9 +71,6 @@ class CommentViewModel : ViewModel() {
 
     }
 
-    fun getNoticeComment(postIdx: Int, userUid: String, alarm: Boolean): MutableLiveData<Comment?> {
-        return commmentRepo.getNoticeComment(postIdx, userUid, alarm)
-    }
 
     fun getMyComments(userUid: String): MutableLiveData<Comment?> {
         return commmentRepo.getMyComments(userUid)

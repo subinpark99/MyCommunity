@@ -10,10 +10,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.Post
-import com.example.community.data.entity.User
 import com.example.community.data.viewModel.PostViewModel
 import com.example.community.databinding.FragmentHomeBinding
-import com.google.gson.Gson
 
 
 class HomeFragment : Fragment() {
@@ -24,7 +22,6 @@ class HomeFragment : Fragment() {
     private val postViewModel: PostViewModel by viewModels()
     private lateinit var contentAdapter: ContentRVAdpater
 
-    private val gson: Gson = Gson()
 
     @SuppressLint("RestrictedApi")
     override fun onCreateView(
@@ -34,14 +31,13 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        val userJson = MyApplication.prefs.getUser("user", "")
-        val user = gson.fromJson(userJson, User::class.java)
+        val user = MyApplication.prefs.getUser()
 
         contentAdapter = ContentRVAdpater(requireContext())
 
         binding.searchBar.setOnQueryTextListener(searchViewTextListener)
 
-        binding.currentLocationTv.text = user.location
+        binding.currentLocationTv.text = user!!.location
         getPost(user.location)
 
         setSearchView()

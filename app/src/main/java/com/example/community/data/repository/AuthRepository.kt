@@ -3,7 +3,6 @@ package com.example.community.data.repository
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.community.data.entity.User
-import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
@@ -39,12 +38,18 @@ class AuthRepository @Inject constructor(
             }
     }
 
+    fun getFcmToken(
+    ) {
+        fcm.token.addOnSuccessListener {
+            val userRef = database.child("user").child(auth.uid.toString()).child("token")
+            userRef.setValue(it)
+        }
+    }
+
     fun loginUser(email: String, password: String, state: (Boolean) -> Unit) {
 
         auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
-                val userUid = auth.currentUser!!.uid
-                getFcmToken(userUid)
                 state(true)
             }
             .addOnFailureListener {
@@ -74,23 +79,6 @@ class AuthRepository @Inject constructor(
 
     }
 
-
-    fun getFcmToken(userUid: String) {
-
-        fcm.token.addOnCompleteListener(OnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.d("FetchingFCM registration token failed", task.exception.toString())
-                return@OnCompleteListener
-            }
-            val token = task.result
-            val tokenRef = database.child("user").child(userUid).child("fcmToken")
-                .child("token")
-
-            tokenRef.setValue(token).addOnFailureListener {
-                Log.d("getFcmToken", "failure")
-            }
-        })
-    }
 
     fun logout() {
         auth.signOut()

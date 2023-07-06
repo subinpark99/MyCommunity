@@ -30,7 +30,6 @@ import com.example.community.ui.other.MainActivity
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
 import java.util.*
 
 class DialogChangeLocation
@@ -39,7 +38,7 @@ class DialogChangeLocation
     lateinit var binding: DialogChangeLocationBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val userViewModel: AuthViewModel by viewModels()
-    private val gson: Gson = Gson()
+
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(
@@ -69,10 +68,9 @@ class DialogChangeLocation
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun bind() {
         val userUid = MyApplication.prefs.getUid("uid", "")
-        val userJson = MyApplication.prefs.getUser("user", "")
-        val user = gson.fromJson(userJson, User::class.java)
+        val user = MyApplication.prefs.getUser()
 
-        val setlocation = binding.setLocationTv.text.toString()
+
         binding.currentLocationIv.setOnClickListener { // 현재 위치 가져오기
             binding.setLocationTv.text = ""
             checkLocationPermission()
@@ -84,17 +82,21 @@ class DialogChangeLocation
         }
 
         binding.doneIv.setOnClickListener {
+            val setlocation = binding.setLocationTv.text.toString()
 
             if (setlocation == "지역을 설정해주세요") {
                 Toast.makeText(requireContext(), "변경될 값이 없습니다.", Toast.LENGTH_SHORT)
                     .show()
                 return@setOnClickListener
+            } else {
+                userViewModel.changeLocation(userUid, setlocation)
+                Toast.makeText(requireContext(), "${setlocation}로 설정됨", Toast.LENGTH_SHORT).show()
+
+                if (user != null) {
+                    changeLocationPref(user, setlocation)
+                }
             }
 
-            changeLocationPref(user, setlocation)
-            userViewModel.changeLocation(userUid, setlocation)
-
-            Toast.makeText(requireContext(), "${setlocation}로 설정됨", Toast.LENGTH_SHORT).show()
 
             val navController = findNavController()
             navController.popBackStack(R.id.homeFragment, false)
@@ -110,10 +112,9 @@ class DialogChangeLocation
     private fun changeLocationPref(user: User, location: String) {
         val changedUser = User(
             user.email, user.password, user.nickname,
-            location, user.age, user.alarm, user.fcmToken
+            location, user.age, user.alarm, user.token
         )
-        val userJson = gson.toJson(changedUser)
-        MyApplication.prefs.setUser("user", userJson)
+        MyApplication.prefs.setUser(changedUser)
     }
 
 

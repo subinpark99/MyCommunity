@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.Post
+import com.example.community.data.entity.User
 import com.example.community.data.viewModel.CommentViewModel
 import com.example.community.data.viewModel.PostViewModel
 import com.example.community.data.viewModel.ReplyViewModel
@@ -27,8 +28,10 @@ class NoticeFragment : Fragment() {
     private val postViewModel: PostViewModel by viewModels()
     private val commentViewModel: CommentViewModel by viewModels()
     private val replyViewModel: ReplyViewModel by viewModels()
+
     var alarm: Boolean = false
 
+    private lateinit var user: User
     private lateinit var userUid: String
     private lateinit var noticeAdapter: NoticeAdapter
 
@@ -43,6 +46,9 @@ class NoticeFragment : Fragment() {
         userUid = MyApplication.prefs.getUid("uid", "")
         noticeAdapter = NoticeAdapter()
         getSwitch()
+        user = MyApplication.prefs.getUser()!!
+
+
 
         return binding.root
     }
@@ -69,11 +75,12 @@ class NoticeFragment : Fragment() {
                 }
             }
         }
+
     }
 
     private fun getCommentNotice(getMyPostIdx: Int) {
 
-        commentViewModel.getNoticeComment(getMyPostIdx, userUid, alarm)
+        commentViewModel.getNoticeComment(getMyPostIdx, userUid)
             .observe(viewLifecycleOwner) {
                 if (it != null) {
                     noticeAdapter.commentList(it)

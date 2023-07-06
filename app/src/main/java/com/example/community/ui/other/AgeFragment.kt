@@ -12,11 +12,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.community.data.local.MyApplication
 import com.example.community.data.entity.Post
-import com.example.community.data.entity.User
 import com.example.community.data.viewModel.PostViewModel
 import com.example.community.databinding.FragmentAgeBinding
 import com.example.community.ui.home.ContentRVAdpater
-import com.google.gson.Gson
 
 
 class AgeFragment : Fragment() {
@@ -26,7 +24,6 @@ class AgeFragment : Fragment() {
 
     private lateinit var range: IntRange
     private lateinit var ageRange: String
-    private val gson: Gson = Gson()
 
     private val postViewModel: PostViewModel by viewModels()
 
@@ -38,8 +35,8 @@ class AgeFragment : Fragment() {
 
         _binding = FragmentAgeBinding.inflate(inflater, container, false)
 
-        val userJson = MyApplication.prefs.getUser("user", "")
-        val user = gson.fromJson(userJson, User::class.java)
+
+        val user = MyApplication.prefs.getUser()
 
         binding.backIv.setOnClickListener {
             val intent = Intent(requireContext(), MainActivity::class.java)
@@ -61,7 +58,9 @@ class AgeFragment : Fragment() {
 
         range = ageRanges.firstOrNull { it.first == ageRange }?.second!!
 
-        getAgePost(user.location)
+        if (user != null) {
+            getAgePost(user.location)
+        }
 
         return binding.root
     }

@@ -20,13 +20,13 @@ import com.example.community.data.viewModel.AuthViewModel
 import com.example.community.databinding.DialogChangePwBinding
 import com.example.community.ui.signup_login.LoginActivity
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
+
 
 class DialogChangePw : DialogFragment(), View.OnClickListener {
 
     lateinit var binding: DialogChangePwBinding
     private lateinit var user: User
-    private val gson: Gson = Gson()
+
     private lateinit var userUid: String
     private val userViewModel: AuthViewModel by viewModels()
 
@@ -41,8 +41,8 @@ class DialogChangePw : DialogFragment(), View.OnClickListener {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))  //배경 투명하게
         dialog?.window?.requestFeature(Window.FEATURE_NO_TITLE)  //dialog 모서리 둥글게
 
-        val userJson = MyApplication.prefs.getUser("user", "")
-        user = gson.fromJson(userJson, User::class.java)
+
+        user = MyApplication.prefs.getUser()!!
         userUid = MyApplication.prefs.getUid("uid", "")
 
         updatePassword()
@@ -104,10 +104,10 @@ class DialogChangePw : DialogFragment(), View.OnClickListener {
     private fun changeLocationPref(user: User, newPassword: String) {
         val changedUser = User(
             user.email, newPassword, user.nickname,
-            user.location, user.age, user.alarm, user.fcmToken
+            user.location, user.age, user.alarm, user.token
         )
-        val userJson = gson.toJson(changedUser)
-        MyApplication.prefs.setUser("user", userJson)
+
+        MyApplication.prefs.setUser(changedUser)
     }
 
 

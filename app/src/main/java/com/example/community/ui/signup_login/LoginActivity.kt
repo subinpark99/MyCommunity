@@ -14,12 +14,11 @@ import com.example.community.databinding.ActivityLoginBinding
 import com.example.community.ui.other.MainActivity
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.google.gson.Gson
+
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val loginViewModel: AuthViewModel by viewModels()
-    private var gson: Gson = Gson()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,13 +54,12 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun saveUser(userUid: String) {
+
         loginViewModel.getUser(userUid).observe(this) {
 
-            val token: String = it?.fcmToken!!["token"] as String
-            val userJson = gson.toJson(it)
-
-            MyApplication.prefs.setUser("user", userJson)  // current user 정보 저장
-            MyApplication.prefs.setToken("token", token)
+            if (it != null) {
+                MyApplication.prefs.setUser(it)
+            }  // current user 정보 저장
             MyApplication.prefs.setUid("uid", userUid)
             MyApplication.prefs.setAutoLogin("login", true)
 

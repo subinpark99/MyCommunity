@@ -22,7 +22,6 @@ import com.example.community.data.viewModel.PostViewModel
 import com.example.community.data.viewModel.ReplyViewModel
 import com.example.community.databinding.FragmentInContentBinding
 import com.example.community.ui.writing.GalleryAdapter
-import com.google.gson.Gson
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -40,11 +39,7 @@ class InContentFragment : Fragment() {
     private val replyViewModel: ReplyViewModel by viewModels()
 
     private lateinit var user: User
-    private val gson: Gson = Gson()
-
     private lateinit var userUid: String
-    private lateinit var userJson: String
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -59,8 +54,7 @@ class InContentFragment : Fragment() {
         postData = args.post
 
         userUid = MyApplication.prefs.getUid("uid", "")
-        userJson = MyApplication.prefs.getUser("user", "")
-        user = gson.fromJson(userJson, User::class.java)
+        user = MyApplication.prefs.getUser()!!
 
         saveComment(userUid)
 
@@ -137,6 +131,9 @@ class InContentFragment : Fragment() {
         commentViewModel.addCommentState.observe(this) { state ->
             when (state) {
                 true -> {
+                    if (postData.uid != userUid) {
+                        postViewModel.sendPushAlarm(postData.postIdx)
+                    }
                     Toast.makeText(requireContext(), "완료", Toast.LENGTH_SHORT).show()
                 }
                 else -> Log.d("setComment", "failed")
@@ -280,6 +277,9 @@ class InContentFragment : Fragment() {
         replyViewModel.addReplyState.observe(this) { state ->
             when (state) {
                 true -> {
+                    if (postData.uid != userUid) {
+                        postViewModel.sendPushAlarm(postData.postIdx)
+                    }
                     Toast.makeText(requireContext(), "완료", Toast.LENGTH_SHORT).show()
                 }
                 else -> Log.d("setReply", "failed")

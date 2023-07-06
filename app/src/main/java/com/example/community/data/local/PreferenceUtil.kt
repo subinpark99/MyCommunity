@@ -2,6 +2,8 @@ package com.example.community.data.local
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.example.community.data.entity.User
+import com.google.gson.Gson
 
 class PreferenceUtil(context: Context) {
     private val prefs: SharedPreferences =
@@ -15,20 +17,14 @@ class PreferenceUtil(context: Context) {
         prefs.edit().putString(key, str).apply()
     }
 
-    fun getUser(key: String, defValue: String): String {  // user 정보 조회
-        return prefs.getString(key, defValue).toString()
+    fun getUser(): User? {  // user 정보 조회
+        val userInfo = prefs.getString("userInfo", "").toString()
+        return Gson().fromJson(userInfo, User::class.java)
     }
 
-    fun setUser(key: String, str: String) {  // user 정보 저장
-        prefs.edit().putString(key, str).apply()
-    }
-
-    fun getToken(key: String, defValue: String): String {  // user token
-        return prefs.getString(key, defValue).toString()
-    }
-
-    fun setToken(key: String, str: String) {  // user token 저장
-        prefs.edit().putString(key, str).apply()
+    fun setUser(user: User) {  // user 정보 저장
+        val userInfo = Gson().toJson(user)
+        prefs.edit().putString("userInfo", userInfo).apply()
     }
 
     fun deleteUid(str: String) {
@@ -36,10 +32,6 @@ class PreferenceUtil(context: Context) {
     }
 
     fun deleteUser(str: String) {
-        prefs.edit().remove(str).apply()
-    }
-
-    fun deleteToken(str: String) {
         prefs.edit().remove(str).apply()
     }
 
