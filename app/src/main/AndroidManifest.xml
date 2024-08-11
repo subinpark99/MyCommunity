@@ -2,22 +2,28 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!--    정확한 위치    -->
+    <!-- Permissions -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <!--    대략적인 위치    -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <!-- Android 10 (API level 29) and higher. -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
-    <uses-permission android:name="android.permission.CAMERA" /> <!--카메라 권한-->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />    <!--저장소 읽기 권한-->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />    <!--저장소 쓰기 권한-->
+        tools:ignore="ScopedStorage" />
+
+    <!-- Features -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
-        android:name=".data.local.MyApplication"
+        android:name=".app.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -25,25 +31,35 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Community"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
+        <!-- Activities -->
         <activity
-            android:name=".ui.other.SplashActivity"
+            android:name=".ui.start.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
         <activity
-            android:name=".ui.other.MainActivity"
+            android:name=".ui.start.MainActivity"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".ui.signup_login.SignUpActivity" />
-        <activity android:name=".ui.signup_login.OcrActivity" />
-        <activity android:name=".ui.signup_login.LoginActivity" />
+        <activity
+            android:name=".ui.start.SignUpActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.other.OcrActivity" />
+        <activity
+            android:name=".ui.start.LoginActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".ui.other.ChangePwActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".ui.other.MapActivity" />
 
+        <!-- Services -->
         <service
             android:name=".ui.notice.fcm.MessagingService"
             android:exported="false">
@@ -51,6 +67,12 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+        <!-- Meta-data -->
+        <meta-data
+            android:name="com.kakao.vectormap.APP_KEY"
+            android:value="${KAKAO_APP_KEY}" />
+
     </application>
 
 </manifest>

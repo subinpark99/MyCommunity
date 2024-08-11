@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.example.community.ui.home.HomeFragment"
+        android:name="com.dev.community.ui.home.HomeFragment"
         android:label="HomeFragment"
         tools:layout="@layout/fragment_home">
         <action
@@ -17,97 +17,103 @@
             android:id="@+id/action_homeFragment_to_noticeFragment"
             app:destination="@id/noticeFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/myPageFragment"
-        android:name="com.example.community.ui.mypage.MyPageFragment"
+        android:name="com.dev.community.ui.mypage.MyPageFragment"
         android:label="MyPageFragment"
         tools:layout="@layout/fragment_mypage">
-        <action
-            android:id="@+id/action_myPageFragment_to_myReplyFragment"
-            app:destination="@id/myReplyFragment" />
+
         <action
             android:id="@+id/action_myPageFragment_to_myContentsFragment"
             app:destination="@id/myContentsFragment" />
         <action
             android:id="@+id/action_myPageFragment_to_loginActivity"
             app:destination="@id/loginActivity" />
-        <action
-            android:id="@+id/action_myPageFragment_to_dialogChangeLocation"
-            app:destination="@id/dialogChangeLocation" />
+
         <action
             android:id="@+id/action_myPageFragment_to_homeFragment"
             app:destination="@id/homeFragment"
             app:popUpTo="@id/homeFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_myPageFragment_to_changePwActivity"
+            app:destination="@id/changePwActivity" />
     </fragment>
+
     <fragment
         android:id="@+id/writingFragment"
-        android:name="com.example.community.ui.writing.WritingFragment"
+        android:name="com.dev.community.ui.writing.WritingFragment"
         android:label="WritingFragment"
-        tools:layout="@layout/fragment_writing" />
+        tools:layout="@layout/fragment_writing">
+        <action
+            android:id="@+id/action_writingFragment_to_inContentFragment"
+            app:destination="@id/inContentFragment"
+            app:popUpTo="@id/writingFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
 
     <fragment
         android:id="@+id/noticeFragment"
-        android:name="com.example.community.ui.notice.NoticeFragment"
+        android:name="com.dev.community.ui.notice.NoticeFragment"
         android:label="NoticeFragment"
         tools:layout="@layout/fragment_notice">
         <action
             android:id="@+id/action_noticeFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/myReplyFragment"
-        android:name="com.example.community.ui.mypage.MyReplyFragment"
-        android:label="MyReplyFragment"
-        tools:layout="@layout/fragment_myreply">
-        <action
-            android:id="@+id/action_myReplyFragment_to_inContentFragment"
-            app:destination="@id/inContentFragment" />
-    </fragment>
+
     <fragment
         android:id="@+id/myContentsFragment"
-        android:name="com.example.community.ui.mypage.MyContentsFragment"
+        android:name="com.dev.community.ui.mypage.MyContentsFragment"
         android:label="MyContentsFragment"
         tools:layout="@layout/fragment_mycontents">
         <action
             android:id="@+id/action_myContentsFragment_to_inContentFragment"
             app:destination="@id/inContentFragment" />
+        <argument
+            android:name="page"
+            app:argType="string" />
     </fragment>
 
     <activity
         android:id="@+id/loginActivity"
-        android:name="com.example.community.ui.signup_login.LoginActivity"
+        android:name="com.dev.community.ui.start.LoginActivity"
         android:label="LoginActivity"
         tools:layout="@layout/activity_login" />
+
     <activity
         android:id="@+id/signUpActivity"
-        android:name="com.example.community.ui.signup_login.SignUpActivity"
+        android:name="com.dev.community.ui.start.SignUpActivity"
         android:label="SignUpActivity"
         tools:layout="@layout/activity_signup" />
+
     <fragment
         android:id="@+id/inContentFragment"
-        android:name="com.example.community.ui.home.InContentFragment"
+        android:name="com.dev.community.ui.home.InContentFragment"
         android:label="InContentFragment"
         tools:layout="@layout/fragment_in_content">
         <action
             android:id="@+id/action_inContentFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
-        <argument
-            android:name="post"
-            app:argType="com.example.community.data.entity.Post" />
+
         <action
             android:id="@+id/action_inContentFragment_to_myContentsFragment"
             app:destination="@id/myContentsFragment" />
         <action
-            android:id="@+id/action_inContentFragment_to_myReplyFragment"
-            app:destination="@id/myReplyFragment" />
-        <action
             android:id="@+id/action_inContentFragment_to_noticeFragment"
             app:destination="@id/noticeFragment" />
+        <argument
+            android:name="postData"
+            app:argType="com.dev.community.data.model.Post" />
+        <argument
+            android:name="imgList"
+            app:argType="string[]" />
     </fragment>
+
     <fragment
         android:id="@+id/ageFragment"
-        android:name="com.example.community.ui.other.AgeFragment"
+        android:name="com.dev.community.ui.home.AgeFragment"
         android:label="AgeFragment"
         tools:layout="@layout/fragment_age">
         <action
@@ -120,39 +126,15 @@
             android:name="location"
             app:argType="string" />
     </fragment>
+
     <activity
         android:id="@+id/mainActivity"
-        android:name="com.example.community.ui.other.MainActivity"
+        android:name="com.dev.community.ui.start.MainActivity"
         android:label="MainActivity" />
-    <dialog
-        android:id="@+id/dialogOcr"
-        android:name="com.example.community.ui.mypage.DialogOcr"
-        android:label="DialogOcr"
-        tools:layout="@layout/dialog_ocr" >
-        <action
-            android:id="@+id/action_dialogOcr_to_dialogChangeLocation"
-            app:destination="@id/dialogChangeLocation" />
-    </dialog>
+
     <activity
-        android:id="@+id/ocrActivity"
-        android:name="com.example.community.ui.signup_login.OcrActivity"
-        android:label="OcrActivity" />
-    <dialog
-        android:id="@+id/dialogChangeLocation"
-        tools:layout="@layout/dialog_change_location"
-        android:name="com.example.community.ui.mypage.DialogChangeLocation"
-        android:label="DialogChangeLocation" >
-        <action
-            android:id="@+id/action_dialogChangeLocation_to_dialogOcr"
-            app:destination="@id/dialogOcr" />
-    </dialog>
-    <dialog
-        android:id="@+id/dialogChangePw"
-        android:name="com.example.community.ui.mypage.DialogChangePw"
-        android:label="DialogChangePw" >
-        <action
-            android:id="@+id/action_dialogChangePw_to_loginActivity"
-            app:destination="@id/loginActivity" />
-    </dialog>
+        android:id="@+id/changePwActivity"
+        android:name="com.dev.community.ui.other.ChangePwActivity"
+        android:label="ChangePwActivity" />
 
 </navigation>

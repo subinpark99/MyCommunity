@@ -6,7 +6,7 @@
 
         <variable
             name="post"
-            type="com.example.community.data.entity.Post" />
+            type="com.dev.community.data.model.Post" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -49,8 +49,9 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:layout_margin="5dp"
+            android:padding="5dp"
             android:src="@drawable/icon_photo"
-            android:visibility="gone"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -60,11 +61,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="@{post.date}"
             android:textColor="@color/deep_green"
             android:textSize="13sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/home_content_tv" />
+            app:layout_constraintTop_toBottomOf="@id/home_content_tv"
+            app:timestamp="@{post.date}" />
 
         <View
             android:id="@+id/ver_line"

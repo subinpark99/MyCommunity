@@ -27,6 +27,7 @@
             android:layout_margin="40dp"
             android:gravity="center"
             android:visibility="gone"
+            android:text="@string/no_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/notice" />

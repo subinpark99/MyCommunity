@@ -1,207 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/signup_bg"
-        android:orientation="vertical">
+        android:background="@color/green">
 
-        <LinearLayout
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/logo_icon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_margin="40dp"
+            android:background="@color/green"
+            android:src="@drawable/icon_logo"
+            app:layout_constraintBottom_toTopOf="@id/frame_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/frame_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:background="@drawable/bg_corner_sheet"
+            android:padding="25dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/logo_icon">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_marginTop="10dp"
-                android:text="@string/city"
-                android:textSize="20sp" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:id="@+id/email_layout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/current_location_iv"
-                    android:layout_width="200dp"
-                    android:layout_height="50dp"
-                    android:layout_marginBottom="10dp"
-                    android:src="@drawable/icon_location" />
+                android:layout_marginTop="10dp"
+                android:background="@drawable/btn_corner_stroke"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/frame_layout">
 
                 <androidx.appcompat.widget.AppCompatImageView
-                    android:id="@+id/identic_location_iv"
-                    android:layout_width="200dp"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/icon_email" />
+
+                <EditText
+                    android:id="@+id/put_email_tv"
+                    style="@style/hint"
+                    android:layout_width="match_parent"
                     android:layout_height="50dp"
-                    android:src="@drawable/icon_identi" />
+                    android:layout_gravity="start"
+                    android:background="@color/transparent"
+                    android:hint="@string/email"
+                    android:inputType="textWebEmailAddress"
+                    tools:ignore="RtlSymmetry" />
 
             </LinearLayout>
 
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/set_location_tv"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_gravity="start"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="40dp"
-            android:background="@drawable/signup_border"
-            android:gravity="center" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="40dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="@string/nickname"
-                android:textSize="20sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start"
-                android:text="@string/ㅁㅎㄷ"
-                android:textSize="20sp" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/put_nickname_ev"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_gravity="start"
-                android:layout_marginStart="40dp"
-                android:layout_weight="1"
-                android:background="@drawable/signup_border"
-                android:gravity="center"
-                android:inputType="textPersonName"
-                android:textColorHint="@color/gray" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="0.2" />
-
-            <EditText
-                android:id="@+id/put_age_ev"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_gravity="start"
-                android:layout_marginEnd="40dp"
-                android:layout_weight="1"
-                android:background="@drawable/signup_border"
-                android:gravity="center"
-                android:hint="@string/_25"
-                android:inputType="textPersonName"
-                android:textColorHint="@color/gray" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="40dp"
-            android:gravity="start"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/email"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/put_email_tv"
+            <LinearLayout
+                android:id="@+id/pw_layout"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="start"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/signup_border"
-                android:gravity="center"
-                android:inputType="textWebEmailAddress" />
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_corner_stroke"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/email_layout">
 
-        </LinearLayout>
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/icon_pw" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginEnd="40dp"
-            android:gravity="start"
-            android:orientation="vertical">
+                <EditText
+                    android:id="@+id/put_password_tv"
+                    style="@style/hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="start"
+                    android:background="@color/transparent"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    tools:ignore="RtlSymmetry" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/nickname_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/btn_corner_stroke"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toStartOf="@id/age_layout"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pw_layout">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/icon_write" />
+
+                <EditText
+                    android:id="@+id/put_nickname_ev"
+                    style="@style/hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="start"
+                    android:background="@color/transparent"
+                    android:hint="@string/nickname"
+                    android:inputType="textPersonName"
+                    tools:ignore="RtlSymmetry" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/age_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_corner_stroke"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/nickname_layout"
+                app:layout_constraintTop_toBottomOf="@id/pw_layout">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/icon_number" />
+
+                <EditText
+                    android:id="@+id/put_age_ev"
+                    style="@style/hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="start"
+                    android:background="@color/transparent"
+                    android:hint="@string/age_"
+                    android:inputType="number"
+                    tools:ignore="RtlSymmetry" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/location_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_corner_stroke"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/nickname_layout">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:padding="10dp"
+                    android:src="@drawable/icon_home" />
+
+                <TextView
+                    android:id="@+id/set_location_tv"
+                    style="@style/hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical"
+                    android:hint="@string/userAddress"
+                    tools:ignore="RtlSymmetry" />
+
+            </LinearLayout>
+
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/password"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/put_password_tv"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_gravity="start"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/signup_border"
-                android:gravity="center"
-                android:inputType="textPassword" />
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/submit_btn"
+                style="@style/done_btn"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/btn_corner_filled"
+                android:text="@string/done"
+                app:layout_constraintBottom_toTopOf="@id/cancel_btn"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+
+            <TextView
+                android:id="@+id/cancel_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:padding="30dp"
-                android:src="@drawable/icon_submit" />
+                android:text="@string/cancel"
+                android:textColor="@color/text"
+                android:textSize="23sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-        </LinearLayout>
 
-    </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </layout>
+

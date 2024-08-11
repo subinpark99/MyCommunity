@@ -2,19 +2,20 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="17dp">
 
         <TextView
             android:id="@+id/mycontenttv"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:text="내 정보"
-            android:textColor="@color/black"
-            android:textSize="23sp"
-            android:textStyle="bold"
+            android:text="@string/myinfo"
+            style="@style/title"
+            android:gravity="center"
+            android:layout_margin="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -23,9 +24,9 @@
             android:id="@+id/cl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:background="@drawable/signup_border"
-            android:padding="15dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/border_radius_stroke"
+            android:padding="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/mycontenttv">
 
@@ -43,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
-                android:text="내가 쓴 글"
+                android:text="@string/mycontents"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintStart_toEndOf="@id/mycontentiv"
@@ -64,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="15dp"
                 android:layout_marginTop="5dp"
-                android:text="내가 쓴 댓글"
+                android:text="@string/myreplies"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintStart_toEndOf="@id/myreplyiv"
@@ -76,9 +77,8 @@
             android:id="@+id/changelocation_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="23dp"
-            android:layout_marginTop="40dp"
-            android:text="현재 위치 변경하기"
+            android:layout_margin="12dp"
+            android:text="@string/change_location"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cl" />
@@ -87,20 +87,22 @@
             android:id="@+id/change_pw_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="23dp"
-            android:text="비밀번호 변경하기"
+            android:layout_margin="12dp"
+            android:text="@string/change_pw"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/changelocation_tv" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
         <TextView
             android:id="@+id/set_notice_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="23dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="24dp"
-            android:text="알림 설정하기"
+            android:layout_margin="12dp"
+            android:text="@string/set_alarm"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/change_pw_tv" />
@@ -110,16 +112,19 @@
             android:layout_width="50dp"
             android:layout_height="35dp"
             android:layout_marginStart="3dp"
+            android:layout_gravity="center"
             app:layout_constraintBottom_toBottomOf="@id/set_notice_tv"
             app:layout_constraintStart_toEndOf="@id/set_notice_tv"
             app:layout_constraintTop_toTopOf="@id/set_notice_tv" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/logout_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="23dp"
-            android:text="로그아웃 하기"
+            android:layout_margin="12dp"
+            android:text="@string/logout"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/set_notice_tv" />
@@ -128,12 +133,12 @@
             android:id="@+id/withdraw_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="23dp"
-            android:text="회원 탈퇴하기"
+            android:layout_margin="12dp"
+            android:text="@string/withdraw"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/logout_tv" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </layout>

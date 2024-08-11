@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/ulsan"
-        android:title="@string/ulsan"
-        android:icon="@drawable/icon_surfing"/>
+        android:title="@string/views"
+        android:icon="@drawable/icon_village"/>
 
 </menu>

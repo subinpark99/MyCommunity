@@ -5,28 +5,25 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="17dp">
 
         <TextView
             android:id="@+id/write_title_tv"
+            style="@style/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:text="@string/writenotice"
-            android:textColor="@color/black"
-            android:textSize="23sp"
-            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/location_iv"
             android:layout_width="25dp"
             android:layout_height="25dp"
-            android:layout_margin="20dp"
-            android:src="@drawable/icon_cur_location"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/icon_cur_location2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/write_title_tv" />
 
@@ -35,41 +32,47 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="20dp"
             android:text="@string/currentlocation"
+            android:textColor="@color/text"
+            app:layout_constraintBottom_toBottomOf="@id/location_iv"
             app:layout_constraintStart_toEndOf="@id/location_iv"
-            app:layout_constraintTop_toBottomOf="@id/write_title_tv" />
+            app:layout_constraintTop_toTopOf="@id/location_iv" />
 
         <TextView
             android:id="@+id/current_location_tv"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="8dp"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:singleLine="true"
+            app:layout_constraintBottom_toBottomOf="@id/location_iv"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/location"
-            app:layout_constraintTop_toBottomOf="@id/write_title_tv" />
+            app:layout_constraintTop_toTopOf="@id/location_iv" />
+
 
         <EditText
             android:id="@+id/writing_title_et"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="23dp"
+            android:layout_marginTop="17dp"
+            android:layout_marginStart="5dp"
             android:background="@color/transparent"
             android:hint="@string/writetitle"
             android:textColorHint="@color/gray"
             android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@id/location_iv"
             app:layout_constraintTop_toBottomOf="@id/location_iv" />
 
         <View
             android:id="@+id/ver_line"
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginTop="15dp"
             android:background="#D3D6D3"
+            app:layout_constraintBottom_toTopOf="@id/writing_content_et"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/writing_title_et" />
@@ -78,44 +81,51 @@
             android:id="@+id/writing_content_et"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:layout_margin="20dp"
-            android:background="@drawable/signup_border"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/border_stroke_bold"
             android:gravity="start"
             android:hint="@string/writecontent"
             android:padding="10dp"
             android:textColorHint="@color/gray"
             android:textSize="15sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/ver_line" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/write_gallery_rv"
             android:layout_width="match_parent"
             android:layout_height="100dp"
-            android:layout_margin="20dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/write_done_iv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/writing_content_et"
             tools:listitem="@layout/item_photo" />
+
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/add_photo_iv"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginStart="20dp"
-            android:src="@drawable/icon_add_photo"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/write_done_iv" />
+            android:src="@drawable/icon_add_photo" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+
+        <Button
             android:id="@+id/write_done_iv"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_done"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:background="@drawable/btn_corner_filled"
+            android:text="@string/done"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

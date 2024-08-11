@@ -3,210 +3,181 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <data>
+
+        <variable
+            name="post"
+            type="com.dev.community.data.model.Post" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:padding="17dp">
 
-        <LinearLayout
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/back_iv"
+            android:layout_width="35dp"
+            android:layout_height="33dp"
+            android:src="@drawable/icon_back"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/title_tv"
+            style="@style/title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:gravity="center_horizontal"
+            android:singleLine="true"
+            android:text="@{post.title}"
+            app:layout_constraintBottom_toBottomOf="@id/back_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/back_iv" />
+
+
+        <TextView
+            android:id="@+id/delete_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp"
+            android:text="@string/delete"
+            android:textColor="@color/red"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/back_iv"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/back_iv" />
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/content_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="17dp"
+            android:background="@drawable/border_radius_stroke"
+            android:padding="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title_tv">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/back_iv"
-                android:layout_width="35dp"
-                android:layout_height="33dp"
-                android:layout_marginStart="10dp"
-                android:src="@drawable/icon_back" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/title_tv"
-                android:layout_width="190dp"
-                android:layout_height="match_parent"
-                android:ellipsize="marquee"
-                android:focusable="true"
-                android:gravity="center"
-                android:singleLine="true"
-                android:text="@string/title"
-                android:textColor="@color/black"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1" />
-
-            <TextView
-                android:id="@+id/delete_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="10dp"
-                android:gravity="center"
-                android:text="@string/delete"
-                android:textColor="@color/red"
-                android:textSize="14sp"
-                android:visibility="gone" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp"
-            android:background="@drawable/writing_border"
-            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/content_tv"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="10dp"
-                android:text="@string/content"
-                android:textColor="@color/black" />
+                android:text="@{post.content}"
+                android:textColor="@color/black"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/img_rv"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginStart="10dp"
-                android:orientation="horizontal"
-                android:text="@string/title"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/content_tv"
                 tools:listitem="@layout/item_photo" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/user_nickname_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/nickname"
-                    android:textColor="@color/deep_green"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/content_time_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    android:text="@string/timecnt"
-                    android:textColor="@color/gray"
-                    android:textSize="13sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/home_content_tv" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <androidx.appcompat.widget.AppCompatImageView
-                    android:layout_width="15dp"
-                    android:layout_height="20dp"
-                    android:layout_marginEnd="5dp"
-                    android:src="@drawable/icon_view_24" />
-
-
-                <TextView
-                    android:id="@+id/view_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="5dp"
-                    android:text="@string/views"
-                    android:textColor="@color/gray"
-                    android:textSize="13sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/home_content_tv" />
-
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_margin="10dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/comment_rv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/writing_border"
-                android:scrollbars="vertical"
-                tools:listitem="@layout/item_comment" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/reply_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <EditText
-                android:id="@+id/reply_et"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/reply_border"
-                android:hint="@string/reply"
-                android:padding="9dp"
-                android:textSize="15sp" />
-
-            <Button
-                android:id="@+id/reply_submit_bnt"
+            <TextView
+                android:id="@+id/user_nickname_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#2D5335"
-                android:text="@string/writedone"
-                android:textColor="@color/white" />
-        </LinearLayout>
+                android:layout_marginTop="7dp"
+                android:text="@{post.nickname}"
+                android:textColor="@color/deep_green"
+                android:textSize="13sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/img_rv" />
+
+            <TextView
+                android:id="@+id/content_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="7dp"
+                android:textColor="@color/gray"
+                android:textSize="13sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@id/user_nickname_tv"
+                app:timestamp="@{post.date}" />
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/view_img"
+                android:layout_width="15dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="7dp"
+                android:src="@drawable/icon_view_24"
+                app:layout_constraintBottom_toBottomOf="@id/view_tv"
+                app:layout_constraintEnd_toStartOf="@id/view_tv"
+                app:layout_constraintTop_toTopOf="@id/view_tv" />
+
+            <TextView
+                android:id="@+id/view_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(post.view)}"
+                android:textColor="@color/gray"
+                android:textSize="13sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/comment_rv"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="7dp"
+            android:background="@drawable/border_radius_stroke"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toTopOf="@id/submit_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/content_layout"
+            tools:listitem="@layout/item_comment" />
+
 
         <LinearLayout
-            android:id="@+id/comment_layout"
+            android:id="@+id/submit_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:visibility="visible"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <EditText
                 android:id="@+id/comment_et"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/reply_border"
+                android:background="@drawable/border_radius_stroke"
+                android:backgroundTint="@color/gray"
                 android:hint="@string/writereply"
-                android:padding="9dp"
+                android:maxLines="1"
+                android:padding="10dp"
                 android:textSize="15sp" />
 
             <Button
                 android:id="@+id/comment_submit_bnt"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/deep_green"
-                android:text="@string/writedone"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/btn_corner_filled"
+                android:text="@string/done"
                 android:textColor="@color/white" />
 
         </LinearLayout>
-
-    </LinearLayout>
-
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

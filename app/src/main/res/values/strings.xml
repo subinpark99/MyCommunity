@@ -5,10 +5,7 @@
     <string name="notice">Notice</string>
     <string name="writing">Writing</string>
     <string name="userEmail">psb0000@naver.com</string>
-    <string name="userAddress">울산광역시 남구</string>
-    <string name="ulsan">울산광역시</string>
-    <string name="busan">부산광역시</string>
-    <string name="splashtext">My City, My Community</string>
+    <string name="userAddress">주소</string>
     <string name="nickname">닉네임 </string>
     <string name="putnickname">닉네임을 입력하세요. </string>
     <string name="putemail">이메일을 입력하세요. </string>
@@ -28,20 +25,39 @@
     <string name="ocrtext">주민등록증만 인식이 가능합니다 \n 높은 정확도를 위해 사진을 위의 직사각형 크기에 맞춰주세요
     </string>
     <string name="writereply">댓글 작성</string>
-    <string name="writedone">완료</string>
+    <string name="done">완료</string>
     <string name="delete">삭제</string>
     <string name="age">age</string>
-    <string name="ㅁㅎㄷ">나이</string>
-    <string name="bini">bini</string>
     <string name="_25">25</string>
     <string name="_20">20대</string>
     <string name="mycontent">내가 쓴 글</string>
     <string name="myreply">내가 쓴 댓글</string>
     <string name="msg_token_fmt" translatable="false">%s</string>
     <string name="fcm_message">MyCommunity !</string>
-    <string name="currentpw">현재 비밀번호: </string>
-    <string name="newpw">새 비밀번호: </string>
+    <string name="currentpw">현재 비밀번호 </string>
+    <string name="newpw">새 비밀번호 </string>
     <string name="reply">대댓글 작성</string>
     <string name="search">search</string>
+    <string name="no_text">글이 없습니다.</string>
+    <string name="login">로그인</string>
+    <string name="signup">회원가입</string>
+    <string name="cancel">취소</string>
+    <string name="age_">나이</string>
+    <string name="ocr_title">주민등록증으로 주소 인식</string>
+    <string name="change_pw">비밀번호 변경</string>
+    <string name="now_pw">현재 비밀번호</string>
+    <string name="re_now_pw">현재 비밀번호 재입력</string>
+    <string name="myinfo">내 정보</string>
+    <string name="mycontents">내가 쓴 글</string>
+    <string name="myreplies">내가 쓴 댓글</string>
+    <string name="withdraw">회원 탈퇴하기</string>
+    <string name="logout">로그아웃 하기</string>
+    <string name="set_alarm">알림 설정하기</string>
+    <string name="change_location">현재 위치 변경</string>
+    <string name="new_comment">새로운 댓글이 달렸어요</string>
+    <string name="location">현재 위치로 주소 인식</string>
+    <string name="no_comment">댓글이 없습니다.</string>
+    <string name="reput_pw">새 비밀번호 다시 입력</string>
+
 
 </resources>

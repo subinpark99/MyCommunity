@@ -2,6 +2,13 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="comment"
+            type="com.dev.community.data.model.Comment" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_click"
         android:layout_width="match_parent"
@@ -23,7 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
-            android:text="새로운 댓글이 달렸어요"
+            android:text="@string/new_comment"
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -36,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
             android:layout_marginTop="5dp"
-            android:text="@string/content"
+            android:text="@{comment.content}"
             android:textColor="@color/black"
             android:textSize="15sp"
             app:layout_constraintStart_toEndOf="@id/noticeiv"
@@ -46,25 +53,12 @@
             android:id="@+id/notice_date_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="6월 4일"
             android:textColor="@color/gray"
             android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="@id/ver_line3"
             app:layout_constraintStart_toStartOf="@id/notice_content_tv"
-            app:layout_constraintTop_toBottomOf="@id/notice_content_tv" />
-
-        <TextView
-            android:id="@+id/notice_time_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:text="11:40"
-            android:textColor="@color/gray"
-            android:textSize="13sp"
-
-            app:layout_constraintStart_toEndOf="@id/notice_date_tv"
-            app:layout_constraintTop_toTopOf="@id/notice_date_tv" />
-
+            app:layout_constraintTop_toBottomOf="@id/notice_content_tv"
+            app:timestamp="@{comment.date}" />
 
         <View
             android:id="@+id/ver_line3"

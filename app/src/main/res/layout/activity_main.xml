@@ -3,83 +3,78 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:openDrawer="start">
 
-        <!-- Navigation DrawerLayout-->
-        <androidx.drawerlayout.widget.DrawerLayout
-            android:id="@+id/drawer_layout"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:openDrawer="start">
+            tools:context=".ui.start.MainActivity">
 
-            <!-- Main -->
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/nav_host"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:defaultNavHost="true"
+                app:layout_constraintBottom_toTopOf="@id/nav_bar"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:navGraph="@navigation/nav_graph" />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/nav_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                app:itemBackground="@color/white"
+                app:itemIconTint="@drawable/menu_selector"
+                app:itemTextColor="@drawable/menu_selector"
+                app:labelVisibilityMode="labeled"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:menu="@menu/nav_menu" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <com.google.android.material.navigation.NavigationView
+            android:id="@+id/drawer_nav"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start">
+
+            <LinearLayout
+                android:id="@+id/header_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".ui.other.MainActivity">
+                android:orientation="vertical">
 
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                <include
+                    android:id="@+id/item_drawer_header"
+                    layout="@layout/item_drawer_header" />
 
-                <androidx.fragment.app.FragmentContainerView
-                    android:id="@+id/nav_host"
-                    android:name="androidx.navigation.fragment.NavHostFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    app:defaultNavHost="true"
-                    app:layout_constraintBottom_toTopOf="@id/nav_bar"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:navGraph="@navigation/nav_graph" />
-
-                <com.google.android.material.bottomnavigation.BottomNavigationView
-                    android:id="@+id/nav_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:background="@color/white"
-                    app:itemBackground="@color/white"
-                    app:itemIconTint="@drawable/menu_selector"
-                    app:itemTextColor="@drawable/menu_selector"
-                    app:labelVisibilityMode="labeled"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/nav_host"
-                    app:menu="@menu/nav_menu" />
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- drawer navigation view-->
-            <com.google.android.material.navigation.NavigationView
-                android:id="@+id/drawer_nav"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
-                app:headerLayout="@layout/item_drawer_header">
-
-                <LinearLayout
-                    android:id="@+id/header_layout"
+                <ExpandableListView
+                    android:id="@+id/expanded_menu"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="100dp"
-                    android:orientation="vertical">
+                    android:groupIndicator="@null" />
 
-                    <ExpandableListView
-                        android:id="@+id/expanded_menu"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:groupIndicator="@null" />
+            </LinearLayout>
 
-                </LinearLayout>
+        </com.google.android.material.navigation.NavigationView>
 
 
-            </com.google.android.material.navigation.NavigationView>
-        </androidx.drawerlayout.widget.DrawerLayout>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>
