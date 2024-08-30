@@ -23,6 +23,7 @@ import com.dev.community.util.Result
 import com.dev.community.databinding.FragmentMycontentsBinding
 import com.dev.community.ui.home.adapter.ContentRVAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -104,10 +105,10 @@ class MyContentsFragment : Fragment() {
     private fun observeState() {
 
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
-                    postViewModel.myPostListState.collect { result ->
+                    postViewModel.myPostListState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> {
                                 AppUtils.dismissLoadingDialog()
@@ -131,7 +132,7 @@ class MyContentsFragment : Fragment() {
                 }
 
                 launch {
-                    postViewModel.myCommentsListState.collect { result ->
+                    postViewModel.myCommentsListState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> {
                                 AppUtils.dismissLoadingDialog()

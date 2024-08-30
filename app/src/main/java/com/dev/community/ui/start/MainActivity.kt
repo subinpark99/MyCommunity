@@ -12,6 +12,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -21,6 +23,7 @@ import com.dev.community.ui.viewModel.UserViewModel
 import com.dev.community.databinding.ActivityMainBinding
 import com.dev.community.ui.home.adapter.ExpandableListAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -69,21 +72,23 @@ class MainActivity : AppCompatActivity() {
         userViewModel.getUser()
 
         lifecycleScope.launch {
-            userViewModel.userState.collect {
-                when (it) {
-                    is Result.Success -> {
-                        val user = it.data
-                        initNavi(user.email, user.location)
-                        setAge(user.location)
+            userViewModel.userState
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collectLatest {
+                    when (it) {
+                        is Result.Success -> {
+                            val user = it.data
+                            initNavi(user.email, user.location)
+                            setAge(user.location)
 
-                        userViewModel.updateFcmToken(user.token)
+                            userViewModel.updateFcmToken(user.token)
+                        }
+
+                        is Result.Error -> Log.e("ERROR", "MainActivity - ${it.message}")
+                        is Result.Loading -> Log.d("loading", "loading...")
+
                     }
-
-                    is Result.Error -> Log.e("ERROR", "MainActivity - ${it.message}")
-                    is Result.Loading -> Log.d("loading", "loading...")
-
                 }
-            }
         }
     }
 
@@ -130,7 +135,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setExpandableList(
         parentList: MutableList<String>,
-        childList: MutableList<MutableList<String>>
+        childList: MutableList<MutableList<String>>,
     ) {
         val ageRange = mutableListOf("10대", "20대", "30대", "40대", "50대", "60대")
         val expandableAdapter = ExpandableListAdapter(this, parentList, childList)

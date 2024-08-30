@@ -39,7 +39,7 @@ class NoticeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentNoticeBinding.inflate(inflater, container, false)
 
@@ -60,29 +60,30 @@ class NoticeFragment : Fragment() {
     private fun observeState() {
 
         viewLifecycleOwner.lifecycleScope.launch {
+            commentViewModel.getNoticeComState
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .collectLatest { result ->
+                    when (result) {
+                        is Result.Success -> {
 
-            commentViewModel.getNoticeComState.collectLatest { result ->
-                when (result) {
-                    is Result.Success -> {
+                            AppUtils.dismissLoadingDialog()
+                            binding.noItem.visibility = View.GONE
+                            binding.noticeRv.visibility = View.VISIBLE
 
-                        AppUtils.dismissLoadingDialog()
-                        binding.noItem.visibility = View.GONE
-                        binding.noticeRv.visibility = View.VISIBLE
+                            noticeAdapter.addComment(result.data)
+                        }
 
-                        noticeAdapter.addComment(result.data)
-                    }
+                        is Result.Error -> {
+                            handleError(result.message)
+                            AppUtils.dismissLoadingDialog()
+                        }
 
-                    is Result.Error -> {
-                        handleError(result.message)
-                        AppUtils.dismissLoadingDialog()
-                    }
-
-                    is Result.Loading -> {
-                       // handleLoading()
-                        AppUtils.showLoadingDialog(requireContext())
+                        is Result.Loading -> {
+                             handleLoading()
+                          //  AppUtils.showLoadingDialog(requireContext())
+                        }
                     }
                 }
-            }
         }
     }
 
@@ -105,8 +106,9 @@ class NoticeFragment : Fragment() {
         postViewModel.getPostById(postId)
 
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                postViewModel.postIdState.collect { result ->
+            postViewModel.postIdState
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+                .collect { result ->
                     when (result) {
                         is Result.Success -> {
                             val postData = result.data
@@ -124,9 +126,8 @@ class NoticeFragment : Fragment() {
                         is Result.Loading -> handleLoading()
                     }
                 }
-
-            }
         }
+
     }
 
     private fun handleError(exception: String) {

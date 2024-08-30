@@ -82,7 +82,7 @@ class InContentFragment : Fragment() {
     private fun observeState() {
 
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 // 사용자 상태
                 launch {
@@ -107,7 +107,7 @@ class InContentFragment : Fragment() {
 
                 // 댓글 삭제 상태
                 launch {
-                    commentViewModel.deleteCommentState.collectLatest { result ->
+                    commentViewModel.deleteCommentState.collect { result ->
                         when (result) {
                             is Result.Success -> if (result.data) AppUtils.showToast(
                                 requireContext(),
@@ -122,7 +122,7 @@ class InContentFragment : Fragment() {
 
                 // 댓글 추가 상태
                 launch {
-                    commentViewModel.addCommentState.collectLatest { result ->
+                    commentViewModel.addCommentState.collect { result ->
                         when (result) {
                             is Result.Success -> {
                                 if (result.data) {
@@ -138,7 +138,7 @@ class InContentFragment : Fragment() {
 
                 // 게시글 삭제 상태
                 launch {
-                    postViewModel.deletePostState.collectLatest { result ->
+                    postViewModel.deletePostState.collect { result ->
                         when (result) {
                             is Result.Success -> if (result.data) findNavController().popBackStack()
                             is Result.Error -> handleError(result.message)
@@ -149,9 +149,7 @@ class InContentFragment : Fragment() {
 
                 // 댓글 가져오기 상태
                 launch {
-                    commentViewModel.getCommentListState
-                        .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                        .collectLatest { result ->
+                    commentViewModel.getCommentListState.collectLatest { result ->
                             when (result) {
                                 is Result.Success -> setCommentAdapter(result.data)
                                 is Result.Error -> handleError(result.message)

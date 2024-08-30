@@ -24,6 +24,7 @@ import com.dev.community.util.Result
 import com.dev.community.ui.viewModel.UserViewModel
 import com.dev.community.databinding.FragmentWritingBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -63,9 +64,8 @@ class WritingFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-
                 launch {
-                    userViewModel.userState.collect {
+                    userViewModel.userState.collectLatest {
                         when (it) {
                             is Result.Success -> {
                                 user = it.data
@@ -95,8 +95,6 @@ class WritingFragment : Fragment() {
                             is Result.Loading -> handleLoading()
                         }
                     }
-
-
                 }
             }
         }

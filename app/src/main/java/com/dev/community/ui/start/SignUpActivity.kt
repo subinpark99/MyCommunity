@@ -8,6 +8,8 @@ import android.util.Log
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.dev.community.util.AppUtils
 import com.dev.community.util.Result
@@ -103,17 +105,18 @@ class SignUpActivity : AppCompatActivity() {
         password: String,
         nickname: String,
         location: String,
-        age: Int
+        age: Int,
     ) {
         userViewModel.registerUser(email, password, nickname, location, age)
         lifecycleScope.launch {
-            userViewModel.registerState.collect { result ->
-                when (result) {
-                    is Result.Success -> if (result.data) handleSignUpSuccess()
-                    is Result.Error -> AppUtils.showToast(this@SignUpActivity, result.message)
-                    is Result.Loading -> Log.e("Loading", "로딩중")
+            userViewModel.registerState
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { result ->
+                    when (result) {
+                        is Result.Success -> if (result.data) handleSignUpSuccess()
+                        is Result.Error -> AppUtils.showToast(this@SignUpActivity, result.message)
+                        is Result.Loading -> Log.e("Loading", "로딩중")
+                    }
                 }
-            }
         }
     }
 

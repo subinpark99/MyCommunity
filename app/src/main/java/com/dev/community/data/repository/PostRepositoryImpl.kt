@@ -27,7 +27,6 @@ class PostRepositoryImpl @Inject constructor(
     private val userId: String
         get() = auth.currentUser?.uid ?: throw IllegalStateException("No user is logged in")
 
-
     override suspend fun addPost(
         age: Int,
         location: String,
@@ -54,11 +53,16 @@ class PostRepositoryImpl @Inject constructor(
             postRef.setValue(post).await()
 
             // 이미지 업로드가 있을 때, 업로드 결과를 기다림
-            if (imageList.isNotEmpty()) {
-                val uploadResult = uploadImagesToFirestore(postId, imageList)
-                if (uploadResult is Result.Error) return Result.Error(uploadResult.message)
-                if (uploadResult is Result.Loading) return Result.Loading
-                if (uploadResult is Result.Success) return  Result.Success(post)
+            val uploadResult = if (imageList.isNotEmpty()) {
+                uploadImagesToFirestore(postId, imageList)
+            } else {
+                Result.Success(true)
+            }
+
+            if (uploadResult is Result.Error) {
+                // 이미지 업로드 실패 시, 게시물 삭제
+                database.child("post").child(postId).removeValue().await()
+                return uploadResult
             }
 
             Result.Success(post)
@@ -67,7 +71,6 @@ class PostRepositoryImpl @Inject constructor(
         }
     }
 
-
     private suspend fun uploadImagesToFirestore(
         postId: String,
         imageList: List<String>
@@ -75,51 +78,39 @@ class PostRepositoryImpl @Inject constructor(
         return try {
             // Storage에 실제 이미지 저장
             val storageRef = storage.child("images/$postId")
-            val imageUrls = mutableListOf<String>()
-
-            imageList.forEachIndexed { index, img ->
+            val imageUrls = imageList.mapIndexed { index, img ->
                 val imageRef = storageRef.child("image_$index")
                 val uploadTask = imageRef.putFile(img.toUri()).await()
-
-                // 다운로드 URL 가져오기
-                val downloadUrl = uploadTask.storage.downloadUrl.await().toString()
-                imageUrls.add(downloadUrl)
+                uploadTask.storage.downloadUrl.await().toString()
             }
 
             // Firestore에 이미지 URL 저장
-            val imageRef = firestore.collection("postImages").document(postId)
-            imageRef.set(mapOf("imageUrls" to imageUrls)).await()
+            firestore.collection("postImages").document(postId)
+                .set(mapOf("imageUrls" to imageUrls)).await()
 
             Result.Success(true)
 
         } catch (e: Exception) {
-            if (e is CancellationException) {
-                Log.e("Upload Error", "Job was cancelled", e)
-            } else {
-                // 기타 예외 처리
-                Log.e("Upload Error", "Error uploading images", e)
-            }
+            Log.e("Upload Error", "Error uploading images", e)
             Result.Error(e.message ?: "Unknown error")
         }
     }
 
-    // 특정 게시물과 관련된 이미지 URL을 가져옴
     private suspend fun fetchPostWithImages(postId: String): PostWithImages {
-        val postRef = database.child("post").child(postId).get().await()
-        val post = postRef.getValue(Post::class.java) ?: throw Exception("Post not found")
+        val post = database.child("post").child(postId).get().await().getValue(Post::class.java)
+            ?: throw Exception("Post not found")
 
-        val imageSnapshot = firestore.collection("postImages").document(postId).get().await()
-        val imageUrls = imageSnapshot.get("imageUrls") as List<String>? ?: emptyList()
+        val imageUrls = firestore.collection("postImages").document(postId)
+            .get().await().get("imageUrls") as List<String>? ?: emptyList()
 
         return PostWithImages(post, imageUrls)
     }
 
-    // 현재 사용자가 작성한 게시물과 관련된 이미지 URL 리스트를 가져오기
     override suspend fun getMyPostsWithImages(): Result<List<PostWithImages>> {
         return try {
-            val postRef = database.child("post").orderByChild("uid").equalTo(userId)
-            val snapshot = postRef.get().await()
-            val postList = snapshot.children.reversed().mapNotNull { it.getValue(Post::class.java) }
+            val postList = database.child("post").orderByChild("uid").equalTo(userId)
+                .get().await().children.reversed().mapNotNull { it.getValue(Post::class.java) }
+
 
             // 각 게시물의 이미지 URL을 비동기적으로 가져옴
             val postsWithImages = coroutineScope {
@@ -133,6 +124,7 @@ class PostRepositoryImpl @Inject constructor(
             Result.Error(e.message ?: "Unknown error")
         }
     }
+
 
     // 현재 사용자가 댓글을 단 게시물과 관련된 이미지 URL 리스트를 가져옴
     override suspend fun getMyCommentedPostsWithImages(): Result<List<PostWithImages>> {

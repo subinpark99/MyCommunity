@@ -25,6 +25,7 @@ import com.dev.community.databinding.FragmentMypageBinding
 import com.dev.community.ui.other.MapActivity
 import com.dev.community.ui.other.OcrActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
@@ -88,7 +89,7 @@ class MyPageFragment : Fragment() {
 
 
                 launch { // 알람 토글 상태
-                    userViewModel.getAlarmState.collect { result ->
+                    userViewModel.getAlarmState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> binding.noticeToggleBtn.isChecked = result.data
                             is Result.Error -> handleError(result.message)

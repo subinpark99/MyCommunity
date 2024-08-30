@@ -23,6 +23,7 @@ import com.dev.community.databinding.FragmentAgeBinding
 import com.dev.community.ui.home.adapter.ContentRVAdapter
 import com.dev.community.ui.start.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -41,7 +42,7 @@ class AgeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
 
         _binding = FragmentAgeBinding.inflate(inflater, container, false)
@@ -83,10 +84,10 @@ class AgeFragment : Fragment() {
     private fun observeState() {
 
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
-                    userViewModel.userState.collect {
+                    userViewModel.userState.collectLatest {
                         when (it) {
                             is Result.Success -> postViewModel.getLocationPostWithImg(it.data.location)
                             is Result.Error -> Log.e("ERROR", it.message)
@@ -97,37 +98,35 @@ class AgeFragment : Fragment() {
                 }
 
                 launch {
-                    lifecycleScope.launch {
-                        postViewModel.locationPostWithImgState.collect { result ->
-                            when (result) {
-                                is Result.Success -> {
+                    postViewModel.locationPostWithImgState.collectLatest { result ->
+                        when (result) {
+                            is Result.Success -> {
 
-                                    AppUtils.dismissLoadingDialog()
-                                    val ageRange = result.data.filter {   // ageRange로 필터링된 리스트 생성
-                                        it.post.age in range
-                                    }
-
-                                    // 필터링된 리스트를 다시 PostWithImages 형태로 변환
-                                    val transformedData = ageRange.map { postWithImages ->
-                                        PostWithImages(
-                                            postWithImages.post,
-                                            postWithImages.imageUrls
-                                        )
-                                    }
-
-                                    if (transformedData.isEmpty()) {
-                                        binding.noText.visibility = View.VISIBLE
-                                        binding.ageContentsRv.visibility = View.GONE
-                                    } else {
-                                        contentRVAdapter.getList(transformedData)
-                                        binding.noText.visibility = View.GONE
-                                        binding.ageContentsRv.visibility = View.VISIBLE
-                                    }
+                                AppUtils.dismissLoadingDialog()
+                                val ageRange = result.data.filter {   // ageRange로 필터링된 리스트 생성
+                                    it.post.age in range
                                 }
 
-                                is Result.Error -> Log.e("ERROR", "AgeFragment - ${result.message}")
-                                is Result.Loading -> AppUtils.showLoadingDialog(requireContext())
+                                // 필터링된 리스트를 다시 PostWithImages 형태로 변환
+                                val transformedData = ageRange.map { postWithImages ->
+                                    PostWithImages(
+                                        postWithImages.post,
+                                        postWithImages.imageUrls
+                                    )
+                                }
+
+                                if (transformedData.isEmpty()) {
+                                    binding.noText.visibility = View.VISIBLE
+                                    binding.ageContentsRv.visibility = View.GONE
+                                } else {
+                                    contentRVAdapter.getList(transformedData)
+                                    binding.noText.visibility = View.GONE
+                                    binding.ageContentsRv.visibility = View.VISIBLE
+                                }
                             }
+
+                            is Result.Error -> Log.e("ERROR", "AgeFragment - ${result.message}")
+                            is Result.Loading -> AppUtils.showLoadingDialog(requireContext())
                         }
                     }
                 }

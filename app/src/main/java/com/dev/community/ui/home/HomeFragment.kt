@@ -20,6 +20,7 @@ import com.dev.community.ui.viewModel.UserViewModel
 import com.dev.community.databinding.FragmentHomeBinding
 import com.dev.community.ui.home.adapter.ContentRVAdapter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -62,7 +63,7 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {  // user 정보 관찰
-                    userViewModel.userState.collect { result ->
+                    userViewModel.userState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> {
                                 val user = result.data
@@ -77,7 +78,7 @@ class HomeFragment : Fragment() {
                 }
 
                 launch {
-                    postViewModel.locationPostWithImgState.collect { result ->
+                    postViewModel.locationPostWithImgState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> {
                                 AppUtils.dismissLoadingDialog()

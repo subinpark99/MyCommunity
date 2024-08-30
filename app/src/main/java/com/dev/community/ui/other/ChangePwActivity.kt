@@ -18,6 +18,7 @@ import com.dev.community.databinding.ActivityChangepwBinding
 import com.dev.community.ui.start.LoginActivity
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -51,7 +52,7 @@ class ChangePwActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    userViewModel.userState.collect { result ->
+                    userViewModel.userState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> user = result.data
                             is Result.Error -> handleError(result.message)

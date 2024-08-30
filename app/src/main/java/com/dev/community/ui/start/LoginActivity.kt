@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.dev.community.util.AppUtils
 import com.dev.community.app.MyApplication
@@ -52,7 +54,8 @@ class LoginActivity : AppCompatActivity() {
     private fun observeLogin() {
 
         lifecycleScope.launch {
-            userViewModel.loginState.collect { result ->
+            userViewModel.loginState
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { result ->
                 when (result) {
                     is Result.Success -> {
                         if (result.data) {

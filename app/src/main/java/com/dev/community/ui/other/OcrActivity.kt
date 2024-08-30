@@ -3,19 +3,21 @@ package com.dev.community.ui.other
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
 import com.dev.community.util.AppUtils
 import com.dev.community.util.Result
 import com.dev.community.ui.viewModel.UserViewModel
@@ -24,6 +26,7 @@ import com.dev.community.ui.start.MainActivity
 import com.dev.community.ui.start.SignUpActivity
 import com.googlecode.tesseract.android.TessBaseAPI
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.*
 
@@ -32,16 +35,13 @@ import java.io.*
 class OcrActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOcrBinding
-
-    private lateinit var loadImg: Uri
     private lateinit var ocrTv: TextView // OCR 결과뷰
 
+    private val userViewModel: UserViewModel by viewModels()
+
     private var image: Bitmap? = null  // 사용되는 이미지
-    private var mTess: TessBaseAPI? = null // Tess API reference
     private var datapath = ""  // 언어 데이터가 있는 경로
     private val langFileName = "kor.traineddata"
-
-    private val userViewModel: UserViewModel by viewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +49,41 @@ class OcrActivity : AppCompatActivity() {
         binding = ActivityOcrBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        AppUtils.hideStatusBar(window)
+        datapath = "$filesDir/tesseract/"
+        ocrTv = binding.getLocationTv
+
+        checkAndCopyLanguageFiles() // 언어 파일 존재 여부 확인 및 복사
         setupListeners() // 버튼 클릭 리스너 설정
+
+        AppUtils.hideStatusBar(window)
+    }
+
+    // 언어 데이터 파일 존재 여부 확인 및 복사
+    private fun checkAndCopyLanguageFiles() {
+        val dir = File("$datapath/tessdata/")
+        val languageFile = File(dir, langFileName)
+
+        if (!languageFile.exists()) {
+            dir.mkdirs() // 디렉토리가 존재하지 않으면 생성
+            copyLanguageFiles(languageFile)
+        }
+    }
+
+    // 언어 데이터 파일 복사
+    private fun copyLanguageFiles(destinationFile: File) {
+        try {
+            assets.open(langFileName).use { instream ->
+                FileOutputStream(destinationFile).use { outstream ->
+                    val buffer = ByteArray(1024)
+                    var bytesRead: Int
+                    while (instream.read(buffer).also { bytesRead = it } != -1) {
+                        outstream.write(buffer, 0, bytesRead)
+                    }
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
 
@@ -66,96 +99,40 @@ class OcrActivity : AppCompatActivity() {
     ) { it ->
         if (it.resultCode == Activity.RESULT_OK) {
             val intent = checkNotNull(it.data)
-            loadImg = intent.data!!
+            val loadImg = intent.data!!
             displayImage(loadImg) // 선택한 이미지 표시
-            performOcr() // OCR 수행
         }
     }
 
 
     private fun displayImage(photoUri: Uri) {
         Glide.with(this)
+            .asBitmap()
             .load(photoUri)
-            .into(binding.ocrImgIv)
-    }
+            .into(object : CustomTarget<Bitmap>() {
+                override fun onLoadCleared(placeholder: Drawable?) { }
 
-    // 이미지에서 텍스트 추출
-    private fun performOcr() {
-        image = loadBitmapFromUri(loadImg)?.let { aRGBBitmap(it) }
-        datapath = "$filesDir/tesseract/"
-        checkAndCopyLanguageFiles() // 언어 파일 존재 여부 확인 및 복사
-        setupTesseract() // TessBaseAPI 설정
-        processImage() // 이미지 처리 및 텍스트 추출
-    }
+                override fun onResourceReady(
+                    resource: Bitmap,
+                    transition: com.bumptech.glide.request.transition.Transition<in Bitmap>?,
+                ) {
+                    image = resource
+                    binding.ocrImgIv.setImageBitmap(image)
 
-    // URI를 비트맵으로 변환
-    private fun loadBitmapFromUri(photoUri: Uri): Bitmap? {
-        return try {
-            if (Build.VERSION.SDK_INT > 27) {
-                val source: ImageDecoder.Source =
-                    ImageDecoder.createSource(this.contentResolver, photoUri)
-                ImageDecoder.decodeBitmap(source)
-            } else {
-                MediaStore.Images.Media.getBitmap(this.contentResolver, photoUri)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            null
-        }
-    }
-
-    // 비트맵을 ARGB_8888 형식으로 변환
-    private fun aRGBBitmap(img: Bitmap): Bitmap? {
-        return img.copy(Bitmap.Config.ARGB_8888, true)
-    }
-
-    // TessBaseAPI 설정
-    private fun setupTesseract() {
-        mTess = TessBaseAPI().apply {
-            init(datapath, "kor")
-        }
-        ocrTv = binding.getLocationTv
-    }
-
-    // 이미지에서 텍스트 추출 후 결과 표시
-    private fun processImage() {
-        mTess?.setImage(image)
-        val ocrResult = mTess?.utF8Text ?: ""
-        val resultLines = ocrResult.split("\n")
-        if (resultLines.size > 3) {
-            ocrTv.text = resultLines[3]
-        }
-    }
-
-    //  언어 데이터 파일 존재 여부 확인 및 복사
-    private fun checkAndCopyLanguageFiles() {
-        val dir = File(datapath + "tessdata/")
-        if (!dir.exists() && dir.mkdirs()) {
-            copyLanguageFiles()
-        } else if (dir.exists()) {
-            val datafilepath = datapath + "tessdata/" + langFileName
-            val datafile = File(datafilepath)
-            if (!datafile.exists()) {
-                copyLanguageFiles()
-            }
-        }
-    }
-
-    // 언어 데이터 파일 복사
-    private fun copyLanguageFiles() {
-        try {
-            val filepath = datapath + "tessdata/" + langFileName
-            assets.open(langFileName).use { instream ->
-                FileOutputStream(filepath).use { outstream ->
-                    val buffer = ByteArray(1024)
-                    var read: Int
-                    while (instream.read(buffer).also { read = it } != -1) {
-                        outstream.write(buffer, 0, read)
-                    }
+                    setupTesseract() // TessBaseAPI 설정
                 }
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
+            })
+    }
+
+
+    // TessBaseAPI 설정 및 이미지에서 텍스트 추출
+    private fun setupTesseract() {
+        TessBaseAPI().apply {
+            init(datapath, "kor")
+            setImage(image)
+
+            val ocrResult = utF8Text.split("\n")
+            ocrTv.text= ocrResult[3]
         }
     }
 
@@ -197,22 +174,26 @@ class OcrActivity : AppCompatActivity() {
         userViewModel.changeLocation(location)
 
         lifecycleScope.launch {
-            userViewModel.changeLocationState.collect {
-                when (it) {
-                    is Result.Success -> {
-                        val intent = Intent(this@OcrActivity, MainActivity::class.java).apply {
-                            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            userViewModel.changeLocationState.flowWithLifecycle(
+                lifecycle,
+                Lifecycle.State.STARTED
+            )
+                .collectLatest {
+                    when (it) {
+                        is Result.Success -> {
+                            val intent = Intent(this@OcrActivity, MainActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            }
+                            startActivity(intent)
+                            finish()
+                            AppUtils.showToast(this@OcrActivity, "${location}으로 변경되었습니다.")
                         }
-                        startActivity(intent)
-                        finish()
-                        AppUtils.showToast(this@OcrActivity, "${location}으로 변경되었습니다.")
+
+                        is Result.Error -> Log.e("ERROR", "OcrActivity - ${it.message}")
+                        is Result.Loading -> Log.e("Loading", "로딩중")
+
                     }
-
-                    is Result.Error -> Log.e("ERROR", "OcrActivity - ${it.message}")
-                    is Result.Loading -> Log.e("Loading", "로딩중")
-
                 }
-            }
         }
     }
 
