@@ -21,7 +21,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.dev.community.R
 import com.dev.community.ui.viewModel.UserViewModel
 import com.dev.community.databinding.ActivityMainBinding
-import com.dev.community.ui.home.adapter.ExpandableListAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -98,29 +97,25 @@ class MainActivity : AppCompatActivity() {
         binding.navBar.setupWithNavController(navController)
         binding.navBar.background = null
 
-        val navView = binding.drawerNav
-        val headerView = navView.findViewById<ConstraintLayout>(R.id.item_drawer_header)
-
         val toolbar = binding.toolbar
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setHomeAsUpIndicator(R.drawable.icon_menu)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        val userEmailView = headerView.findViewById<TextView>(R.id.user_email_tv)
-        val userAddressView = headerView.findViewById<TextView>(R.id.user_address_tv)
-
-        userEmailView.text = email
-        userAddressView.text = location
+        val headerView = binding.drawerNav.findViewById<ConstraintLayout>(R.id.item_drawer_header)
+        headerView.findViewById<TextView>(R.id.user_email_tv).text = email
+        headerView.findViewById<TextView>(R.id.user_address_tv).text = location
     }
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
+        return if (item.itemId == android.R.id.home) {
             drawerLayout.openDrawer(GravityCompat.START)
-            return true
+            true
+        } else {
+            super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 
     // 사용자 위치에 따라 나이대 리스트를 설정
@@ -137,15 +132,15 @@ class MainActivity : AppCompatActivity() {
         parentList: MutableList<String>,
         childList: MutableList<MutableList<String>>,
     ) {
-        val ageRange = mutableListOf("10대", "20대", "30대", "40대", "50대", "60대")
         val expandableAdapter = ExpandableListAdapter(this, parentList, childList)
         val menu = binding.expandedMenu
         menu.setAdapter(expandableAdapter)
 
         menu.setOnGroupClickListener { _, _, _, _ -> false }
         menu.setOnChildClickListener { _, _, groupPosition, childPosition, _ ->
-            if (groupPosition == 0 && childPosition in ageRange.indices) {
-                val ageValue = ageRange[childPosition]
+
+            if (groupPosition == 0 && childPosition in childList[0].indices) {
+                val ageValue = childList[0][childPosition]
                 val bundle = bundleOf("age" to ageValue)
                 navController.navigate(R.id.ageFragment, bundle)
                 drawerLayout.closeDrawer(GravityCompat.START)

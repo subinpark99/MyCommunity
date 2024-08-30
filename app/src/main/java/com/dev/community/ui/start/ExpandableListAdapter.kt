@@ -1,4 +1,4 @@
-package com.dev.community.ui.home.adapter
+package com.dev.community.ui.start
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -14,7 +14,7 @@ import com.dev.community.R
 class ExpandableListAdapter(
     private val context: Context,
     private val parents: MutableList<String>,
-    private val childList: MutableList<MutableList<String>>
+    private val childList: MutableList<MutableList<String>>,
 ) : BaseExpandableListAdapter() {
 
     override fun getGroupCount() = parents.size
@@ -38,13 +38,13 @@ class ExpandableListAdapter(
         parent: Int,
         isExpanded: Boolean,
         convertView: View?,
-        parentview: ViewGroup
+        parentview: ViewGroup,
     ): View {
         val inflater: LayoutInflater = LayoutInflater.from(context)
         val binding = inflater.inflate(R.layout.menu_parent, parentview, false)
 
-        val parentTitle=binding.findViewById<TextView>(R.id.parent_city_tv)
-        parentTitle.text=parents[parent]
+        val parentTitle = binding.findViewById<TextView>(R.id.parent_city_tv)
+        parentTitle.text = parents[parent]
 
         setIcon(parent, binding)
         setArrow(binding, isExpanded)
@@ -58,12 +58,12 @@ class ExpandableListAdapter(
         child: Int,
         isLastChild: Boolean,
         convertView: View?,
-        parentview: ViewGroup
+        parentview: ViewGroup,
     ): View {
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val binding = inflater.inflate(R.layout.menu_child, parentview, false)
 
-        val childTitle=binding.findViewById<TextView>(R.id.child_city_tv)
+        val childTitle = binding.findViewById<TextView>(R.id.child_city_tv)
         childTitle.text = getChild(parent, child)
 
         return binding
@@ -71,7 +71,7 @@ class ExpandableListAdapter(
 
     // drawer 아이콘 설정
     private fun setIcon(parentPosition: Int, parentView: View) {
-        val cityIcon=parentView.findViewById<ImageView>(R.id.icon_iv)
+        val cityIcon = parentView.findViewById<ImageView>(R.id.icon_iv)
         when (parentPosition) {
 
             0 -> cityIcon.setImageResource(R.drawable.icon_village)
@@ -82,8 +82,8 @@ class ExpandableListAdapter(
     @SuppressLint("SuspiciousIndentation")
     private fun setArrow(parentView: View, isExpanded: Boolean) {
 
-        val arrowIcon=parentView.findViewById<ImageView>(R.id.arrow_drop_iv)
-            if (isExpanded) arrowIcon.setImageResource(R.drawable.icon_arrow_up)
-            else arrowIcon.setImageResource(R.drawable.icon_arrow_drop)
-        }
+        val arrowIcon = parentView.findViewById<ImageView>(R.id.arrow_drop_iv)
+        if (isExpanded) arrowIcon.setImageResource(R.drawable.icon_arrow_up)
+        else arrowIcon.setImageResource(R.drawable.icon_arrow_drop)
+    }
 }
