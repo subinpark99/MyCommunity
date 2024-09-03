@@ -13,6 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -42,10 +43,9 @@
             android:id="@+id/search_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             app:layout_constraintTop_toTopOf="@id/top_layout"
-            app:layout_constraintBottom_toBottomOf="@id/top_layout"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/top_layout"
             app:queryHint="검색어를 입력해주세요" />
 
         <TextView
@@ -64,11 +64,11 @@
             android:id="@+id/home_contents_rv"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="7dp"
+            android:layout_marginTop="5dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/top_layout"
+            app:layout_constraintTop_toBottomOf="@id/search_bar"
             tools:listitem="@layout/item_home_contents" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
