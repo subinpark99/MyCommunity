@@ -24,6 +24,7 @@ import com.dev.community.ui.viewModel.UserViewModel
 import com.dev.community.databinding.FragmentMypageBinding
 import com.dev.community.ui.other.MapActivity
 import com.dev.community.ui.other.OcrActivity
+import com.dev.community.ui.start.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -154,10 +155,13 @@ class MyPageFragment : Fragment() {
 
     private fun setUserSuccess() {
 
-        view?.findNavController()?.navigate(R.id.action_myPageFragment_to_loginActivity)
         AppUtils.showToast(requireContext(), "완료")
         MyApplication.prefs.setAutoLogin(false)
 
+        val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
     }
 
     private fun handleError(exception: String) {

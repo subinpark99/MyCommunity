@@ -12,6 +12,7 @@ import android.view.View
 import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowInsetsController
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -94,14 +95,23 @@ object AppUtils {
         getImage.launch(intent)
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
+
     fun hideStatusBar(window: Window) {
-        val insetsController = window.insetsController
-        insetsController?.let {
-            it.hide(WindowInsets.Type.statusBars())
-            it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val insetsController = window.insetsController
+            insetsController?.let {
+                it.hide(WindowInsets.Type.statusBars())
+                it.systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            // API 30 미만
+            window.setFlags(
+                WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN
+            )
         }
     }
+
 
     fun showLoadingDialog(context: Context) {
         if (loadingDialog == null) {

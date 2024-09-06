@@ -27,9 +27,6 @@
         <action
             android:id="@+id/action_myPageFragment_to_myContentsFragment"
             app:destination="@id/myContentsFragment" />
-        <action
-            android:id="@+id/action_myPageFragment_to_loginActivity"
-            app:destination="@id/loginActivity" />
 
         <action
             android:id="@+id/action_myPageFragment_to_homeFragment"
