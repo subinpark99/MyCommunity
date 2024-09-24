@@ -1,5 +1,6 @@
 package com.dev.community.ui.home
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -15,7 +16,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dev.community.util.AppUtils
-import com.dev.community.data.model.PostWithImages
+import com.dev.community.data.model.User
 import com.dev.community.ui.viewModel.PostViewModel
 import com.dev.community.util.Result
 import com.dev.community.ui.viewModel.UserViewModel
@@ -34,6 +35,7 @@ class AgeFragment : Fragment() {
 
     private lateinit var range: IntRange
     private lateinit var ageRange: String
+    private var user = User()
     private lateinit var contentRVAdapter: ContentRVAdapter
 
     private val postViewModel: PostViewModel by viewModels()
@@ -66,7 +68,6 @@ class AgeFragment : Fragment() {
         )
 
         range = ageRanges.firstOrNull { it.first == ageRange }?.second!!
-
         setRvAdapter()
 
         return binding.root
@@ -81,6 +82,7 @@ class AgeFragment : Fragment() {
     }
 
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun observeState() {
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -89,7 +91,11 @@ class AgeFragment : Fragment() {
                 launch {
                     userViewModel.userState.collectLatest {
                         when (it) {
-                            is Result.Success -> postViewModel.getLocationPostWithImg(it.data.location)
+                            is Result.Success -> {
+                                user= it.data
+                                postViewModel.getLocationPosts(it.data.location)
+                            }
+
                             is Result.Error -> Log.e("ERROR", it.message)
                             is Result.Loading -> Log.e("Loading", "로딩중")
 
@@ -98,34 +104,27 @@ class AgeFragment : Fragment() {
                 }
 
                 launch {
-                    postViewModel.locationPostWithImgState.collectLatest { result ->
+                    postViewModel.postsState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> {
 
                                 AppUtils.dismissLoadingDialog()
+
                                 val ageRange = result.data.filter {   // ageRange로 필터링된 리스트 생성
-                                    it.post.age in range
+                                    it.age in range
                                 }
 
-                                // 필터링된 리스트를 다시 PostWithImages 형태로 변환
-                                val transformedData = ageRange.map { postWithImages ->
-                                    PostWithImages(
-                                        postWithImages.post,
-                                        postWithImages.imageUrls
-                                    )
-                                }
-
-                                if (transformedData.isEmpty()) {
+                                if (ageRange.isEmpty()) {
                                     binding.noText.visibility = View.VISIBLE
                                     binding.ageContentsRv.visibility = View.GONE
                                 } else {
-                                    contentRVAdapter.getList(transformedData)
+                                    contentRVAdapter.getList(ageRange)
                                     binding.noText.visibility = View.GONE
                                     binding.ageContentsRv.visibility = View.VISIBLE
                                 }
                             }
 
-                            is Result.Error -> Log.e("ERROR", "AgeFragment - ${result.message}")
+                            is Result.Error -> handleError(result.message)
                             is Result.Loading -> AppUtils.showLoadingDialog(requireContext())
                         }
                     }
@@ -136,8 +135,8 @@ class AgeFragment : Fragment() {
 
     private fun setRvAdapter() {
 
-        contentRVAdapter = ContentRVAdapter(contentClickListener = { postData ->
-            onPostClicked(postData)
+        contentRVAdapter = ContentRVAdapter(contentClickListener = { postId ->
+            onPostClicked(postId)
         })
         binding.ageContentsRv.apply {
             adapter = contentRVAdapter
@@ -146,15 +145,17 @@ class AgeFragment : Fragment() {
     }
 
 
-    private fun onPostClicked(postData: PostWithImages) { // 게시물 조회수 증가
-        postViewModel.updatePostCnt(postData.post.postId)
+    private fun onPostClicked(postId:String) { // 게시물 조회수 증가
+        postViewModel.updatePostCnt(postId)
         val arguments = AgeFragmentDirections.actionAgeFragmentToInContentFragment(
-            postData.post,
-            postData.imageUrls.toTypedArray()
-        )
+            postId, user)
         findNavController().navigate(arguments)
     }
 
+
+    private fun handleError(exception: String) {
+        Log.e("ERROR", "AgeFragment - $exception")
+    }
 
     override fun onStart() {
         super.onStart()

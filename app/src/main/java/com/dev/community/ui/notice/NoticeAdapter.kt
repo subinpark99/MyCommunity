@@ -1,6 +1,7 @@
 package com.dev.community.ui.notice
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -9,15 +10,16 @@ import com.dev.community.databinding.ItemNoticeBinding
 
 
 class NoticeAdapter(
-    private val commentClickListener: (String) -> Unit
+    private val commentClickListener: (String) -> Unit,
 ) :
     RecyclerView.Adapter<NoticeAdapter.ViewHolder>() {
 
     private var commentItems = mutableListOf<Comment>()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun addComment(comment: Comment) {
-        commentItems.add(0,comment)
+    fun addComment(comment: List<Comment>) {
+        commentItems.clear()
+        commentItems.addAll(comment)
         notifyDataSetChanged()
     }
 
@@ -31,7 +33,6 @@ class NoticeAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         holder.bind(commentItems[position])
-
     }
 
     override fun getItemCount(): Int = commentItems.size

@@ -10,19 +10,18 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dev.community.data.model.Post
-import com.dev.community.data.model.PostWithImages
 import com.dev.community.databinding.ItemHomeContentsBinding
 
 class ContentRVAdapter(
-    private val contentClickListener: (PostWithImages) -> Unit
+    private val contentClickListener: (String) -> Unit
 ) : RecyclerView.Adapter<ContentRVAdapter.ViewHolder>(), Filterable {
 
-    private val items = ArrayList<PostWithImages>()  // 원본
-    var filterItem = ArrayList<PostWithImages>()  // 검색결과
+    private val items = ArrayList<Post>()  // 원본
+    var filterItem = ArrayList<Post>()  // 검색결과
     private var setFilter = ItemFilter()
 
     @SuppressLint("NotifyDataSetChanged")
-    fun getList(posts: List<PostWithImages>) {
+    fun getList(posts: List<Post>) {
         items.clear()
         items.addAll(posts)
         filterItem.clear()
@@ -44,23 +43,21 @@ class ContentRVAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val postWithImages = filterItem[position]
-        val post = postWithImages.post
-        val images = postWithImages.imageUrls
+        val post = filterItem[position]
 
         holder.apply {
             bind(post)
 
             binding.layoutClick.setOnClickListener {  // 게시물 클릭 시 조회수 증가
-                contentClickListener(postWithImages)
+                contentClickListener(post.postId)
             }
 
             val context = binding.root.context
 
-            if (images.isNotEmpty()) {
+            if (post.imageList.isNotEmpty()) {
                 binding.imageExIv.visibility = View.VISIBLE
                 Glide.with(context)
-                    .load(images[0])
+                    .load(post.imageList[0])
                     .into(binding.imageExIv)
             } else {
                 binding.imageExIv.visibility = View.GONE
@@ -85,10 +82,10 @@ class ContentRVAdapter(
             } else {
                 val filterPattern = charSequence.toString().lowercase().trim()
                 items.filter {
-                    it.post.title.lowercase()
-                        .contains(filterPattern) || it.post.content.lowercase()
+                    it.title.lowercase()
+                        .contains(filterPattern) || it.content.lowercase()
                         .contains(filterPattern)
-                } as ArrayList<PostWithImages>
+                } as ArrayList<Post>
             }
 
             return FilterResults().apply { values = filteredList }
@@ -99,7 +96,7 @@ class ContentRVAdapter(
             filterItem.clear()
 
             if (filterResults?.values is List<*>) {
-                filterItem.addAll(filterResults.values as List<PostWithImages>)
+                filterItem.addAll(filterResults.values as List<Post>)
             }
             notifyDataSetChanged()
         }

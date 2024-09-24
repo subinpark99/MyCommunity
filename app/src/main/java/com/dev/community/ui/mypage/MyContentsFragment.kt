@@ -16,12 +16,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.dev.community.data.model.User
 import com.dev.community.util.AppUtils
-import com.dev.community.data.model.PostWithImages
 import com.dev.community.ui.viewModel.PostViewModel
 import com.dev.community.util.Result
 import com.dev.community.databinding.FragmentMycontentsBinding
 import com.dev.community.ui.home.adapter.ContentRVAdapter
+import com.dev.community.ui.viewModel.UserViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -31,8 +32,11 @@ class MyContentsFragment : Fragment() {
     private var _binding: FragmentMycontentsBinding? = null
     private val binding get() = _binding!!
 
+    private val userViewModel: UserViewModel by viewModels()
     private val postViewModel: PostViewModel by viewModels()
     private lateinit var contentAdapter: ContentRVAdapter
+
+    private var user = User()
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
@@ -53,12 +57,13 @@ class MyContentsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        userViewModel.getUser()
         observeState()
     }
 
     private fun setupRecyclerView() {
-        contentAdapter = ContentRVAdapter(contentClickListener = { postData ->
-            onPostClicked(postData)
+        contentAdapter = ContentRVAdapter(contentClickListener = { postId->
+            onPostClicked(postId)
         })
         binding.mycontentRv.apply {
             adapter = contentAdapter
@@ -66,12 +71,12 @@ class MyContentsFragment : Fragment() {
         }
     }
 
-    private fun onPostClicked(postData: PostWithImages) {
-        postViewModel.updatePostCnt(postData.post.postId)
+    private fun onPostClicked(postId:String) {
+        postViewModel.updatePostCnt(postId)
         val arguments =
             MyContentsFragmentDirections.actionMyContentsFragmentToInContentFragment(
-                postData.post,
-                postData.imageUrls.toTypedArray()
+                postId,
+                user
             )
         findNavController().navigate(arguments)
     }
@@ -86,7 +91,6 @@ class MyContentsFragment : Fragment() {
     }
 
     // 내가 쓴 글 가져오기
-
     @SuppressLint("SetTextI18n")
     private fun getMyContents() {
         binding.mycontenttv.text = "내가 쓴 글"
@@ -98,7 +102,7 @@ class MyContentsFragment : Fragment() {
     @SuppressLint("SetTextI18n")
     private fun getMyComments() {
         binding.mycontenttv.text = "내가 쓴 댓글"
-        postViewModel.getMyCommentedPost()
+        postViewModel.getMyCommentedPosts()
     }
 
 
@@ -108,31 +112,17 @@ class MyContentsFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
-                    postViewModel.myPostListState.collectLatest { result ->
-                        when (result) {
-                            is Result.Success -> {
-                                AppUtils.dismissLoadingDialog()
-                                if (result.data.isNotEmpty()) {
-                                    binding.noText.visibility = View.GONE
-                                    binding.mycontentRv.visibility = View.VISIBLE
-                                    contentAdapter.getList(result.data)
-                                } else {
-                                    binding.noText.visibility = View.VISIBLE
-                                    binding.mycontentRv.visibility = View.GONE
-                                }
-                            }
-
-                            is Result.Error -> {
-                                handleError(result.message)
-                                AppUtils.dismissLoadingDialog()
-                            }
-                            is Result.Loading -> handleLoading()
+                    userViewModel.userState.collectLatest {
+                        when (it) {
+                            is Result.Success -> user= it.data
+                            is Result.Error -> Log.e("ERROR", it.message)
+                            is Result.Loading -> Log.e("Loading", "로딩중")
                         }
                     }
                 }
 
                 launch {
-                    postViewModel.myCommentsListState.collectLatest { result ->
+                    postViewModel.postsState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> {
                                 AppUtils.dismissLoadingDialog()
@@ -150,12 +140,10 @@ class MyContentsFragment : Fragment() {
                                 handleError(result.message)
                                 AppUtils.dismissLoadingDialog()
                             }
-
                             is Result.Loading -> handleLoading()
                         }
                     }
                 }
-
             }
         }
     }

@@ -150,7 +150,6 @@ class UserRepositoryImpl @Inject constructor(
                     // FCM 토큰 가져오기 성공
                     val token = task.result
                     if (token != currentToken) database.child("user").child(userId).child("token").setValue(token)
-
                 } else {
                     Log.e("FCM Token", "FCM 토큰을 가져오는 데 실패했습니다.", task.exception)
                 }

@@ -14,11 +14,14 @@ interface UserRepository {
     suspend fun login(email: String, password: String): Result<Boolean>
     suspend fun logout(): Result<Boolean>
     suspend fun withdraw(): Result<Boolean>
+
     suspend fun changeLocation(location: String): Result<Boolean>
     suspend fun changePassword(newPw: String): Result<Boolean>
+
     suspend fun setAlarmState(state: Boolean)
     suspend fun setSwitchOn() = setAlarmState(true)
     suspend fun setSwitchOff() = setAlarmState(false)
     suspend fun getSwitch(): Result<Boolean>
+
     fun updateFcmToken(currentToken: String)
 }

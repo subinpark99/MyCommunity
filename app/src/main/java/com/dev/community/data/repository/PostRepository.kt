@@ -2,8 +2,8 @@ package com.dev.community.data.repository
 
 
 import com.dev.community.data.model.Post
-import com.dev.community.data.model.PostWithImages
 import com.dev.community.util.Result
+
 
 interface PostRepository {
 
@@ -12,14 +12,19 @@ interface PostRepository {
         location: String,
         nickname: String,
         title: String,
-        content: String,
-        imageList: List<String>
+        content: String
     ): Result<Post>
-    suspend fun getPostWithImages(postId: String): Result<PostWithImages>
-    suspend fun getLocationPostsWithImages(location: String): Result<List<PostWithImages>>
-    suspend fun getMyPostsWithImages(): Result<List<PostWithImages>>
-    suspend fun getMyCommentedPostsWithImages(): Result<List<PostWithImages>>
+
+    suspend fun addImage(
+        postId: String,
+        imageList:List<String>
+    ): Result<String>
+
+    suspend fun getPostById(postId: String): Result<Post>
+    suspend fun getLocationPosts(location: String): Result<List<Post>>
+    suspend fun getMyPosts(): Result<List<Post>>
+    suspend fun getMyCommentedPosts(): Result<List<Post>>
+
     suspend fun updatePostCnt(postId: String)
     suspend fun deletePost(postIdx: String): Result<Boolean>
-
 }

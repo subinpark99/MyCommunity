@@ -13,7 +13,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.messaging
 import com.google.firebase.storage.FirebaseStorage
@@ -53,11 +52,6 @@ object DatabaseModule {
         return FirebaseStorage.getInstance().reference
     }
 
-    @Provides
-    @Singleton
-    fun provideFireStore(): FirebaseFirestore {
-        return FirebaseFirestore.getInstance()
-    }
 
     @Provides
     @Singleton

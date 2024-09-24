@@ -42,7 +42,7 @@ class WritingFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentWritingBinding.inflate(inflater, container, false)
 
@@ -79,19 +79,40 @@ class WritingFragment : Fragment() {
                 }
 
                 launch {
-                    postViewModel.addPostState.collect { post ->
+                    postViewModel.postState.collect { post ->
                         when (post) {
                             is Result.Success -> {
 
-                                val arguments =
-                                    WritingFragmentDirections.actionWritingFragmentToInContentFragment(
-                                        post.data, imgList.toTypedArray()
-                                    )
-                                findNavController().navigate(arguments)
-
+                                if (imgList.isNotEmpty()) {
+                                    postViewModel.addImage(post.data.postId, imgList)
+                                } else {
+                                    val arguments =
+                                        WritingFragmentDirections.actionWritingFragmentToInContentFragment(
+                                            post.data.postId, user
+                                        )
+                                    findNavController().navigate(arguments)
+                                }
                             }
 
                             is Result.Error -> handleError(post.message)
+                            is Result.Loading -> handleLoading()
+                        }
+                    }
+                }
+
+
+                launch {
+                    postViewModel.addImageState.collect { postId ->
+                        when (postId) {
+                            is Result.Success -> {
+                                val arguments =
+                                    WritingFragmentDirections.actionWritingFragmentToInContentFragment(
+                                        postId.data, user
+                                    )
+                                findNavController().navigate(arguments)
+                            }
+
+                            is Result.Error -> handleError(postId.message)
                             is Result.Loading -> handleLoading()
                         }
                     }
@@ -131,7 +152,7 @@ class WritingFragment : Fragment() {
                 user.location,
                 user.nickname,
                 title,
-                content, imgList
+                content
             )
 
         } else AppUtils.showToast(requireContext(), "제목과 내용을 입력하세요.")

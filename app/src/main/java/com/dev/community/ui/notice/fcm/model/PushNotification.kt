@@ -1,6 +1,11 @@
 package com.dev.community.ui.notice.fcm.model
 
 data class PushNotification(
-    var data: NotificationData,
-    var to: String
+    val message: Message
 )
+
+data class Message(
+    val token: String,  // 수신 디바이스의 FCM 토큰
+    val notification: NotificationData
+)
+

@@ -109,7 +109,7 @@ class SignUpActivity : AppCompatActivity() {
     ) {
         userViewModel.registerUser(email, password, nickname, location, age)
         lifecycleScope.launch {
-            userViewModel.registerState
+            userViewModel.goToLoginState
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).collect { result ->
                     when (result) {
                         is Result.Success -> if (result.data) handleSignUpSuccess()

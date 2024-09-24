@@ -1,30 +1,35 @@
 package com.dev.community.data.repository
 
+import android.content.Context
+import android.util.Log
 import com.dev.community.data.model.Comment
 import com.dev.community.data.model.Post
 import com.dev.community.data.model.User
 import com.dev.community.util.Result
 import com.dev.community.ui.notice.fcm.RetrofitInstance
+import com.dev.community.ui.notice.fcm.model.Message
 import com.dev.community.ui.notice.fcm.model.NotificationData
 import com.dev.community.ui.notice.fcm.model.PushNotification
+import com.google.auth.oauth2.GoogleCredentials
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CommentRepositoryImpl @Inject constructor(
     private val database: DatabaseReference,
     private val auth: FirebaseAuth,
+    @ApplicationContext private val context: Context
 ) : CommentRepository {
 
     private val userUid: String
@@ -37,7 +42,6 @@ class CommentRepositoryImpl @Inject constructor(
         nickname: String,
         content: String,
         parentId: String,
-        alarm: Boolean
     ): Result<Boolean> {
         return try {
             // 고유한 commentId 생성
@@ -48,21 +52,71 @@ class CommentRepositoryImpl @Inject constructor(
                 commentId = commentId, postId = postId, parentId = parentId,
                 uid = userUid, nickname = nickname, content = content
             )
-
             // 댓글 저장
             commentRef.setValue(comment).await()
-
-            if (alarm) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    sendPushAlarm(comment.postId, comment.content)
-                }
-            }
 
             Result.Success(true)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Unknown error")
         }
     }
+
+
+   override suspend fun sendPushAlarm(postId: String, content: String) {
+        val postRef = database.child("post").child(postId)
+        val postSnapshot = postRef.get().await()
+        val post = postSnapshot.getValue(Post::class.java) ?: return
+
+        val userRef = database.child("user").child(post.uid)
+        val userSnapshot = userRef.get().await()
+        val user = userSnapshot.getValue(User::class.java) ?: return
+
+        if (user.alarm && user.uid != userUid ) {
+            withContext(Dispatchers.IO) {
+                sendFcmNotification(content, user.token)
+            }
+        }else {
+            Log.e("FCM", "FCM token is null or empty")
+        }
+
+    }
+
+    private fun getAccessToken(): String {
+        val assetManager = context.assets
+        val inputStream = assetManager.open("serviceAccountKey.json")
+
+        val googleCredentials = GoogleCredentials
+            .fromStream(inputStream)
+            .createScoped(listOf("https://www.googleapis.com/auth/firebase.messaging"))
+
+        googleCredentials.refreshIfExpired()  // 만료된 경우 새로고침
+        return googleCredentials.accessToken.tokenValue
+    }
+
+    private suspend fun sendFcmNotification(message: String, token: String) {
+        val notificationData = NotificationData(
+            title = "새로운 댓글이 달렸어요!",
+            body = message
+        )
+
+        val messages = Message(
+            token = token,
+            notification = notificationData
+        )
+
+        val pushNotification = PushNotification(
+            message = messages
+        )
+
+        val response = RetrofitInstance.api.postNotification(token = "Bearer ${getAccessToken()}",pushNotification)
+        if (response.isSuccessful) {
+            Log.d("FCM", "SUCCESS: ${response.message()}")
+        } else {
+            Log.e("FCM", "Error: ${response.errorBody()?.string() }")
+        }
+
+    }
+
 
     // postId에 해당하는 모든 댓글 가져옴
     override suspend fun getComments(postId: String): Flow<Result<List<Comment>>> = callbackFlow {
@@ -85,6 +139,7 @@ class CommentRepositoryImpl @Inject constructor(
         awaitClose { commentRef.removeEventListener(commentListener) }
     }
 
+
     private suspend fun groupComments(comments: List<Comment>): List<Comment> {
         // 댓글을 parentId를 키로 그룹화
         val commentMap: Map<String, List<Comment>> = comments.groupBy { it.parentId }
@@ -106,6 +161,7 @@ class CommentRepositoryImpl @Inject constructor(
         // 루트 댓글(부모 댓글이 없는 댓글)을 찾아서 정렬한 후 자식 댓글을 추가
         return (commentMap[""] ?: emptyList()).sortedBy { it.date }.flatMap { addReplies(it) }
     }
+
 
     // 댓글과 자식 댓글을 재귀적으로 삭제
     private suspend fun deleteCommentRecursively(commentId: String) {
@@ -155,92 +211,31 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
 
-    override suspend fun getNoticeComments(): Flow<Result<Comment>> =
-        callbackFlow {
-            val postsSnapshot =
-                database.child("post").orderByChild("uid").equalTo(userUid).get().await()
+    override suspend fun getNoticeComments(): Result<List<Comment>> {
+        return try {
+            // 내가 쓴 게시물 리스트 가져오기
+            val postList = database.child("post").orderByChild("uid").equalTo(userUid)
+                .get().await().children.mapNotNull { it.getValue(Post::class.java) }
 
-            // 포스트 데이터가 없을 경우 Error 반환
-            if (!postsSnapshot.exists() || postsSnapshot.childrenCount == 0L) {
-                trySend(Result.Error("No posts found for the given user UID"))
-                close()  // Flow 종료
-                return@callbackFlow
+            // 게시물 리스트의 각 게시물에 대한 댓글 리스트 가져오기
+            val allComments = mutableListOf<Comment>()
+            postList.forEach { post ->
+                val comments = database.child("comment").orderByChild("postId")
+                    .equalTo(post.postId).get().await().children.mapNotNull {
+                        val comment = it.getValue(Comment::class.java)
+                        if (comment?.uid != userUid && comment?.content != null) comment else null // 내가 쓴 댓글은 제외
+                    }
+                allComments.addAll(comments)
             }
 
-            val commentListener = object : ChildEventListener {
-                override fun onChildAdded(
-                    commentSnapshot: DataSnapshot,
-                    previousChildName: String?
-                ) {
-                    val comment = commentSnapshot.getValue(Comment::class.java) ?: return
-                    if (userUid != comment.uid && comment.content.isNotEmpty()) trySend(
-                        Result.Success(
-                            comment
-                        )
-                    )
-                }
+            val sortedList = allComments.sortedByDescending { it.date }
 
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
-                override fun onChildRemoved(snapshot: DataSnapshot) {}
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-                override fun onCancelled(error: DatabaseError) {
-                    trySend(Result.Error(error.message))
-                }
-            }
-
-            // 포스트에 대해 댓글 리스너를 추가
-            var hasComments = false
-            for (postSnapshot in postsSnapshot.children) {
-                val postId = postSnapshot.key ?: continue
-                val commentsRef = database.child("comment").orderByChild("postId").equalTo(postId)
-
-                commentsRef.addChildEventListener(commentListener)
-
-                // 첫 번째 댓글이 없는 경우 확인
-                val commentsSnapshot = commentsRef.get().await()
-                if (commentsSnapshot.exists()) {
-                    hasComments = true
-                }
-            }
-
-            // 댓글이 없을 경우 Error 반환
-            if (!hasComments) {
-                trySend(Result.Error("No comments found for the user's posts"))
-                close()  // Flow 종료
-                return@callbackFlow
-            }
-
-
-            awaitClose {
-                for (postSnapshot in postsSnapshot.children) {
-                    val postId = postSnapshot.key ?: continue
-                    val commentsRef =
-                        database.child("comment").orderByChild("postId").equalTo(postId)
-                    commentsRef.removeEventListener(commentListener)
-                }
-            }
-        }
-
-
-    private suspend fun sendPushAlarm(postId: String, content: String) {
-        val postRef = database.child("post").child(postId)
-        val postSnapshot = postRef.get().await()
-        val post = postSnapshot.getValue(Post::class.java) ?: return
-
-        val userRef = database.child("user").child(post.uid)
-        val userSnapshot = userRef.get().await()
-        val user = userSnapshot.getValue(User::class.java) ?: return
-
-        if (user.alarm && user.uid != userUid) {
-            sendFcmNotification(content, user.token)
+            // 3. 최종 댓글 리스트를 Result로 반환
+            Result.Success(sortedList)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Unknown error")
         }
     }
 
-    private suspend fun sendFcmNotification(message: String, token: String) {
-        val notification = PushNotification(
-            data = NotificationData("새로운 댓글이 달렸어요!", message),
-            to = token
-        )
-        RetrofitInstance.api.postNotification(notification)
-    }
+
 }

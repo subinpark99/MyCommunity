@@ -13,7 +13,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dev.community.util.AppUtils
-import com.dev.community.data.model.PostWithImages
+import com.dev.community.data.model.User
 import com.dev.community.ui.viewModel.PostViewModel
 import com.dev.community.util.Result
 import com.dev.community.ui.viewModel.UserViewModel
@@ -28,6 +28,7 @@ class HomeFragment : Fragment() {
 
     private val postViewModel: PostViewModel by viewModels()
     private val userViewModel: UserViewModel by viewModels()
+    private var user = User()
 
     private lateinit var contentAdapter: ContentRVAdapter
     private lateinit var searchViewTextListener: SearchView.OnQueryTextListener
@@ -39,7 +40,7 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
@@ -66,9 +67,9 @@ class HomeFragment : Fragment() {
                     userViewModel.userState.collectLatest { result ->
                         when (result) {
                             is Result.Success -> {
-                                val user = result.data
+                                user = result.data
                                 binding.currentLocationTv.text = user.location
-                                postViewModel.getLocationPostWithImg(user.location)  // 지역별 게시물 리스트 가져오기
+                                postViewModel.getLocationPosts(user.location)
                             }
 
                             is Result.Error -> handleError(result.message)
@@ -78,7 +79,7 @@ class HomeFragment : Fragment() {
                 }
 
                 launch {
-                    postViewModel.locationPostWithImgState.collectLatest { result ->
+                    postViewModel.postsState.collect { result ->
                         when (result) {
                             is Result.Success -> {
                                 AppUtils.dismissLoadingDialog()
@@ -87,25 +88,29 @@ class HomeFragment : Fragment() {
                                     binding.noText.visibility = View.VISIBLE
                                     binding.homeContentsRv.visibility = View.GONE
                                 } else {
-                                    contentAdapter.getList(result.data)
+
                                     binding.noText.visibility = View.GONE
                                     binding.homeContentsRv.visibility = View.VISIBLE
+
+                                    contentAdapter.getList(result.data)
                                 }
                             }
+
                             is Result.Error -> handleError(result.message)
                             is Result.Loading -> AppUtils.showLoadingDialog(requireContext())
 
                         }
                     }
                 }
+
             }
         }
     }
 
     private fun setupRecyclerView() {
-        contentAdapter = ContentRVAdapter(contentClickListener = { postData ->
-            onPostClicked(postData) // 게시물 클릭 시 조회수 증가
-            navigateToPostDetail(postData) // 게시물 상세 페이지로 이동
+        contentAdapter = ContentRVAdapter(contentClickListener = { postId ->
+            onPostClicked(postId) // 게시물 클릭 시 조회수 증가
+            navigateToPostDetail(postId) // 게시물 상세 페이지로 이동
         })
         binding.homeContentsRv.apply {
             adapter = contentAdapter
@@ -114,15 +119,14 @@ class HomeFragment : Fragment() {
     }
 
 
-    private fun onPostClicked(postData: PostWithImages) {
-        postViewModel.updatePostCnt(postData.post.postId)
+    private fun onPostClicked(postId: String) {
+        postViewModel.updatePostCnt(postId)
     }
 
 
-    private fun navigateToPostDetail(postData: PostWithImages) {
+    private fun navigateToPostDetail(postId: String) {
         val arguments = HomeFragmentDirections.actionHomeFragmentToInContentFragment(
-            postData.post,
-            postData.imageUrls.toTypedArray()
+            postId, user
         )
         findNavController().navigate(arguments)
     }

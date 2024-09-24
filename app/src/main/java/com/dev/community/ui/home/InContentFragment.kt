@@ -10,14 +10,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dev.community.data.model.Comment
-import com.dev.community.data.model.Post
 import com.dev.community.data.model.User
 import com.dev.community.util.AppUtils
 import com.dev.community.ui.viewModel.CommentViewModel
@@ -27,7 +25,6 @@ import com.dev.community.ui.home.adapter.CommentAdapter
 import com.dev.community.ui.writing.GalleryAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import com.dev.community.util.Result
-import com.dev.community.ui.viewModel.UserViewModel
 import com.dev.community.ui.writing.ImageDialog
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -38,28 +35,27 @@ class InContentFragment : Fragment() {
     private var _binding: FragmentInContentBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var post: Post
+    private lateinit var postId: String
     private lateinit var user: User
+
     private var isReply = false
     private var parentId: String = ""
 
-    private val userViewModel: UserViewModel by viewModels()
     private val commentViewModel: CommentViewModel by viewModels()
     private val postViewModel: PostViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         _binding = FragmentInContentBinding.inflate(inflater, container, false)
+
         val postArgs = navArgs<InContentFragmentArgs>().value
-        post = postArgs.postData
+        postId = postArgs.postId
+        user = postArgs.user
 
-        binding.post = post
-
-        setupUI(postArgs.imgList.toList())
-        setClickListeners(post)
+        setupUI()
 
         return binding.root
     }
@@ -67,16 +63,17 @@ class InContentFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userViewModel.getUser()
+        postViewModel.getPostById(postId)
+        commentViewModel.getComments(postId)
         observeState()
-
     }
 
-    private fun setupUI(imgList: List<String>) {
+    private fun setupUI() {
 
+        setClickListeners()
         binding.backIv.setOnClickListener { findNavController().popBackStack() }
         binding.commentEt.hint = "댓글 작성"
-        setImageAdapter(imgList)
+
     }
 
     private fun observeState() {
@@ -84,52 +81,33 @@ class InContentFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
-                // 사용자 상태
                 launch {
-                    userViewModel.userState.collectLatest { result ->
+                    postViewModel.postState.collectLatest { result ->
                         when (result) {
-                            is Result.Success -> {
-                                user = result.data
-
-                                if (user.uid == post.uid) {
+                            is Result.Success ->{
+                                if (user.uid == result.data.uid) {
                                     binding.deleteTv.visibility = View.VISIBLE
                                     deletePost()
                                 } else binding.deleteTv.visibility = View.GONE
 
-                                commentViewModel.getComments(post.postId)  // 댓글 리스트 가져오기
+                                binding.post = result.data  // 데이터 바인딩
+                                setImageAdapter(result.data.imageList)
                             }
-
                             is Result.Error -> handleError(result.message)
                             is Result.Loading -> handleLoading()
                         }
                     }
+
                 }
 
-                // 댓글 삭제 상태
+
                 launch {
-                    commentViewModel.deleteCommentState.collect { result ->
+                    commentViewModel.doneState.collect { result ->
                         when (result) {
                             is Result.Success -> if (result.data) AppUtils.showToast(
                                 requireContext(),
                                 "완료"
                             )
-
-                            is Result.Error -> handleError(result.message)
-                            is Result.Loading -> handleLoading()
-                        }
-                    }
-                }
-
-                // 댓글 추가 상태
-                launch {
-                    commentViewModel.addCommentState.collect { result ->
-                        when (result) {
-                            is Result.Success -> {
-                                if (result.data) {
-                                    AppUtils.dismissLoadingDialog()
-                                    AppUtils.showToast(requireContext(), "완료")
-                                }
-                            }
                             is Result.Error -> handleError(result.message)
                             is Result.Loading -> handleLoading()
                         }
@@ -150,12 +128,12 @@ class InContentFragment : Fragment() {
                 // 댓글 가져오기 상태
                 launch {
                     commentViewModel.getCommentListState.collectLatest { result ->
-                            when (result) {
-                                is Result.Success -> setCommentAdapter(result.data)
-                                is Result.Error -> handleError(result.message)
-                                is Result.Loading -> handleLoading()
-                            }
+                        when (result) {
+                            is Result.Success -> setCommentAdapter(result.data)
+                            is Result.Error -> handleError(result.message)
+                            is Result.Loading -> handleLoading()
                         }
+                    }
                 }
             }
         }
@@ -164,11 +142,12 @@ class InContentFragment : Fragment() {
 
     private fun deletePost() {
         binding.deleteTv.setOnClickListener {
-            postViewModel.deletePost(post.postId)  // 게시글 삭제
+            postViewModel.deletePost(postId)  // 게시글 삭제
         }
     }
 
-    private fun setClickListeners(post: Post) {
+    private fun setClickListeners() {
+
         binding.commentSubmitBnt.setOnClickListener {
             val content = binding.commentEt.text
             if (content.toString().isNotEmpty()) {
@@ -176,12 +155,12 @@ class InContentFragment : Fragment() {
                 val currentParentId = if (isReply) parentId else ""
 
                 commentViewModel.addComment(
-                    post.postId,
+                    postId,
                     user.nickname,
                     content.toString(),
-                    currentParentId,
-                    user.alarm
+                    currentParentId
                 )
+                commentViewModel.sendPushAlarm(postId,content.toString())
 
                 isReply = false
                 parentId = ""
@@ -205,7 +184,7 @@ class InContentFragment : Fragment() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun setCommentAdapter(
-        commentsWithReplies: List<Comment>
+        commentsWithReplies: List<Comment>,
     ) {
         val commentAdapter = CommentAdapter(
             user.uid,

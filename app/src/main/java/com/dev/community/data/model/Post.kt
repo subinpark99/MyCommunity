@@ -13,9 +13,5 @@ data class Post(
     val location: String = "",
     val date: Long = System.currentTimeMillis(),
     var view: Int = 0,
+    var imageList: List<String> = emptyList()
 ) : Serializable
-
-data class PostWithImages(
-    val post: Post,
-    val imageUrls: List<String>
-)

@@ -101,11 +101,13 @@
             android:id="@+id/action_inContentFragment_to_noticeFragment"
             app:destination="@id/noticeFragment" />
         <argument
-            android:name="postData"
-            app:argType="com.dev.community.data.model.Post" />
+            android:name="postId"
+            app:argType="string" />
+
         <argument
-            android:name="imgList"
-            app:argType="string[]" />
+            android:name="user"
+            app:argType="com.dev.community.data.model.User" />
+
     </fragment>
 
     <fragment
@@ -119,9 +121,9 @@
         <argument
             android:name="ageRange"
             app:argType="string" />
-        <argument
-            android:name="location"
-            app:argType="string" />
+<!--        <argument-->
+<!--            android:name="location"-->
+<!--            app:argType="string" />-->
     </fragment>
 
     <activity

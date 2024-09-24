@@ -11,11 +11,11 @@ interface CommentRepository {
         postId: String,
         nickname: String,
         content: String,
-        parentId: String,
-        alarm: Boolean
+        parentId: String
     ): Result<Boolean>
 
+    suspend fun sendPushAlarm(postId: String, content: String)
     suspend fun getComments(postId: String): Flow<Result<List<Comment>>>
-    suspend fun getNoticeComments(): Flow<Result<Comment>>
+    suspend fun getNoticeComments(): Result<List<Comment>>
     suspend fun deleteComment(commentId: String, parentId: String): Result<Boolean>
 }

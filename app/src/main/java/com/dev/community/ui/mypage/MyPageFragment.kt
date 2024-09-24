@@ -68,18 +68,7 @@ class MyPageFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch { // 로그아웃
-                    userViewModel.logoutState.collect { result ->
-                        when (result) {
-                            is Result.Success -> if (result.data) setUserSuccess()
-                            is Result.Error -> handleError(result.message)
-                            is Result.Loading -> handleLoading()
-                        }
-                    }
-                }
-
-
-                launch { // 회원탈퇴
-                    userViewModel.withdrawState.collect { result ->
+                    userViewModel.goToLoginState.collect { result ->
                         when (result) {
                             is Result.Success -> if (result.data) setUserSuccess()
                             is Result.Error -> handleError(result.message)

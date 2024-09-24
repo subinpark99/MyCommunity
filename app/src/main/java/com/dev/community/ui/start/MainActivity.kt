@@ -1,6 +1,7 @@
 package com.dev.community.ui.start
 
 
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -82,7 +83,6 @@ class MainActivity : AppCompatActivity() {
 
                             userViewModel.updateFcmToken(user.token)
                         }
-
                         is Result.Error -> Log.e("ERROR", "MainActivity - ${it.message}")
                         is Result.Loading -> Log.d("loading", "loading...")
 

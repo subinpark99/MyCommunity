@@ -8,7 +8,6 @@ import com.dev.community.util.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -19,20 +18,14 @@ class UserViewModel @Inject constructor(
     private val userRepo: UserRepository
 ) : ViewModel() {
 
-    private val _registerState = MutableSharedFlow<Result<Boolean>>()
-    val registerState = _registerState.asSharedFlow()
-
-    private val _loginState = MutableSharedFlow<Result<Boolean>>()
-    val loginState = _loginState.asSharedFlow()
-
-    private val _logoutState = MutableSharedFlow<Result<Boolean>>()
-    val logoutState = _logoutState.asSharedFlow()
-
     private val _userState = MutableStateFlow<Result<User>>(Result.Loading)
     val userState = _userState.asStateFlow()
 
-    private val _withdrawState = MutableSharedFlow<Result<Boolean>>()
-    val withdrawState = _withdrawState.asSharedFlow()
+    private val _goToLoginState = MutableSharedFlow<Result<Boolean>>()
+    val goToLoginState = _goToLoginState.asSharedFlow()  // 로그인화면으로 이동
+
+    private val _loginState = MutableSharedFlow<Result<Boolean>>()
+    val loginState = _loginState.asSharedFlow() // 메인으로 이동
 
     private val _changeLocationState = MutableSharedFlow<Result<Boolean>>()
     val changeLocationState = _changeLocationState.asSharedFlow()
@@ -53,7 +46,7 @@ class UserViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val result = userRepo.registerUser(email, password, nickname, location, age)
-            _registerState.emit(result)
+            _goToLoginState.emit(result)
         }
     }
 
@@ -69,7 +62,7 @@ class UserViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             val result = userRepo.logout()
-            _logoutState.emit(result)
+            _goToLoginState.emit(result)
         }
     }
 
@@ -77,7 +70,7 @@ class UserViewModel @Inject constructor(
     fun withdraw() {
         viewModelScope.launch {
             val result = userRepo.withdraw()
-            _withdrawState.emit(result)
+            _goToLoginState.emit(result)
 
         }
     }
